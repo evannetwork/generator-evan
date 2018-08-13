@@ -11,8 +11,6 @@ Example:
         .gitignore: files that should be ignored by git
         .npmrc: disabled package.lock.json
         lerna.json: management for nested lerna projects (needed for smart-agents, dapps, ...) 
-        
-        config: folder for managing project configuration like deployment files
         config/deployment.js: DBCP deployment configuration, have a look into the readme.md file for more details
 
 Sub commands:
