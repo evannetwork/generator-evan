@@ -1,0 +1,57 @@
+<!--
+  Copyright (c) 2018-present evan GmbH.
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+      http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<dapp-wrapper>
+  <div class="evan-content" evan-content>
+    <h3 class="content-header m-b-0 m-t-0">
+      {{ '<%= dbcpName %>' | translate }}
+    </h3>
+    <p ion-text class="m-b-0 m-t-0">
+      {{ '_<%= dbcpName %>.description' | translate }}
+    </p>
+    
+    <ion-item>
+      <ion-label stacked>
+        <h3>Property 1</h3>
+      </ion-label>
+      <ion-input type="text"
+        [(ngModel)]="formData.property1"
+        [placeholder]="Property"
+        (ionChange)="ref.detectChanges()">
+      </ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label stacked>
+        <h3>Property 2</h3>
+      </ion-label>
+      <ion-input type="text"
+        [(ngModel)]="formData.property2"
+        [placeholder]="Property"
+        (ionChange)="ref.detectChanges()">
+      </ion-input>
+    </ion-item>
+
+    <div class="evan-content evan-mini-content" text-center padding-bottom>
+      <button ion-button round icon-left outline (click)="saveTask()"
+        [disabled]="name.length === 0 || (membersRequired ? membersRequired > members.length : false) || todos.length === 0 || taskCreating || !isDetailValid()">
+        <ion-icon name="add" *ngIf="!taskCreating"></ion-icon>
+        <ion-spinner color="light" *ngIf="taskCreating"></ion-spinner>
+      
+        <span>{{ '_dapptaskboard.create-task' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</dapp-wrapper>

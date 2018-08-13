@@ -19,14 +19,18 @@ import {
 } from 'dapp-browser';
 
 import {
-  Injectable, OnDestroy,    // '@angular/core';
-  Platform,                 // ionic-angular
-  Observable, Subscription
+  Injectable,
+  Observable,
+  OnDestroy,
+  Platform,
+  Subscription
 } from 'angular-libs';
 
 import {
   EvanUtilService,
   SingletonService,
+  EvanBCCService,
+  DescriptionService
 } from 'angular-core';
 
 /**************************************************************************************************/
@@ -41,8 +45,9 @@ export class <%= dbcpName %>Service implements OnDestroy {
    * Create a singleton service instance. 
    */
   constructor(
-    private platform: Platform,
-    private singleton: SingletonService
+    private singleton: SingletonService,
+    private bcc: EvanBCCService,
+    private descriptionService: DescriptionService
   ) {
     return singleton.create(<%= dbcpName %>Service, this, () => {
 
