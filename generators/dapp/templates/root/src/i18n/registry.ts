@@ -25,6 +25,10 @@ import {
 import { en } from './en';
 import { de } from './de';
 
+export const translations = {
+  en, de
+};
+
 @Injectable()
 export class Translations {
   constructor(translate: EvanTranslationService) {

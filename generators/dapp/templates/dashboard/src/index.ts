@@ -35,9 +35,21 @@ import {
   createIonicAppElement
 } from 'angular-core';
 
+// import components
 import { RootComponent } from './components/root/root';
 import { SampleComponent } from './components/sample/sample';
+
+// import services and dispatchers
 import { Translations } from './i18n/registry';
+import { <%= dbcpName %>Service } from './services/service';
+import { <%= dbcpName %>Dispatcher } from './dispatcher/dispatcher';
+
+// export service and dispatcher so it can be accessed from outside of the dapp to handle correct
+// dispatcher handling
+export {
+  <%= dbcpName %>Service,
+  <%= dbcpName %>Dispatcher
+}
 
 /**************************************************************************************************/
 
@@ -86,6 +98,7 @@ function getConfig(isDispatcher?: boolean) {
     ],
     providers: [
       Translations,
+      <%= dbcpName %>Service,
     ],
   };
 
