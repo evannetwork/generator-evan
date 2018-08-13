@@ -1,0 +1,24 @@
+Description:
+    Creates a basic evan.network project structure
+
+Example:
+    yo evan
+
+    This will create:
+        README.md: Description and minimal user instructions
+        VERSIONS.md: Description of changes
+        package.json: Development packages installed by npm
+        .gitignore: files that should be ignored by git
+        .npmrc: disabled package.lock.json
+        lerna.json: management for nested lerna projects (needed for smart-agents, dapps, ...) 
+        
+        config: folder for managing project configuration like deployment files
+        config/deployment.js: DBCP deployment configuration, have a look into the readme.md file for more details
+
+Sub commands:
+    yo evan:dapps : Will create a new dapp within the dapps folder.
+    yo evan:contract : Will create a new contract sample within the contracts folder.
+    yo evan:edge-server : Will create a new edge-serve within the edge-server folder.
+    yo evan:smart-agent : Will create a new smart-agent within the edge-server folder.
+
+Run the subcommands with --help for more informations.
