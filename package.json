@@ -1,0 +1,23 @@
+{
+  "author": "contractus",
+  "dependencies": {},
+  "description": "blockchain interaction core library",
+  "devDependencies": {},
+  "homepage": "https://evannetwork.github.io/",
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "smart-contracts",
+    "javascript",
+    "typescript",
+    "API"
+  ],
+  "license": "AGPL-3.0-only",
+  "name": "@evan.network/generator-evan",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:evannetwork/generator-evan.git"
+  },
+  "scripts": {},
+  "version": "1.0.0"
+}
