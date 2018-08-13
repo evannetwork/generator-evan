@@ -22,6 +22,7 @@
     "SASS"
   ],
   "name": "<%= projectName %>",
+  "description": "<%= description %>",
   "scripts": {
     "dapp-build": "gulp --cwd . --gulpfile node_modules/@evan.network/angular-gulp/dapp.js build --dapp",
     "dapp-sass": "gulp --cwd . --gulpfile node_modules/@evan.network/angular-gulp/dapp.js sass --dapp",
