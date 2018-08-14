@@ -38,6 +38,8 @@ import {
 // import components
 import { RootComponent } from './components/root/root';
 import { SampleComponent } from './components/sample/sample';
+import { CreateComponent } from './components/create/create';
+import { DetailComponent } from './components/detail/detail';
 
 // import services and dispatchers
 import { Translations } from './i18n/registry';
@@ -60,20 +62,37 @@ function getRoutes(): Routes {
     [
       {
         path: '',
-        component: SampleComponent,
+        component: CreateComponent,
         data: {
-          state: 'sample',
+          state: 'create',
           navigateBack: true
         }
       },
       {
-        path: '**',
-        component: DAppLoaderComponent,
+        path: `:address`,
         data: {
-          state: 'unkown',
+          state: 'contract',
           navigateBack: true
-        }
-      }
+        },
+        children: [
+          {
+            path: ``,
+            data: {
+              state: 'contract',
+              navigateBack: true
+            },
+            component: DetailComponent
+          },
+          {
+            path: '**',
+            data: {
+              state: 'unknown',
+              navigateBack: true
+            },
+            component: DAppLoaderComponent,
+          }
+        ]
+      },
     ]
   );
 }
@@ -112,6 +131,8 @@ function getConfig(isDispatcher?: boolean) {
       BootstrapComponent,
       RootComponent,
       SampleComponent,
+      CreateComponent,
+      DetailComponent,
     ];
   }
 

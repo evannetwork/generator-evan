@@ -16,8 +16,6 @@
 
 @import '@evan.network/ui-angular-sass/src/variables/colors';
 
-<%= dbcpName %>-root {
-  div[evan-content] {
-    height: 100%;
-  }
+<%= dbcpName %>-root > dapp-wrapper > ion-content > .scroll-content > div[evan-content] {
+  height: 100%;
 }

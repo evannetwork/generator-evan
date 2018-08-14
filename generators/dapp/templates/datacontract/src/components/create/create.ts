@@ -41,15 +41,15 @@ import {
 /**************************************************************************************************/
 
 @Component({
-  selector: '<%= dbcpName %>-sample',
-  templateUrl: 'sample.html',
+  selector: '<%= dbcpName %>-create',
+  templateUrl: 'create.html',
   animations: [ ]
 })
 
 /**
  * Sample component to display a simple text.
  */
-export class SampleComponent extends AsyncComponent {
+export class CreateComponent extends AsyncComponent {
   /**
    * Initialized queueId to simple add data to a queue.
    */
@@ -63,7 +63,17 @@ export class SampleComponent extends AsyncComponent {
   /**
    * data for the data contract that should be created
    */
-  private formData: boolean;
+  private formData: any;
+
+  /**
+   * Disable create button while creating a new contract
+   */
+  private creating: boolean;
+
+  /**
+   * Contract ID of the newly created contract
+   */
+  private contractAddress: string;
 
   constructor(
     private alertService: EvanAlertService,
@@ -82,9 +92,7 @@ export class SampleComponent extends AsyncComponent {
    * Test if service and dispatcher are working.
    */
   async _ngOnInit() {
-    this.dispatcherIsFinished = false;
-
-    this.<%= dbcpName %>ServiceInstance.testFunction();
+    this.formData = { };
 
     // test dispatcher functionallity
     this.queueId = new QueueId(
@@ -94,36 +102,38 @@ export class SampleComponent extends AsyncComponent {
     );
 
     // wait for dispatcher to be finished
-    this.queueWatcher = await this.queueService.onQueueFinish(this.queueId, async (reload) => {
+    this.queueWatcher = await this.queueService.onQueueFinish(this.queueId, async (reload, results) => {
       // if the function was called by finishing the queue, everything is fine.
       if (reload) {
         console.log('Dispatcher is working');
 
         // sample UI data update
-        this.dispatcherIsFinished = true;
+        this.contractAddress = results[0][0];
+        this.creating = false;
         this.ref.detectChanges();
       }
     });
-
-    // submit new data to the queue
-    this.queueService.addQueueData(
-      this.queueId,
-      {
-        param1: 'param1',
-        param2: 'param2',
-      }
-    );
-
-    // start the queue
-    this.queueService.startSyncAll();
   }
 
   /**
    * Clear the queue watcher
-   *
-   * @return     {<type>}  { description_of_the_return_value }
    */
   async _ngOnDestroy() {
     this.queueWatcher();
+  }
+  
+  /**
+   * Starts the creation of a new contract
+   */
+  create() {
+    this.creating = true;
+
+    // submit new data to the queue
+    this.queueService.addQueueData(
+      this.queueId,
+      this.formData
+    );
+
+    this.ref.detectChanges();
   }
 }

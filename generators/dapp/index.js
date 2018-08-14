@@ -78,16 +78,16 @@ module.exports = class extends Generator {
         message : 'Which type of DApp you want to create?',
         choices: [
           {
+            name: 'DataContract DApp (DApp including create, detail routing for a DataContract)',
+            value: 'datacontract'
+          },
+          {
             name: 'Single DApp (wrapping DApp including only a sample component)',
             value: 'single'
           },
           {
             name: 'Dashboard DApp (wrapping DApp including predefined left panel navigation)',
             value: 'dashboard'
-          },
-          {
-            name: 'Contract DApp (DApp including create, detail routing for a contract)',
-            value: 'contract'
           },
         ]
       }

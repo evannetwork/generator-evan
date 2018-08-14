@@ -30,7 +30,8 @@ import {
   EvanUtilService,
   SingletonService,
   EvanBCCService,
-  DescriptionService
+  EvanDescriptionService,
+  EvanCoreService
 } from 'angular-core';
 
 /**************************************************************************************************/
@@ -45,9 +46,10 @@ export class <%= dbcpName %>Service implements OnDestroy {
    * Create a singleton service instance. 
    */
   constructor(
-    private singleton: SingletonService,
-    private bcc: EvanBCCService,
-    private descriptionService: DescriptionService
+    public bcc: EvanBCCService,
+    public core: EvanCoreService,
+    public descriptionService: EvanDescriptionService,
+    public singleton: SingletonService,
   ) {
     return singleton.create(<%= dbcpName %>Service, this, () => {
 

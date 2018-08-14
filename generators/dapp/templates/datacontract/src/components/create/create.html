@@ -14,7 +14,8 @@
   limitations under the License.
 -->
 
-<dapp-wrapper>
+<evan-loading *ngIf="loading"></evan-loading>
+<ng-container *ngIf="!loading">
   <div class="evan-content" evan-content>
     <h3 class="content-header m-b-0 m-t-0">
       {{ '<%= dbcpName %>' | translate }}
@@ -29,7 +30,6 @@
       </ion-label>
       <ion-input type="text"
         [(ngModel)]="formData.property1"
-        [placeholder]="Property"
         (ionChange)="ref.detectChanges()">
       </ion-input>
     </ion-item>
@@ -39,19 +39,26 @@
       </ion-label>
       <ion-input type="text"
         [(ngModel)]="formData.property2"
-        [placeholder]="Property"
         (ionChange)="ref.detectChanges()">
       </ion-input>
     </ion-item>
 
-    <div class="evan-content evan-mini-content" text-center padding-bottom>
-      <button ion-button round icon-left outline (click)="saveTask()"
-        [disabled]="name.length === 0 || (membersRequired ? membersRequired > members.length : false) || todos.length === 0 || taskCreating || !isDetailValid()">
-        <ion-icon name="add" *ngIf="!taskCreating"></ion-icon>
-        <ion-spinner color="light" *ngIf="taskCreating"></ion-spinner>
+    <div text-center padding-bottom margin-top>
+      <button ion-button round icon-left outline
+        (click)="create()"
+        [disabled]="creating">
+        <ion-icon name="add" *ngIf="!creating"></ion-icon>
+        <ion-spinner color="light" *ngIf="creating"></ion-spinner>
       
-        <span>{{ '_dapptaskboard.create-task' | translate }}</span>
+        <span>Create</span>
       </button>
     </div>
   </div>
-</dapp-wrapper>
+  <div class="evan-content" evan-content *ngIf="contractAddress">
+    <h3 class="content-header m-b-0 m-t-0">
+      New Contract
+    </h3>
+
+    <a routerLink="./{{ contractAddress }}">{{ contractAddress }}</a>
+  </div>
+</ng-container>

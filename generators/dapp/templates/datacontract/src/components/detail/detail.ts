@@ -28,6 +28,7 @@ import {
   EvanAlertService,
   EvanBCCService,
   EvanCoreService,
+  EvanDescriptionService,
   EvanQrCodeService,
   EvanQueue,
   EvanRoutingService,
@@ -41,29 +42,29 @@ import {
 /**************************************************************************************************/
 
 @Component({
-  selector: '<%= dbcpName %>-create',
-  templateUrl: 'create.html',
+  selector: '<%= dbcpName %>-detail',
+  templateUrl: 'detail.html',
   animations: [ ]
 })
 
 /**
  * Sample component to display a simple text.
  */
-export class CreateComponent extends AsyncComponent {
+export class DetailComponent extends AsyncComponent {
   /**
-   * Initialized queueId to simple add data to a queue.
+   * contract id that should be loaded
    */
-  private queueId: QueueId;
+  private contractAddress: string;
 
   /**
-   * Function to unsubscribe from queue results.
+   * Dbcp Data of the contract
    */
-  private queueWatcher: Function;
+  private dbcpData: any;
 
   /**
-   * show data ui update
+   * Entry data that was inserted by the create component
    */
-  private dispatcherIsFinished: boolean;
+  private entryData: any;
 
   constructor(
     private alertService: EvanAlertService,
@@ -73,6 +74,7 @@ export class CreateComponent extends AsyncComponent {
     private queueService: EvanQueue,
     private ref: ChangeDetectorRef,
     private routingService: EvanRoutingService,
+    private descriptionService: EvanDescriptionService,
     private <%= dbcpName %>ServiceInstance: <%= dbcpName %>Service
   ) {
     super(ref);
@@ -82,46 +84,15 @@ export class CreateComponent extends AsyncComponent {
    * Test if service and dispatcher are working.
    */
   async _ngOnInit() {
-    this.dispatcherIsFinished = false;
+    // get current contract address from url
+    this.contractAddress = await this.routingService.getHashParam('address');
 
-    this.<%= dbcpName %>ServiceInstance.testFunction();
-
-    // test dispatcher functionallity
-    this.queueId = new QueueId(
-      `<%= dbcpName %>.${ getDomainName() }`,
-      '<%= dbcpName %>Dispatcher',
-      '<%= dbcpName %>'
-    );
-
-    // wait for dispatcher to be finished
-    this.queueWatcher = await this.queueService.onQueueFinish(this.queueId, async (reload) => {
-      // if the function was called by finishing the queue, everything is fine.
-      if (reload) {
-        // sample UI data update
-        this.dispatcherIsFinished = true;
-        this.ref.detectChanges();
-      }
-    });
-
-    // submit new data to the queue
-    this.queueService.addQueueData(
-      this.queueId,
-      {
-        param1: 'param1',
-        param2: 'param2',
-      }
-    );
-
-    // start the queue
-    this.queueService.startSyncAll();
-  }
-
-  /**
-   * Clear the queue watcher
-   *
-   * @return     {<type>}  { description_of_the_return_value }
-   */
-  async _ngOnDestroy() {
-    this.queueWatcher();
+    // load and stringify the data so we can show it within textareas
+    this.dbcpData = JSON.stringify(await this.descriptionService.getDescription(this.contractAddress), null, 2);
+    this.entryData = JSON.stringify(await this.bcc.dataContract.getEntry(
+      this.contractAddress,
+      'entry_settable_by_member',
+      this.core.activeAccount()
+    ), null, 2);
   }
 }
