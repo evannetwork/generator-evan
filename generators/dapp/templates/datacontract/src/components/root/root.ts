@@ -36,7 +36,7 @@ import {
 /**************************************************************************************************/
 
 @Component({
-  selector: '<%= dbcpName %>-root',
+  selector: '<%= cleanName %>-root',
   templateUrl: 'root.html',
   animations: [
     createOpacityTransition(),

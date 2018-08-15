@@ -43,14 +43,14 @@ import { DetailComponent } from './components/detail/detail';
 
 // import services and dispatchers
 import { Translations } from './i18n/registry';
-import { <%= dbcpName %>Service } from './services/service';
-import { <%= dbcpName %>Dispatcher } from './dispatcher/dispatcher';
+import { <%= cleanName %>Service } from './services/service';
+import { <%= cleanName %>Dispatcher } from './dispatcher/dispatcher';
 
 // export service and dispatcher so it can be accessed from outside of the dapp to handle correct
 // dispatcher handling
 export {
-  <%= dbcpName %>Service,
-  <%= dbcpName %>Dispatcher
+  <%= cleanName %>Service,
+  <%= cleanName %>Dispatcher
 }
 
 /**************************************************************************************************/
@@ -112,7 +112,7 @@ function getConfig(isDispatcher?: boolean) {
     ],
     providers: [
       Translations,
-      <%= dbcpName %>Service,
+      <%= cleanName %>Service,
     ],
   };
 
@@ -144,14 +144,14 @@ export class DispatcherModule {
 }
 
 @NgModule(getConfig(false))
-class <%= dbcpName %>Module {
+class <%= cleanName %>Module {
   constructor(private translations: Translations) { }
 }
 
 export async function startDApp(container, dbcpName) {
   const ionicAppEl = createIonicAppElement(container, dbcpName);
 
-  await startAngularApplication(<%= dbcpName %>Module, getRoutes());
+  await startAngularApplication(<%= cleanName %>Module, getRoutes());
 
   container.appendChild(ionicAppEl);
 }

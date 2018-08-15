@@ -35,13 +35,13 @@ import {
 } from 'angular-core';
 
 import {
-  <%= dbcpName %>Service
+  <%= cleanName %>Service
 } from '../../services/service';
 
 /**************************************************************************************************/
 
 @Component({
-  selector: '<%= dbcpName %>-create',
+  selector: '<%= cleanName %>-create',
   templateUrl: 'create.html',
   animations: [ ]
 })
@@ -83,7 +83,7 @@ export class CreateComponent extends AsyncComponent {
     private queueService: EvanQueue,
     private ref: ChangeDetectorRef,
     private routingService: EvanRoutingService,
-    private <%= dbcpName %>ServiceInstance: <%= dbcpName %>Service
+    private <%= cleanName %>ServiceInstance: <%= cleanName %>Service
   ) {
     super(ref);
   }
@@ -97,8 +97,8 @@ export class CreateComponent extends AsyncComponent {
     // test dispatcher functionallity
     this.queueId = new QueueId(
       `<%= dbcpName %>.${ getDomainName() }`,
-      '<%= dbcpName %>Dispatcher',
-      '<%= dbcpName %>'
+      '<%= cleanName %>Dispatcher',
+      '<%= cleanName %>'
     );
 
     // wait for dispatcher to be finished

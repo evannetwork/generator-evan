@@ -53,7 +53,7 @@ module.exports = class extends Generator {
       {
         type    : 'input',
         name    : 'dbcpName',
-        message : 'ENS path of your dapp (should only include characters and numbers)',
+        message : 'ENS path of your dapp (should only include characters and numbers) (can also include subdomains (mydapp.mycompany))',
         default : projectName.replace(/\ |\-/g, '')
       },
       {
@@ -105,6 +105,7 @@ module.exports = class extends Generator {
 
     // append projectName into the answers object to handle it within the 
     this.answers.projectName = projectName;
+    this.answers.cleanName = this.answers.dbcpName.replace('.', '');
   }
 
   /**

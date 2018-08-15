@@ -41,7 +41,7 @@ import {
  * @class      Injectable EvanUtilService
  */
 @Injectable()
-export class <%= dbcpName %>Service implements OnDestroy {
+export class <%= cleanName %>Service implements OnDestroy {
   /**
    * Create a singleton service instance. 
    */
@@ -51,7 +51,7 @@ export class <%= dbcpName %>Service implements OnDestroy {
     public descriptionService: EvanDescriptionService,
     public singleton: SingletonService,
   ) {
-    return singleton.create(<%= dbcpName %>Service, this, () => {
+    return singleton.create(<%= cleanName %>Service, this, () => {
 
     });
   }

@@ -36,13 +36,13 @@ import {
 } from 'angular-core';
 
 import {
-  <%= dbcpName %>Service
+  <%= cleanName %>Service
 } from '../../services/service';
 
 /**************************************************************************************************/
 
 @Component({
-  selector: '<%= dbcpName %>-detail',
+  selector: '<%= cleanName %>-detail',
   templateUrl: 'detail.html',
   animations: [ ]
 })
@@ -75,7 +75,7 @@ export class DetailComponent extends AsyncComponent {
     private ref: ChangeDetectorRef,
     private routingService: EvanRoutingService,
     private descriptionService: EvanDescriptionService,
-    private <%= dbcpName %>ServiceInstance: <%= dbcpName %>Service
+    private <%= cleanName %>ServiceInstance: <%= cleanName %>Service
   ) {
     super(ref);
   }

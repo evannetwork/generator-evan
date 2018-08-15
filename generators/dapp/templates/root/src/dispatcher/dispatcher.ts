@@ -33,19 +33,19 @@ import {
 } from '../i18n/registry';
 
 import {
-  <%= dbcpName %>Service
+  <%= cleanName %>Service
 } from '../services/service';
 
 /**************************************************************************************************/
 
-export const <%= dbcpName %>Dispatcher = new QueueDispatcher(
+export const <%= cleanName %>Dispatcher = new QueueDispatcher(
   [
     new QueueSequence(
-      '_<%= dbcpName %>.dispatcher.title',
-      '_<%= dbcpName %>.dispatcher.description',
-      async (service: <%= dbcpName %>Service, queueEntry: any) => {
+      '_<%= cleanName %>.dispatcher.title',
+      '_<%= cleanName %>.dispatcher.description',
+      async (service: <%= cleanName %>Service, queueEntry: any) => {
         console.log('Dispatcher is starting with the following service:');
-        console.dir(<%= dbcpName %>Service);
+        console.dir(<%= cleanName %>Service);
 
         // save your data here
         for (let entry of queueEntry.data) {
@@ -59,5 +59,5 @@ export const <%= dbcpName %>Dispatcher = new QueueDispatcher(
     )
   ],
   translations,
-  '<%= dbcpName %>Service'
+  '<%= cleanName %>Service'
 );
