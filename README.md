@@ -3,6 +3,13 @@
 The generator-evan is an yeoman generator for evan.network projects. By using the generator you can
 easily create and handle smart-contracts, smart-agents and dapps.
 
+## Installation
+
+```bash
+npm install -g yeoman
+npm install -g generator-evan
+```
+
 ## Generate: Basic project structure
 
 The basic project structure is needed to handle all sub components and will include several scripts,
@@ -49,6 +56,21 @@ dapp. Each new dapp will placed within the "dapps" folder of your basi project.Y
 2. Dashboard DApp = Represents a DApp that handles a Dashboard with left side panel navigation, that can organize and open other DApps.
 3. DataContract DApp = A single DApp for creating and viewing a DataContract. The DApp includes the basic routing for contract addresses and the logic for creating a new data contract and setting some data.
 4. Custom Contract DApp = A single DApp that includes your custom smart contract ABI definition. The DApp includes the basic routing for contract addresses and the logic for creating a new data contract and setting some data.
+
+After you created your DApp, you can now build your DApps by running:
+
+```bash
+npm run dapps-build
+```
+
+You can now start your local dev server by running:
+
+```bash
+npm run serve
+```
+
+After you started your local dev server, visit localhost:3000/dev.html.
+You can now open your DApp by adding it to your favorites using the following name ${ this.answers.dbcpName }.
 
 More infos about DApps:
 

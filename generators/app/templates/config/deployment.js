@@ -52,7 +52,10 @@ const runtimeConfig = {
       '0000...',
   },
   ipfs: { host: 'ipfs.evan.network', port: '443', protocol: 'https' },
-  web3Provider: 'wss://testcore.evan.network/ws'
+  web3Provider: 'wss://testcore.evan.network/ws',
+  
+  // enable this, for deploying on sub domains
+  // subEns: 'mytestsub'
 }
 
 module.exports = { bcConfig, runtimeConfig }

@@ -113,5 +113,15 @@ module.exports = class extends Generator {
   writing() {
     copyTemplateIntoDApps.call(this, 'root');
     copyTemplateIntoDApps.call(this, this.answers.type);
+
+    console.log(`
+      Your app was generated successfully!
+
+      You can now build your DApps by running: "npm run dapps-build".
+      You can now start your local dev server by running: "npm run serve".
+
+      After you started your local dev server, visit localhost:3000/dev.html.
+      You can now open your DApp by adding it to your favorites using the following name ${ this.answers.dbcpName }.
+    `);
   }
 };
