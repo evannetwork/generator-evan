@@ -6,7 +6,7 @@ easily create and handle smart-contracts, smart-agents and dapps.
 ## Installation
 
 ```bash
-npm install -g yeoman
+npm install -g yo
 npm install -g generator-evan
 ```
 

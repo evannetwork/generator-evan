@@ -16,7 +16,7 @@
 
 <evan-loading *ngIf="loading"></evan-loading>
 <ng-container *ngIf="!loading">
-  <div class="evan-content" evan-content>
+  <div class="evan-content">
     <h3 class="content-header m-b-0 m-t-0">
       {{ '<%= dbcpName %>' | translate }}
     </h3>
@@ -54,7 +54,7 @@
       </button>
     </div>
   </div>
-  <div class="evan-content" evan-content *ngIf="contractAddress">
+  <div class="evan-content" *ngIf="contractAddress">
     <h3 class="content-header m-b-0 m-t-0">
       New Contract
     </h3>

@@ -36,9 +36,7 @@ import {
 
 /**************************************************************************************************/
 /**
- * Utility service for the whole angular core module
- *
- * @class      Injectable EvanUtilService
+ * Utility service for the whole <%= cleanName %> DApp
  */
 @Injectable()
 export class <%= cleanName %>Service implements OnDestroy {
