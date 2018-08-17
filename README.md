@@ -70,7 +70,7 @@ npm run serve
 ```
 
 After you started your local dev server, visit localhost:3000/dev.html.
-You can now open your DApp by adding it to your favorites using the following name ${ this.answers.dbcpName }.
+You can now open your DApp by adding it to your favorites using the dbcp name of your new DApp.
 
 More infos about DApps:
 
