@@ -1,5 +1,5 @@
 {
-  "author": "Evan",
+  "author": "evan GmbH",
   "main": "dist/index.js",
   "name": "<%= projectName %>",
   "description": "<%= description %>",
