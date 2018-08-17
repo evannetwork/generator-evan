@@ -1,6 +1,8 @@
 {
-  "author": "contractus",
-  "dependencies": {},
+  "author": "evan GmbH",
+  "dependencies": {
+    "yeoman-generator": "^1.1.1"
+  },
   "description": "blockchain interaction core library",
   "devDependencies": {},
   "homepage": "https://evannetwork.github.io/",
@@ -10,10 +12,11 @@
     "smart-contracts",
     "javascript",
     "typescript",
-    "API"
+    "API",
+    "yeoman-generator"
   ],
   "license": "AGPL-3.0-only",
-  "name": "@evan.network/generator-evan",
+  "name": "generator-evan",
   "repository": {
     "type": "git",
     "url": "git@github.com:evannetwork/generator-evan.git"

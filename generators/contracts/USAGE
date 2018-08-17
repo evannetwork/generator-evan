@@ -1,0 +1,7 @@
+Description:
+
+    Creates a new contracts folder in your project folder and adds build scripts.
+
+Example:
+    yo evan:contracts
+

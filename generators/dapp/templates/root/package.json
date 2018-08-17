@@ -1,0 +1,17 @@
+{
+  "author": "evan GmbH",
+  "main": "dist/index.js",
+  "name": "<%= projectName %>",
+  "description": "<%= description %>",
+  "typings": "dist/index.d.ts",
+  "version": "1.0.2",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "API",
+    "Angular 5",
+    "Ionic",
+    "DApp",
+    "SASS"
+  ]
+}
