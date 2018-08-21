@@ -47,12 +47,45 @@ const bcConfig = {
 }
 
 const runtimeConfig = {
-  accountMap: {
-    '0x534...':
-      '0000...',
-  },
   ipfs: { host: 'ipfs.evan.network', port: '443', protocol: 'https' },
-  web3Provider: 'wss://testcore.evan.network/ws'
+  web3Provider: 'wss://testcore.evan.network/ws',
+  minBalance: 1000000000000000000,
+  memnonics: {
+    // account mnemonics and their data keys
+    // 'race game grant legal illegal spring stable banana walk quiz vanish middle': 'some password',
+    // 'recycle web high fan relax ignore chalk require main about casual near': 'another password',
+  },
+  aliases: {
+    // account mnemonics and their aliases
+    // 'race game grant legal illegal spring stable banana walk quiz vanish middle': 'Sample User 1',
+    // 'recycle web high fan relax ignore chalk require main about casual near': 'Sample User 2',
+  },
+  contactConfig: {
+    // accounts and their contacts, you only need to do this for one way
+    // 'race game grant legal illegal spring stable banana walk quiz vanish middle': [
+    //   'recycle web high fan relax ignore chalk require main about casual near',
+    // ],
+  },
+  bookmarkDefinitions: {
+    // bookmarks as ENS domain and DBCP for bookmark
+    // "sample.evan": {
+    //   "name": "sample",
+    //   "description": "evan.network sample bookmark",
+    //   "i18n": {
+    //     "description": {
+    //       "en": "evan.network sample"
+    //     },
+    //     "name": {
+    //       "en": "sample"
+    //     }
+    //   },
+    //   // ...
+    // }
+  },
+  bookmarks: {
+    // accounts and their bookmarks as ENS domain names
+    // 'race game grant legal illegal spring stable banana walk quiz vanish middle': ['sample.evan'],
+  },
 }
 
 module.exports = { bcConfig, runtimeConfig }

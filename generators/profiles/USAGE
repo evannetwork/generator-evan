@@ -1,0 +1,7 @@
+Description:
+
+    Adds scripts to your project, that allow profil creation and management
+
+Example:
+    yo evan:profiles
+
