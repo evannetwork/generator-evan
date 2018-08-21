@@ -78,7 +78,7 @@ module.exports = {
   createRuntimes: async (web3, dfs, runtimeConfig) => {
     console.group('createRuntimes');
     const runtimes = {};
-    for (let account of runtimeConfig.accounts) {
+    for (let account of Object.keys(runtimeConfig.accountMap)) {
       const reducedRuntimeConfig = Object.assign({}, runtimeConfig);
       reducedRuntimeConfig.accountMap = {};
       reducedRuntimeConfig.accountMap[account] = runtimeConfig.accountMap[account];
@@ -205,5 +205,58 @@ module.exports = {
     });
     await prottle(prottleMaxRequests, tasks);
     console.groupEnd('addBookmarks');
+  },
+  addToBusinessCenters: async (runtimes, runtimeConfig) => {
+    debugger;
+    console.group('addToBusinessCenters');
+    // pick first runtime for read operation (account id behind doesn't matter)
+    const runtime = runtimes[Object.keys(runtimes)[0]];
+    for (let bc of Object.keys(runtimeConfig.businessCenters)) {
+      const owner = runtimeConfig.businessCenters[bc].owner;
+      const bcAddress = await runtime.nameResolver.getAddress(bc);
+      const bcContract = runtime.contractLoader.loadContract('BusinessCenterInterface', bcAddress);
+      // get business center join schema
+      const joinSchema = JSON.parse(
+        await runtime.executor.executeContractCall(bcContract, 'joinSchema'));
+
+      const tasks = runtimeConfig.businessCenters[bc].members.map((mnemonic) => async () => {
+        const member = runtimeConfig.mnemonic2account[mnemonic];
+        if (await runtime.executor.executeContractCall(bcContract, 'isMember', member)) {
+          // continue if already member
+          console.log(`account "${member}" is already a member of "${bc}"`);
+          return;
+        }
+        // validate requirements for schemas: SelfJoin, AddOnly, Handshake, JoinOrAdd
+        if (joinSchema === 0 && !runtimes[member]) {
+          throw new Error(`bc "${bc}" has join schema "SelfJoin", ` +
+            `but no member runtime found for account "${member}"`);
+        } else if (joinSchema === 1 && !owner) {
+          throw new Error(`bc "${bc}" has join schema "AddOnly", ` +
+            `but no owner runtime found for account "${owner}"`);
+        } else if (joinSchema === 2 && (!owner || !runtimes[member])) {
+          throw new Error(`bc "${bc}" has join schema "Handshake", ` +
+            `but either no owner runtime for "${owner}" or no member runtime found for "${member}"`);
+        } else if (joinSchema === 3 && !owner && !runtimes[member]) {
+          throw new Error(`bc "${bc}" has join schema "JoinOrAdd", ` +
+            `but no owner runtime for "${owner}" and no member runtime found for "${member}"`);
+        }
+        // join schema is SelfJoin, Handshake, if JoinOrAdd try to use member runtime
+        if (joinSchema === 0 || joinSchema === 2 || (joinSchema === 3 && runtimes[member])) {
+          // join as new member
+          console.log(`joining with account "${member}"`);
+          await runtimes[member].executeContractTransaction(bcContract, 'join', { from: member, });
+        }
+        // if join schema is AddOnly or Handshake, if JoinOrAdd and no member runtime
+        if (joinSchema === 1 || joinSchema === 2 || (joinSchema === 3 && !runtimes[member])) {
+          // invite new member
+          console.log(`inviting "${member}" with account "${owner}"`);
+          await runtimes[owner].executor.executeContractTransaction(bcContract, 'invite', { from: owner, }, member);
+        }
+      });
+      if (tasks.length) {
+        await prottle(prottleMaxRequests, tasks);
+      }
+    }
+    console.groupEnd('addToBusinessCenters');
   },
 };
