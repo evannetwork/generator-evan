@@ -35,23 +35,23 @@ module.exports = {
     runtimeConfig.accounts = runtimeConfig.accounts || [];
     runtimeConfig.accountMap = runtimeConfig.accountMap || {};
     runtimeConfig.keyConfig = runtimeConfig.keyConfig || {};
-    runtimeConfig.memnonic2account = runtimeConfig.memnonic2account || {};
-    for (let memnonic of Object.keys(runtimeConfig.memnonics)) {
+    runtimeConfig.mnemonic2account = runtimeConfig.mnemonic2account || {};
+    for (let mnemonic of Object.keys(runtimeConfig.mnemonics)) {
       const vault = await promisify(keystore.createVault).bind(keystore)({
-        seedPhrase: memnonic,
-        password: runtimeConfig.memnonics[memnonic],
+        seedPhrase: mnemonic,
+        password: runtimeConfig.mnemonics[mnemonic],
         hdPathString : 'm/45\'/62\'/13\'/7'
       });
-      const pwDerivedKey = await promisify(vault.keyFromPassword).bind(vault)(runtimeConfig.memnonics[memnonic]);
+      const pwDerivedKey = await promisify(vault.keyFromPassword).bind(vault)(runtimeConfig.mnemonics[mnemonic]);
       vault.generateNewAddress(pwDerivedKey, 1);
       const accountId = web3.utils.toChecksumAddress(vault.getAddresses()[0]);
       const pKey = vault.exportPrivateKey(accountId.toLowerCase(), pwDerivedKey);
-      const dataKey = web3.utils.sha3(runtimeConfig.memnonics[memnonic]).substr(2);
+      const dataKey = web3.utils.sha3(runtimeConfig.mnemonics[mnemonic]).substr(2);
       runtimeConfig.accounts.push(accountId);
       runtimeConfig.accountMap[accountId] = pKey;
       runtimeConfig.keyConfig[web3.utils.soliditySha3(accountId)] = dataKey;
       runtimeConfig.keyConfig[web3.utils.soliditySha3(web3.utils.soliditySha3(accountId), web3.utils.soliditySha3(accountId))] = dataKey;
-      runtimeConfig.memnonic2account[memnonic] = accountId;
+      runtimeConfig.mnemonic2account[mnemonic] = accountId;
     }
     console.groupEnd('buildKeyConfig');
   },
@@ -89,8 +89,8 @@ module.exports = {
   },
   ensureProfiles: async (runtimes, runtimeConfig) => {
     console.group('ensureProfiles');
-    const tasks = Object.keys(runtimeConfig.memnonics).map((memnonic) => {
-      const account = runtimeConfig.memnonic2account[memnonic];
+    const tasks = Object.keys(runtimeConfig.mnemonics).map((mnemonic) => {
+      const account = runtimeConfig.mnemonic2account[mnemonic];
       const accountRuntime = runtimes[account];
       return async () => {
         console.log(`checking profile for ${account}`);
@@ -99,7 +99,7 @@ module.exports = {
           console.log(`creating profile for ${account}`);
           const keys = await accountRuntime.keyExchange.getDiffieHellmanKeys();
           await accountRuntime.profile.createProfile(keys);
-          const alias = runtimeConfig.aliases[memnonic] || runtimeConfig.aliases[account];
+          const alias = runtimeConfig.aliases[mnemonic] || runtimeConfig.aliases[account];
           if (alias) {
             console.log(`setting alias for ${account}`);
             await accountRuntime.profile.loadForAccount(accountRuntime.profile.treeLabels.addressBook);
@@ -115,20 +115,20 @@ module.exports = {
   },
   exchangeKeys: async (runtimes, runtimeConfig) => {
     console.group('exchangeKeys');
-    for (let memnonic of Object.keys(runtimeConfig.contactConfig)) {
-      const account = runtimeConfig.memnonic2account[memnonic];
+    for (let mnemonic of Object.keys(runtimeConfig.contactConfig)) {
+      const account = runtimeConfig.mnemonic2account[mnemonic];
       const runtime = runtimes[account];
       await runtime.profile.loadForAccount(runtime.profile.treeLabels.addressBook);
       if (!runtime) {
         throw new Error(`no private key found for ${account}, make sure, accounts you configured for key exchange are included in private key config as well`);
       }
-      const contacts = runtimeConfig.contactConfig[memnonic];
+      const contacts = runtimeConfig.contactConfig[mnemonic];
       const tasks = contacts.map((contact) => {
         return async () => {
           const split = contact.split(':');
           if (split.length === 1 || split.length === 2 && split[0] === 'user') {
             // plain account, cover both sides
-            const targetAccount = runtimeConfig.memnonic2account[contact];
+            const targetAccount = runtimeConfig.mnemonic2account[contact];
             console.log(`checking key exchange from ${account} with user ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
             // if (false) {
@@ -145,7 +145,7 @@ module.exports = {
               await runtime.profile.storeForAccount(runtime.profile.treeLabels.addressBook);
               // store for target account
               await targetRuntime.profile.addContactKey(account, 'commKey', commKey);
-              await targetRuntime.profile.addProfileKey(account, 'alias', runtimeConfig.aliases[memnonic]);
+              await targetRuntime.profile.addProfileKey(account, 'alias', runtimeConfig.aliases[mnemonic]);
               await targetRuntime.profile.storeForAccount(targetRuntime.profile.treeLabels.addressBook);
             }
           } else if (split.length === 2 && split[0] === 'bmail') {
@@ -169,7 +169,7 @@ module.exports = {
               await runtime.profile.addContactKey(targetAccount, 'commKey', commKey);
               const alias = runtimeConfig.aliases[targetAccount];
               if (alias) {
-                console.log(`setting alias for ${memnonic || account}`);
+                console.log(`setting alias for ${mnemonic || account}`);
                 await runtime.profile.addProfileKey(account, 'alias', alias);
               }
               await runtime.profile.storeForAccount(runtime.profile.treeLabels.addressBook);
@@ -187,11 +187,11 @@ module.exports = {
   },
   addBookmarks: async (runtimes, runtimeConfig) => {
     console.group('addBookmarks');
-    const tasks = Object.keys(runtimeConfig.bookmarks).map((memnonic) => {
-      const accountId = runtimeConfig.memnonic2account[memnonic];
+    const tasks = Object.keys(runtimeConfig.bookmarks).map((mnemonic) => {
+      const accountId = runtimeConfig.mnemonic2account[mnemonic];
       const accountRuntime = runtimes[accountId];
       return async () => {
-        for (let bookmark of runtimeConfig.bookmarks[memnonic]) {
+        for (let bookmark of runtimeConfig.bookmarks[mnemonic]) {
           const existingBookmark = await accountRuntime.profile.getDappBookmark(bookmark);
           const bookmarkDefinition = runtimeConfig.bookmarkDefinitions[bookmark];
           if (!existingBookmark && bookmarkDefinition) {

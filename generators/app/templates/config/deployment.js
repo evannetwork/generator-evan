@@ -50,7 +50,7 @@ const runtimeConfig = {
   ipfs: { host: 'ipfs.evan.network', port: '443', protocol: 'https' },
   web3Provider: 'wss://testcore.evan.network/ws',
   minBalance: 1000000000000000000,
-  memnonics: {
+  mnemonics: {
     // account mnemonics and their data keys
     // 'race game grant legal illegal spring stable banana walk quiz vanish middle': 'some password',
     // 'recycle web high fan relax ignore chalk require main about casual near': 'another password',
