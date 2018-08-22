@@ -26,6 +26,7 @@ const {
   createRuntimes,
   ensureProfiles,
   exchangeKeys,
+  addToBusinessCenters,
 } = require('../scripts/profiles-helper');
 
 const runtimeConfig = require('../config/deployment.js').runtimeConfig;
@@ -57,9 +58,14 @@ gulp.task('add-bookmarks', ['init', 'ensure-profiles'], async () => {
   await addBookmarks(runtimes, runtimeConfig);
 })
 
+gulp.task('add-to-business-centers', ['init'], async () => {
+  await addToBusinessCenters(runtimes, runtimeConfig);
+})
+
 gulp.task('create-profiles', ['init'], async () => {
   await exchangeKeys(runtimes, runtimeConfig);
   await addBookmarks(runtimes, runtimeConfig);
+  await addToBusinessCenters(runtimes, runtimeConfig);
 })
 
 gulp.task('default', ['create-profiles'])

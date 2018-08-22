@@ -86,6 +86,15 @@ const runtimeConfig = {
     // accounts and their bookmarks as ENS domain names
     // 'race game grant legal illegal spring stable banana walk quiz vanish middle': ['sample.evan'],
   },
+  businessCenters: {
+    // 'sample.evan': {
+    //   owner: '0x0000000000000000000000000000000000000001',
+    //   members: [
+    //     'race game grant legal illegal spring stable banana walk quiz vanish middle',
+    //     'recycle web high fan relax ignore chalk require main about casual near',
+    //   ],
+    // },
+  },
 }
 
 module.exports = { bcConfig, runtimeConfig }

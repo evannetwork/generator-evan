@@ -70,7 +70,7 @@ function getRoutes(): Routes {
         path: '**',
         component: DAppLoaderComponent,
         data: {
-          state: 'unkown',
+          state: 'unknown',
           navigateBack: true
         }
       }
