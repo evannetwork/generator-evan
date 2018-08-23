@@ -95,6 +95,18 @@ const runtimeConfig = {
     //   ],
     // },
   },
+  contracts: {
+    // // contract id or ens name
+    // '0xc0274ac700000000000000000000000000000000': {
+    //   // mnemonic or account id
+    //   owner: 'race game grant legal illegal spring stable banana walk quiz vanish middle',
+    //   members: [{
+    //     // mnemonic or account id
+    //     account: 'recycle web high fan relax ignore chalk require main about casual near',
+    //     sharings: ['*']
+    //   }],
+    // }
+  },
 }
 
 module.exports = { bcConfig, runtimeConfig }

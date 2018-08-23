@@ -259,4 +259,53 @@ module.exports = {
     }
     console.groupEnd('addToBusinessCenters');
   },
+  inviteToContracts: async (runtimes, runtimeConfig) => {
+    console.group('inviteToContracts');
+    for (let contractKey of Object.keys(runtimeConfig.contracts)) {
+      console.group(`contract ${contractKey}`);
+      const contract = runtimeConfig.contracts[contractKey];
+      const ownerRuntime = runtimes[contract.owner];
+      let ownerId;
+      if (contract.owner.startsWith('0x')) {
+        ownerId = contract.owner;
+      } else {
+        ownerId = runtimeConfig.mnemonic2account[contract.owner];
+      }
+      let contractId;
+      if (contractKey.startsWith('0x')) {
+        contractId = contractKey;
+      } else {
+        contractId = await ownerRuntime.nameResolver.getAddress(contractKey);
+      }
+      let businessCenterId;
+      if (!contract.businessCenter) {
+        businessCenterId = null;
+      } else if (contract.businessCenter.startsWith('0x')) {
+        businessCenterId = contract.businessCenter;
+      } else {
+        businessCenterId = await ownerRuntime.nameResolver.getAddresses(contract.businessCenter);
+      }
+      const tasks = contract.members.map((member) => {
+        return async() => {
+          console.group(`member ${member.account}`);
+          let memberId;
+          if (member.account.startsWith('0x')) {
+            memberId = member.account;
+          } else {
+            memberId = runtimeConfig.mnemonic2account[member.account];
+          }
+          await ownerRuntime.dataContract.inviteToContract(businessCenterId, contractId, ownerId, memberId);
+          for (let sharing of member.sharings) {
+            console.log(`sharing ${sharing}`);
+            const contentKey = await ownerRuntime.sharing.getKey(contractId, ownerId, sharing);
+            await ownerRuntime.sharing.addSharing(contractId, ownerId, memberId, sharing, 0, contentKey);
+          }
+          console.groupEnd(`member ${member}`);
+        };
+      });
+      await prottle(1, tasks);
+      console.groupEnd(`contract ${contractKey}`);
+    }
+    console.groupEnd('inviteToContracts');
+  },
 };
