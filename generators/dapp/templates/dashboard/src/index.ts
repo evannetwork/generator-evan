@@ -135,6 +135,9 @@ class <%= cleanName %>Module {
 export async function startDApp(container, dbcpName) {
   const ionicAppEl = createIonicAppElement(container, dbcpName);
 
+  // Add project class name to the ion-app / .evan-dapp element for generalized styling
+  // ionicAppEl.className += ' .<%= dbcpName %>-style';
+
   await startAngularApplication(<%= cleanName %>Module, getRoutes());
 
   container.appendChild(ionicAppEl);
