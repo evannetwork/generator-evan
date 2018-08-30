@@ -107,6 +107,16 @@ const runtimeConfig = {
     //   }],
     // }
   },
+  registrar: {
+    // // subdomains of this are claimable
+    // domain: 'certificates.sartorius.evan',
+    // // parent domain for registrar, has to be owned by 'domainParentOwner'
+    // domainParent: 'sartorius.evan',
+    // // owner of 'domainParent', registers and assigns 'domain' to new registrar
+    // domainParentOwner: process.env.ENS_OWNER,
+    // // Ethereum private key of 'domainParentOwner'
+    // domainParentOwnerKey: process.env.ENS_OWNER_KEY,
+  },
 }
 
 module.exports = { bcConfig, runtimeConfig }
