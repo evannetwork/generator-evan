@@ -68,6 +68,7 @@ gulp.task('invite-to-contracts', ['init'], async () => {
 })
 
 gulp.task('create-profiles', ['init'], async () => {
+  await ensureProfiles(runtimes, runtimeConfig);
   await exchangeKeys(runtimes, runtimeConfig);
   await addBookmarks(runtimes, runtimeConfig);
   await addToBusinessCenters(runtimes, runtimeConfig);
