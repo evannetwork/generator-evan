@@ -283,7 +283,7 @@ module.exports = {
       } else if (contract.businessCenter.startsWith('0x')) {
         businessCenterId = contract.businessCenter;
       } else {
-        businessCenterId = await ownerRuntime.nameResolver.getAddresses(contract.businessCenter);
+        businessCenterId = await ownerRuntime.nameResolver.getAddress(contract.businessCenter);
       }
       const tasks = contract.members.map((member) => {
         return async() => {
