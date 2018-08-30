@@ -77,3 +77,20 @@ More infos about DApps:
 - [DApp Tutorials](https://evannetwork.github.io/dapps/basics)
 - [API Reference UI](https://ipfs.evan.network/ipns/QmReXE5YkiXviaHNG1ASfY6fFhEoiDKuSkgY4hxgZD9Gm8)
 - [API Reference blockchain-core / DBCP](https://ipfs.evan.network/ipns/QmYmsPTdPPDLig6gKB1wu1De4KJtTqAXFLF1498umYs4M6)
+
+### DApp custom style
+
+If you want to create a DApp with an custom and clear styling, you will find a predefined light
+style for your application within the "dapp/src/style" folder. Have a look into each file under
+"style/scss" and remove the comments within each style definition.
+
+After this is done, you can use the "style/colors.scss" to manage your new color theme easily.
+Alternatively, all style definitions can be adapted manually.
+
+After you enabled your new style, you must add a class to your root dapp. Remove the comment from
+the following line within your "src/index.ts" file of your project.
+
+```ts
+  // ionicAppEl.className
+```
+
