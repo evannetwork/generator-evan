@@ -30,49 +30,54 @@ const {
   inviteToContracts,
 } = require('../scripts/profiles-helper');
 
-const runtimeConfig = require('../config/deployment.js').runtimeConfig;
-
+const runtimeConfig = require('../scripts/config/deployment.js').runtimeConfig;
+const evan = require('../scripts/evan.access.js');
 
 let web3;
 let dfs;
 let runtimes;
 
-gulp.task('init', async () => {
+gulp.task('init-profiles', async () => {
   web3 = new Web3();
+  console.log(runtimeConfig)
+  console.log(runtimeConfig.web3Provider)
   web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider));
   dfs = new Ipfs({ remoteNode: new IpfsApi(runtimeConfig.ipfs), });
 
   await buildKeyConfig(web3, runtimeConfig);
   await checkBalances(web3, runtimeConfig);
   runtimes = await createRuntimes(web3, dfs, runtimeConfig);
+  return evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-gulp.task('ensure-profiles', ['init'], async () => {
+gulp.task('ensure-profiles', ['init-profiles'], async () => {
   await ensureProfiles(runtimes, runtimeConfig);
+  await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-gulp.task('exchange-keys', ['init', 'ensure-profiles'], async () => {
+gulp.task('exchange-keys', ['init-profiles', 'ensure-profiles'], async () => {
   await exchangeKeys(runtimes, runtimeConfig);
 })
 
-gulp.task('add-bookmarks', ['init', 'ensure-profiles'], async () => {
+gulp.task('add-bookmarks', ['init-profiles', 'ensure-profiles'], async () => {
   await addBookmarks(runtimes, runtimeConfig);
 })
 
-gulp.task('add-to-business-centers', ['init'], async () => {
+gulp.task('add-to-business-centers', ['init-profiles'], async () => {
   await addToBusinessCenters(runtimes, runtimeConfig);
 })
 
-gulp.task('invite-to-contracts', ['init'], async () => {
+gulp.task('invite-to-contracts', ['init-profiles'], async () => {
   await inviteToContracts(runtimes, runtimeConfig);
+  await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-gulp.task('create-profiles', ['init'], async () => {
-  await ensureProfiles(runtimes, runtimeConfig);
+gulp.task('create-profiles', ['init-profiles'], async () => {
   await exchangeKeys(runtimes, runtimeConfig);
   await addBookmarks(runtimes, runtimeConfig);
   await addToBusinessCenters(runtimes, runtimeConfig);
   await inviteToContracts(runtimes, runtimeConfig);
+  await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
 

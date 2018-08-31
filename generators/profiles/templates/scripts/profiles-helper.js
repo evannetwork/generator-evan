@@ -29,6 +29,13 @@ const {
 
 const prottleMaxRequests = 10;
 
+function accountAndKey(key, cfg) {
+  return (key.startsWith('0x') ?
+          { accountId: key, lookup: key  } : { accountId: cfg.mnemonic2account[key], lookup: key });
+}
+
+ async function address(key, rt) { return key ? (key.startsWith('0x')) ? key : rt.nameResolver.getAddress(key) : null }
+
 module.exports = {
   buildKeyConfig: async (web3, runtimeConfig) =>  {
     console.group('buildKeyConfig');
@@ -66,6 +73,14 @@ module.exports = {
         if (balance < runtimeConfig.minBalance) {
           notEnoughBalance = true;
           console.log(`account ${account} does not have enough funds (${web3.utils.fromWei(balance.toString())} EVE)`)
+          console.log('Get funds at https://gitter.im/evannetwork/faucet and then press a key.')
+          const fs = require("fs")
+          const fd = fs.openSync("/dev/stdin", "rs")
+          fs.readSync(fd, new Buffer(1), 0, 1)
+          fs.closeSync(fd)
+          const balance2 = parseInt(await web3.eth.getBalance(account), 10);
+          if(balance2 < runtimeConfig.minBalance) console.warn(`${account} still has insufficient funds.`)
+          else notEnoughBalance = false
         }
       };
     });
@@ -89,6 +104,7 @@ module.exports = {
   },
   ensureProfiles: async (runtimes, runtimeConfig) => {
     console.group('ensureProfiles');
+    // only uses mnemonics, because if an accountId exists, it is already created
     const tasks = Object.keys(runtimeConfig.mnemonics).map((mnemonic) => {
       const account = runtimeConfig.mnemonic2account[mnemonic];
       const accountRuntime = runtimes[account];
@@ -115,46 +131,50 @@ module.exports = {
   },
   exchangeKeys: async (runtimes, runtimeConfig) => {
     console.group('exchangeKeys');
-    for (let mnemonic of Object.keys(runtimeConfig.contactConfig)) {
-      const account = runtimeConfig.mnemonic2account[mnemonic];
-      const runtime = runtimes[account];
+    // it is possible to not have the mnemonic for an account, so allow using accountIDs
+    for (let mnemonic in runtimeConfig.contactConfig) {
+      const { accountId, lookup } = accountAndKey(mnemonic, runtimeConfig)
+      const runtime = runtimes[accountId]
       await runtime.profile.loadForAccount(runtime.profile.treeLabels.addressBook);
       if (!runtime) {
-        throw new Error(`no private key found for ${account}, make sure, accounts you configured for key exchange are included in private key config as well`);
+        throw new Error(`no private key found for ${accountId}, make sure, accounts you configured for key exchange are included in private key config as well`);
       }
-      const contacts = runtimeConfig.contactConfig[mnemonic];
+      const contacts = runtimeConfig.contactConfig[lookup];
       const tasks = contacts.map((contact) => {
         return async () => {
           const split = contact.split(':');
           if (split.length === 1 || split.length === 2 && split[0] === 'user') {
             // plain account, cover both sides
-            const targetAccount = runtimeConfig.mnemonic2account[contact];
-            console.log(`checking key exchange from ${account} with user ${targetAccount}`);
+            const targetAccount =  (split.length == 1 && contact.startsWith('0x') ? contact :
+                                    accountAndKey(split[1], runtimeConfig));
+            console.log(`checking key exchange from ${accountId} with user ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
             // if (false) {
-              console.log(`key found from ${account} with user ${targetAccount}`);
+              console.log(`key found from ${accountId} with user ${targetAccount}`);
             } else {
-              console.log(`exchanging keys from ${account} with user ${targetAccount}`);
+              console.log(`exchanging keys from ${accountId} with user ${targetAccount}`);
               const targetRuntime = runtimes[targetAccount];
               await targetRuntime.profile.loadForAccount(targetRuntime.profile.treeLabels.addressBook);
               // generate commKey
               const commKey = await runtime.keyExchange.generateCommKey();
               // store for current account
               await runtime.profile.addContactKey(targetAccount, 'commKey', commKey);
-              await runtime.profile.addProfileKey(targetAccount, 'alias', runtimeConfig.aliases[contact]);
+              await runtime.profile.addProfileKey(
+                targetAccount, 'alias',
+                runtimeConfig.aliases[targetAccount] || runtimeConfig.aliases[contact]);
               await runtime.profile.storeForAccount(runtime.profile.treeLabels.addressBook);
               // store for target account
-              await targetRuntime.profile.addContactKey(account, 'commKey', commKey);
-              await targetRuntime.profile.addProfileKey(account, 'alias', runtimeConfig.aliases[mnemonic]);
+              await targetRuntime.profile.addContactKey(accountId, 'commKey', commKey);
+              await targetRuntime.profile.addProfileKey(accountId, 'alias', runtimeConfig.aliases[lookup]);
               await targetRuntime.profile.storeForAccount(targetRuntime.profile.treeLabels.addressBook);
             }
           } else if (split.length === 2 && split[0] === 'bmail') {
             // smart agent, send request only
             const targetAccount = split[split.length - 1];
-            console.log(`checking key exchange from ${account} with account ${account}`);
+            console.log(`checking key exchange from ${accountId} with account ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
             // if (false) {
-              console.log(`key found from ${account} with account ${targetAccount}`);
+              console.log(`key found from ${accountId} with account ${targetAccount}`);
             } else {
               const agentProfile = new Profile({
                 accountId: targetAccount,
@@ -170,11 +190,11 @@ module.exports = {
               const alias = runtimeConfig.aliases[targetAccount];
               if (alias) {
                 console.log(`setting alias for ${mnemonic || account}`);
-                await runtime.profile.addProfileKey(account, 'alias', alias);
+                await runtime.profile.addProfileKey(accountId, 'alias', alias);
               }
               await runtime.profile.storeForAccount(runtime.profile.treeLabels.addressBook);
               await runtime.profile.loadForAccount(runtime.profile.treeLabels.addressBook);
-              await runtime.keyExchange.sendInvite(targetAccount, targetPubkey, commKey, { fromAlias: account, });
+              await runtime.keyExchange.sendInvite(targetAccount, targetPubkey, commKey, { fromAlias: accountId, });
             }
           } else {
             throw new Error(`unsupported format for contacts: "${contact}", use plain account id or prefix it with "agent" / "user"`);
@@ -188,10 +208,10 @@ module.exports = {
   addBookmarks: async (runtimes, runtimeConfig) => {
     console.group('addBookmarks');
     const tasks = Object.keys(runtimeConfig.bookmarks).map((mnemonic) => {
-      const accountId = runtimeConfig.mnemonic2account[mnemonic];
+      const { accountId, lookup } = accountAndKey(mnemonic, runtimeConfig)
       const accountRuntime = runtimes[accountId];
       return async () => {
-        for (let bookmark of runtimeConfig.bookmarks[mnemonic]) {
+        for (let bookmark of runtimeConfig.bookmarks[lookup]) {
           const existingBookmark = await accountRuntime.profile.getDappBookmark(bookmark);
           const bookmarkDefinition = runtimeConfig.bookmarkDefinitions[bookmark];
           if (!existingBookmark && bookmarkDefinition) {
@@ -203,7 +223,7 @@ module.exports = {
         }
       };
     });
-    await prottle(prottleMaxRequests, tasks);
+    if(tasks.length) await prottle(prottleMaxRequests, tasks);
     console.groupEnd('addBookmarks');
   },
   addToBusinessCenters: async (runtimes, runtimeConfig) => {
@@ -220,85 +240,62 @@ module.exports = {
         await runtime.executor.executeContractCall(bcContract, 'joinSchema'));
 
       const tasks = runtimeConfig.businessCenters[bc].members.map((mnemonic) => async () => {
-        const member = runtimeConfig.mnemonic2account[mnemonic];
-        if (await runtime.executor.executeContractCall(bcContract, 'isMember', member)) {
+        const { accountId, lookup} = accountAndKey(mnemonic, runtimeConfig);
+        if (await runtime.executor.executeContractCall(bcContract, 'isMember', accountId)) {
           // continue if already member
-          console.log(`account "${member}" is already a member of "${bc}"`);
+          console.log(`account "${accountId}" is already a member of "${bc}"`);
           return;
         }
         // validate requirements for schemas: SelfJoin, AddOnly, Handshake, JoinOrAdd
-        if (joinSchema === 0 && !runtimes[member]) {
+        if (joinSchema === 0 && !runtimes[accountId]) {
           throw new Error(`bc "${bc}" has join schema "SelfJoin", ` +
-            `but no member runtime found for account "${member}"`);
+            `but no member runtime found for account "${accountId}"`);
         } else if (joinSchema === 1 && !owner) {
           throw new Error(`bc "${bc}" has join schema "AddOnly", ` +
             `but no owner runtime found for account "${owner}"`);
-        } else if (joinSchema === 2 && (!owner || !runtimes[member])) {
+        } else if (joinSchema === 2 && (!owner || !runtimes[accountId])) {
           throw new Error(`bc "${bc}" has join schema "Handshake", ` +
-            `but either no owner runtime for "${owner}" or no member runtime found for "${member}"`);
-        } else if (joinSchema === 3 && !owner && !runtimes[member]) {
+            `but either no owner runtime for "${owner}" or no member runtime found for "${accountId}"`);
+        } else if (joinSchema === 3 && !owner && !runtimes[accountId]) {
           throw new Error(`bc "${bc}" has join schema "JoinOrAdd", ` +
-            `but no owner runtime for "${owner}" and no member runtime found for "${member}"`);
+            `but no owner runtime for "${owner}" and no member runtime found for "${accountId}"`);
         }
         // join schema is SelfJoin, Handshake, if JoinOrAdd try to use member runtime
-        if (joinSchema === 0 || joinSchema === 2 || (joinSchema === 3 && runtimes[member])) {
+        if (joinSchema === 0 || joinSchema === 2 || (joinSchema === 3 && runtimes[accountId])) {
           // join as new member
-          console.log(`joining with account "${member}"`);
-          await runtimes[member].executeContractTransaction(bcContract, 'join', { from: member, });
+          console.log(`joining with account "${accountId}"`);
+          await runtimes[accountId].executeContractTransaction(bcContract, 'join', { from: accountId, });
         }
         // if join schema is AddOnly or Handshake, if JoinOrAdd and no member runtime
-        if (joinSchema === 1 || joinSchema === 2 || (joinSchema === 3 && !runtimes[member])) {
+        if (joinSchema === 1 || joinSchema === 2 || (joinSchema === 3 && !runtimes[accountId])) {
           // invite new member
-          console.log(`inviting "${member}" with account "${owner}"`);
-          await runtimes[owner].executor.executeContractTransaction(bcContract, 'invite', { from: owner, }, member);
+          console.log(`inviting "${accountId}" with account "${owner}"`);
+          await runtimes[owner].executor.executeContractTransaction(bcContract, 'invite', { from: owner, }, accountId);
         }
       });
-      if (tasks.length) {
-        await prottle(prottleMaxRequests, tasks);
-      }
+      if (tasks.length) await prottle(prottleMaxRequests, tasks);
     }
     console.groupEnd('addToBusinessCenters');
   },
   inviteToContracts: async (runtimes, runtimeConfig) => {
     console.group('inviteToContracts');
-    for (let contractKey of Object.keys(runtimeConfig.contracts)) {
+    for (let contractKey in runtimeConfig.contracts) {
       console.group(`contract ${contractKey}`);
       const contract = runtimeConfig.contracts[contractKey];
       const ownerRuntime = runtimes[contract.owner];
       let ownerId;
-      if (contract.owner.startsWith('0x')) {
-        ownerId = contract.owner;
-      } else {
-        ownerId = runtimeConfig.mnemonic2account[contract.owner];
-      }
-      let contractId;
-      if (contractKey.startsWith('0x')) {
-        contractId = contractKey;
-      } else {
-        contractId = await ownerRuntime.nameResolver.getAddress(contractKey);
-      }
-      let businessCenterId;
-      if (!contract.businessCenter) {
-        businessCenterId = null;
-      } else if (contract.businessCenter.startsWith('0x')) {
-        businessCenterId = contract.businessCenter;
-      } else {
-        businessCenterId = await ownerRuntime.nameResolver.getAddress(contract.businessCenter);
-      }
+      const { accountId, lookup } = accountAndKey(contract.owner, ownerRuntime)
+      let contractId = address(contractKey, runtimeConfig)
+      let businessCenterId = address(contract.businessCenter, ownerRuntime)
       const tasks = contract.members.map((member) => {
         return async() => {
           console.group(`member ${member.account}`);
-          let memberId;
-          if (member.account.startsWith('0x')) {
-            memberId = member.account;
-          } else {
-            memberId = runtimeConfig.mnemonic2account[member.account];
-          }
-          await ownerRuntime.dataContract.inviteToContract(businessCenterId, contractId, ownerId, memberId);
+          const { accountId, lookup} = accountAndKey(member.account, runtimeConfig)
+          await ownerRuntime.dataContract.inviteToContract(businessCenterId, contractId, ownerId, accountId);
           for (let sharing of member.sharings) {
             console.log(`sharing ${sharing}`);
             const contentKey = await ownerRuntime.sharing.getKey(contractId, ownerId, sharing);
-            await ownerRuntime.sharing.addSharing(contractId, ownerId, memberId, sharing, 0, contentKey);
+            await ownerRuntime.sharing.addSharing(contractId, ownerId, accountId, sharing, 0, contentKey);
           }
           console.groupEnd(`member ${member}`);
         };
