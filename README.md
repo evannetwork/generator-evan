@@ -35,6 +35,30 @@ other commands. All commands and descriptions to handle everything descripted wi
 file of the newly generated project.
 
 ## Generate smart-contract
+To add support for your own smart contracts to your project, run:
+```
+yo evan:contracts
+```
+
+To build your contracts run
+```
+gulp --gulpfile ./gulp/compile-contracts.js
+```
+
+The generator allows to add custom contract files to your project and build them alongside the default contracts. You are able to import them as if they would be in the same directory as the default contract files from:
+- [dbcp](https://github.com/evannetwork/dbcp)
+- [smart-contracts-core](https://github.com/evannetwork/smart-contracts-core)
+
+To import contracts from these projects, import them like local contracts:
+```solidity
+import "./AbstractDescribed.sol";
+```
+
+By default, a sample contract called `Greeter.sol` is added to the project. This is a sample contract, that you can replace with your own logic.
+
+When the contracts have been compiled, the resulting `compiles.json` and `compiled.js` are placed in the `contracts` subfolder.
+
+
 
 ## Generate edge-server
 
