@@ -189,7 +189,7 @@ module.exports = {
               await runtime.profile.addContactKey(targetAccount, 'commKey', commKey);
               const alias = runtimeConfig.aliases[targetAccount];
               if (alias) {
-                console.log(`setting alias for ${mnemonic || account}`);
+                console.log(`setting alias for ${mnemonic}`);
                 await runtime.profile.addProfileKey(accountId, 'alias', alias);
               }
               await runtime.profile.storeForAccount(runtime.profile.treeLabels.addressBook);
@@ -227,7 +227,6 @@ module.exports = {
     console.groupEnd('addBookmarks');
   },
   addToBusinessCenters: async (runtimes, runtimeConfig) => {
-    debugger;
     console.group('addToBusinessCenters');
     // pick first runtime for read operation (account id behind doesn't matter)
     const runtime = runtimes[Object.keys(runtimes)[0]];
@@ -240,7 +239,7 @@ module.exports = {
         await runtime.executor.executeContractCall(bcContract, 'joinSchema'));
 
       const tasks = runtimeConfig.businessCenters[bc].members.map((mnemonic) => async () => {
-        const { accountId, lookup} = accountAndKey(mnemonic, runtimeConfig);
+        const { accountId, } = accountAndKey(mnemonic, runtimeConfig);
         if (await runtime.executor.executeContractCall(bcContract, 'isMember', accountId)) {
           // continue if already member
           console.log(`account "${accountId}" is already a member of "${bc}"`);
@@ -283,14 +282,13 @@ module.exports = {
       console.group(`contract ${contractKey}`);
       const contract = runtimeConfig.contracts[contractKey];
       const ownerRuntime = runtimes[contract.owner];
-      let ownerId;
-      const { accountId, lookup } = accountAndKey(contract.owner, ownerRuntime)
+      const { ownerId, } = accountAndKey(contract.owner, ownerRuntime)
       let contractId = address(contractKey, runtimeConfig)
       let businessCenterId = address(contract.businessCenter, ownerRuntime)
       const tasks = contract.members.map((member) => {
         return async() => {
           console.group(`member ${member.account}`);
-          const { accountId, lookup} = accountAndKey(member.account, runtimeConfig)
+          const { accountId, } = accountAndKey(member.account, runtimeConfig)
           await ownerRuntime.dataContract.inviteToContract(businessCenterId, contractId, ownerId, accountId);
           for (let sharing of member.sharings) {
             console.log(`sharing ${sharing}`);
