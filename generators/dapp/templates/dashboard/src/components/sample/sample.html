@@ -14,9 +14,15 @@
   limitations under the License.
 -->
 
-<evan-loading *ngIf="loading" delayLoading="500"></evan-loading>
-<dapp-wrapper *ngIf="!loading" #dappWrapper (refreshing)="ref.detectChanges()">
-  <div evan-content [@routerTransition]="o?.activatedRouteData?.state">
-    <router-outlet #o="outlet" *ngIf="!dappWrapper.refreshContent"></router-outlet>
+<dapp-wrapper>
+  <div class="evan-content" evan-content>
+    <h3 class="content-header m-b-0 m-t-0">
+      {{ '<%= dbcpName %>' | translate }}
+    </h3>
+    <p ion-text class="m-b-0 m-t-0">
+      {{ '_<%= dbcpName %>.description' | translate }}
+    </p>
+    <p margin-top>Your DApp is working: {{ '<%= dbcpName %>' | translate }}</p>
+    <p>Dispatcher is finished: {{ dispatcherIsFinished }}</p>
   </div>
 </dapp-wrapper>

@@ -1,0 +1,7 @@
+Description:
+
+    Adds scripts to your project, that allow to register a registrar for ENS addresses.
+
+Example:
+    yo evan:registrar
+
