@@ -1,7 +1,8 @@
 {
   "author": "evan GmbH",
   "dependencies": {
-    "yeoman-generator": "^1.1.1"
+    "yeoman-generator": "^1.1.1",
+    "web3-utils": "1.0.0-beta.27"
   },
   "description": "blockchain interaction core library",
   "devDependencies": {},
