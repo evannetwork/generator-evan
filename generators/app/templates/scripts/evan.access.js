@@ -35,9 +35,9 @@ let createProfiles = {}
 let createdProfiles = {} 
 
 // the account sources to add
-try{ accessProfiles = require('./config/accessProfiles.js') }
+try{ accessProfiles = require('./config/externalAccounts.js') }
 catch(e) { if (e.code !== "MODULE_NOT_FOUND") throw e }
-try{ createProfiles = require('./config/createProfiles.js') }
+try{ createProfiles = require('./config/managedProfiles.js') }
 catch(e) { if (e.code !== "MODULE_NOT_FOUND") throw e }
 
 // createdProfiles can change doring execution, and is written back then
@@ -69,9 +69,9 @@ function findAccount(key, runtimeConfig) {
   This is not just a security problem, it would also prevent developers to have own accounts configured.
   For this reason account data configuration is by default separated into own files in the config/ directory:
   
-  accessProfiles.js  - precreated profiles that are used in development and deployment tasks
-  createProfiles.js  - profiles that are automatically created if they don't exist already
-  createdProfiles.js - the profiles that have already been created - generated when profiles are created
+  externalAccounts.js  - precreated profiles that are used in development and deployment tasks
+  managedAccounts.js   - profiles that are automatically created if they don't exist already
+  createdProfiles.js   - the profiles that have already been created - generated when profiles are created
 
   From those files a config object that can actually be used by blockchain-core is created and returned.
   The returned config object can be further edited or used immediately with default values.
