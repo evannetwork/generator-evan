@@ -101,6 +101,22 @@
     }
   }
 
+  contract-members {
+    padding-right: 4px;
+
+    .evan-tag-container {
+      margin-top: -45px;
+      margin-bottom: 10px;
+      margin-left: 8px;
+    }
+
+    .member-search {
+      button.person-add-button {
+        bottom: 10px;
+      }
+    }
+  }
+
   button.button-outline-md-alert:hover {
     background-color: #fb840d !important;
   }

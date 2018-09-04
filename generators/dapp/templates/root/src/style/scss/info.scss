@@ -57,6 +57,16 @@
 
       text-align: center;
     }
+
+    @media (max-width: 768px) {
+      position: relative !important;
+      top: unset !important;
+      right: unset !important;
+
+      display: inline-block !important;
+
+      width: auto;
+    }
   }
 }
 */
