@@ -15,6 +15,10 @@
 */
 
 import {
+  getDomainName
+} from 'dapp-browser';
+
+import {
   Injectable,
   Component, OnInit, Input,            // @angular/core
   Validators, FormBuilder, FormGroup,  // @angular/forms
@@ -49,7 +53,7 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
         for (let entry of queueEntry.data) {
           // get description for the current dapp and use it as contract metadata preset
           const description = await service.descriptionService.getDescription(
-            '<%= dbcpName %>.${ getDomainName() }',
+            `<%= dbcpName %>.${ getDomainName() }`,
             true
           );
 
