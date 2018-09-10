@@ -14,7 +14,7 @@
   limitations under the License.
 */
 
-const { bcConfig } = require('../config/deployment');
+const { bcConfig } = require('./config/deployment');
 
 module.exports = {
   deployRegistrar: async (runtime, runtimeConfig) => {
