@@ -305,10 +305,10 @@ const runtimeConfig = {
 ## Generate ENS Registrar
 To add a deployment script for a custom registar to your project, run:
 ```
-yo evan:profiles
+yo evan:registar
 ```
 
-To create/ensure your configured profiles run
+To create/ensure your registrar scripts are running
 ```
 gulp --gulpfile ./gulp/deploy-registrar.js
 ```

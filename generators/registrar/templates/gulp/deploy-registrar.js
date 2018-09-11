@@ -23,7 +23,7 @@ const {
   deployRegistrar,
 } = require('../scripts/registrar-helper');
 
-const runtimeConfig = require('../config/deployment.js').runtimeConfig;
+const runtimeConfig = require('../scripts/config/deployment.js').runtimeConfig;
 
 
 let web3;
