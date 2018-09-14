@@ -25,13 +25,13 @@
   },
   "description": "<%= description %>",
   "devDependencies": {
-    "@evan.network/angular-gulp": "^1.0.2",
-    "@evan.network/api-blockchain-core": "^1.0.2",
-    "@evan.network/smart-contracts-core": "^1.0.2",
-    "@evan.network/ui-angular-core": "^1.0.2",
-    "@evan.network/ui-angular-libs": "^1.0.2",
-    "@evan.network/ui-angular-sass": "^1.0.2",
-    "@evan.network/ui-dapp-browser": "^1.0.2"
+    "@evan.network/angular-gulp": "1.2.0",
+    "@evan.network/api-blockchain-core": "1.2.0",
+    "@evan.network/smart-contracts-core": "1.1.0",
+    "@evan.network/ui-angular-core": "1.2.0",
+    "@evan.network/ui-angular-libs": "1.2.0",
+    "@evan.network/ui-angular-sass": "1.2.0",
+    "@evan.network/ui-dapp-browser": "1.2.0"
   },
   "keywords": [
     "javascript",
