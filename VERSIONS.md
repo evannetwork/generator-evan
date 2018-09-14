@@ -1,5 +1,18 @@
 # generator-evan
 
+## Next Version
+### Features
+### Fixes
+### Deprecations
+
+## Version 1.1.0
+### Features
+- better generators for dapps
+- generators for smart-agents
+- generator for registrar generation
+- generator for automatic profile generation
+- generator for contract creation
+
 ## Version 1.0.1
 ### Features
 - add account creation scripts
