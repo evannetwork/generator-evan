@@ -1,0 +1,7 @@
+Description:
+
+    Adds a smart-agent template to your project, and all the scripts and dependecies to work with smart-agents.
+
+Example:
+    yo evan:agents
+
