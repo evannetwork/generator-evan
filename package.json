@@ -1,6 +1,7 @@
 {
   "author": "evan GmbH",
   "dependencies": {
+    "eth-lightwallet": "git+https://github.com/ConsenSys/eth-lightwallet.git#251eda97f705dbfae5ef099479aa19160028ae80",
     "yeoman-generator": "^1.1.1",
     "web3-utils": "1.0.0-beta.27"
   },
