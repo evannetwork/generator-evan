@@ -4,6 +4,8 @@
 ### Features
 ### Fixes
 ### Deprecations
+- remove account config from `deployment.js` and only use  `externalAccounts.js` and `managedAccounts.js` for this purpose
+
 
 ## Version 1.1.0
 ### Features
