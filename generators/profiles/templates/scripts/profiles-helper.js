@@ -145,8 +145,9 @@ module.exports = {
           const split = contact.split(':');
           if (split.length === 1 || split.length === 2 && split[0] === 'user') {
             // plain account, cover both sides
-            const targetAccount =  (split.length == 1 && contact.startsWith('0x') ? contact :
-                                    accountAndKey(split[1], runtimeConfig));
+            const targetAccount = (split.length == 1 && contact.startsWith('0x') ?
+              contact :
+              accountAndKey(split[0], runtimeConfig).accountId);
             console.log(`checking key exchange from ${accountId} with user ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
             // if (false) {
