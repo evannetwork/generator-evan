@@ -1,0 +1,7 @@
+Description:
+
+    Configures an ENS domain for you and adds scripts that allow to redo this process.
+
+Example:
+    yo evan:domain
+
