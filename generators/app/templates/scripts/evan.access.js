@@ -149,7 +149,7 @@ function getAccountConfig(evanConfig = {}, accountConfig = {}, createConfig = {}
   }
 
   config.activeAccount = config.activeAccount || config.accounts[0]
-  console.log(config)
+
   return config
 }
 

@@ -14,13 +14,16 @@
   limitations under the License.
 */
 
+const externalAccounts = require('./externalAccounts');
+const managedAccounts = require('./managedAccounts');
+
+
 /*
  The configuration data needed to interact with evan.network during development,
  i.e. for creating and interacting with contracts, for uploading files to the dfs,
  to create profiles etc.
  
 */
-
 const bcConfig = {
   nameResolver: {
     ensAddress: process.env.ENS_ADDRESS || '0x937bbC1d3874961CA38726E9cD07317ba81eD2e1',
@@ -43,45 +46,11 @@ const bcConfig = {
       profile: process.env.ENS_PROFILES || ['profile', 'ensRoot'],
       profileFactory: ['profile', 'factory', 'ensRoot'],
       mailbox: process.env.ENS_MAILBOX || ['mailbox', 'ensRoot'],
+      dappsDomain: '<%= dappsDomain %>',
     },
   },
   alwaysAutoGasLimit: 1.1
 }
-
-const accessProfilesConfig = {
-  /*
-    // accounts to be loaded, it is preferred however to have a separate file 'externalAccounts.js'
-
-    // accountNameKey is just an identifier used internally in the config/deployment scripts
-    accountNameKey: {
-      id: '0x0000000000000000000000000000000000000000000000000000000000000000',
-      privateKey: '0000000000000000000000000000000000000000000000000000000000000000',
-      profileKey: '0000000000000000000000000000000000000000000000000000000000000000',
-    },
-   */
-}
-
-const createProfilesConfig = {
-  /*
-    // accounts to be created, it is preferred however to have a separate file 'managedAccounts.js'
-    // if you fill anything in here, you will need evan:profiles generated
-
-    // accountNameKey is just an identifier used internally in the config/deployment scripts
-    // they are unknown and irrelevant within the blockchain
-    accountNameKey: {
-      // needs to be generated
-      mnemonic: 'word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12',
-      password: 'supersecure',
-      alias: 'DisplayName',
-    },
-  */
-}
-
-
-/*
-  It is still possible to insert the mnemonics/aliases/contactConfig properties here directly,
-  but it will require evan:profiles generated and check the blockchain, whether the accounts exist or not
-*/
 
 const runtimeConfig = {
   // web3Provider: 'wss://testcore.evan.network/ws',                       // default value
@@ -151,5 +120,5 @@ module.exports = {
 
 const evan = require('../evan.access.js')
 
-module.exports['runtimeConfig'] = evan.getAccountConfig(runtimeConfig, accessProfilesConfig, createProfilesConfig)
+module.exports['runtimeConfig'] = evan.getAccountConfig(runtimeConfig, externalAccounts, managedAccounts)
 

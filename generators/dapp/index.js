@@ -63,12 +63,6 @@ module.exports = class extends Generator {
     this.answers = await this.prompt([
       {
         type    : 'input',
-        name    : 'dbcpName',
-        message : 'ENS path of your dapp (should only include characters and numbers) (can also include subdomains (mydapp.mycompany))',
-        default : projectName.replace(/\ |\-/g, '')
-      },
-      {
-        type    : 'input',
         name    : 'description',
         message : 'Your projects description'
       },
@@ -114,9 +108,19 @@ module.exports = class extends Generator {
       this.answers.standalone = false;
     }
 
+    // require deployment config to get the ENS Path (if exists)
+    try {
+      const deploymentConfig = require(`${ this.destinationRoot() }/scripts/config/deployment.js`);
+      this.answers.dbcpName = `${projectName}.${deploymentConfig.bcConfig.nameResolver.domains.dappsDomain}`;
+      this.answers.cleanName = this.answers.dbcpName.replace(/\./g, '');
+    } catch(e) {
+      // silent
+      this.answers.dbcpName = `${projectName}`;
+      this.answers.cleanName = this.answers.dbcpName.replace(/\./g, '');
+    }
+
     // append projectName into the answers object to handle it within the 
     this.answers.projectName = projectName;
-    this.answers.cleanName = this.answers.dbcpName.replace('.', '');
   }
 
   /**

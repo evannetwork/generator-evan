@@ -304,4 +304,5 @@ module.exports = {
     }
     console.groupEnd('inviteToContracts');
   },
+  accountAndKey
 };

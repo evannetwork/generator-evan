@@ -26,6 +26,11 @@
 */
 
 const Generator = require('yeoman-generator');
+const path = require('path');
+const { claimDomain, getRuntime } = require(`./templates/scripts/domain-helper.js`);
+const registrarDomainSuffix = '.fifs.registrar.test.evan';
+const registrarDomainSuffixWithoutEvan = '.fifs.registrar.test';
+const registrarDomainLengh = registrarDomainSuffix.split('.').length;
 
 module.exports = class extends Generator {
   /**
@@ -46,15 +51,70 @@ module.exports = class extends Generator {
         type    : 'input',
         name    : 'description',
         message : 'Your projects description'
+      },
+      {
+        type    : 'confirm',
+        name    : 'ensClaim',
+        message : 'Should i claim you a sub ens address on evan.network for you? (mnemonic required)',
+        default : true
       }
     ]);
+    if(this.answers.ensClaim) {
+      const mnemonic = await this.prompt([
+        {
+          type    : 'input',
+          name    : 'mnemonic',
+          message : 'Use which mnemonic?',
+          validate: (input) => {
+            if (!/^\s*(?:\w+ ){11}(?:\w+)\s*$/.test(input)) {
+              return 'This doesn\'t look like a valid mnemonic.';
+            }
+            return true;
+          },
+        }
+      ]);
+      const domain = await this.prompt([
+        {
+          type    : 'input',
+          name    : 'domain',
+          message : 'Claim which subdomain?',
+          default : this.answers.projectName,
+          validate: async (input) => {
+            const split = input.split('.');
+            if (split.length === registrarDomainLengh && !input.endsWith(registrarDomainSuffix)) {
+              return `FQDNs have to end with "${registrarDomainSuffix}"`;
+            } else if (split.length > registrarDomainLengh) {
+              return `FQDNs have to be direct subdomains of "${registrarDomainSuffix}"`;
+            } else {
+              try {
+                await claimDomain(input, mnemonic.mnemonic);
+                return true;
+              } catch(e) {
+                return `${input}${registrarDomainSuffix} isnt free anymore ... choose another one`;
+              }
+            }
+          },
+          filter: (input) => `${input}${registrarDomainSuffix}`,
+          transformer: (input) => `${input}${registrarDomainSuffix}`,
+        },
+      ]);
+      const userRuntime = await getRuntime(mnemonic.mnemonic);
+      const accountId = userRuntime.activeAccount;
+      this.answers.dappsDomain = `${domain.domain}`.replace(/\.evan$/, '');
+      this.answers.deploymentAccountId = accountId;
+      this.answers.deploymentPrivateKey = await userRuntime.accountStore.getPrivateKey(accountId);
+
+      await userRuntime.dfs.stop();
+      await userRuntime.web3.currentProvider.connection.close();
+    }
+    this.answers.deploymentConfigLocation = path.normalize(`${this.destinationPath()}/${this.answers.projectName}/scripts/config/deployment.js`).replace(/\\/g, '\\\\');
   }
 
   /**
    * Copy all files from the origin into the destination and replace the placeholders.
    */
-  writing() {
-    this.fs.copyTpl(
+  async writing() {
+    await this.fs.copyTpl(
       this.templatePath('**'),
       this.destinationPath(`${ this.destinationRoot() }/${ this.answers.projectName }`),
       this.answers,
@@ -64,5 +124,9 @@ module.exports = class extends Generator {
         } 
       }
     );
+  }
+
+  end() {
+    process.exit();
   }
 };
