@@ -46,6 +46,7 @@ const bcConfig = {
       profile: process.env.ENS_PROFILES || ['profile', 'ensRoot'],
       profileFactory: ['profile', 'factory', 'ensRoot'],
       mailbox: process.env.ENS_MAILBOX || ['mailbox', 'ensRoot'],
+      dappsDomain: '<%= dappsDomain %>',
     },
   },
   alwaysAutoGasLimit: 1.1
