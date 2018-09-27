@@ -4,8 +4,15 @@
 ### Features
 ### Fixes
 ### Deprecations
-- remove account config from `deployment.js` and only use  `externalAccounts.js` and `managedAccounts.js` for this purpose
 
+## Version 1.2.0
+### Features
+- add deployment flow for dapps
+- add free subdomain claim for dapp deployments
+### Fixes
+- fix deployment path for new ui-dapp-browser
+### Deprecations
+- remove account config from `deployment.js` and only use  `externalAccounts.js` and `managedAccounts.js` for this purpose
 
 ## Version 1.1.0
 ### Features
