@@ -1,6 +1,7 @@
 {
   "author": "evan GmbH",
   "dependencies": {
+    "@evan.network/api-blockchain-core": "1.2.1",
     "eth-lightwallet": "git+https://github.com/ConsenSys/eth-lightwallet.git#251eda97f705dbfae5ef099479aa19160028ae80",
     "ipfs-api": "^17.5.0",
     "prottle": "^1.0.3",
