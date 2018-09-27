@@ -78,7 +78,7 @@ module.exports = class extends Generator {
           type    : 'input',
           name    : 'domain',
           message : 'Claim which subdomain?',
-          default : this.answers.projectName 
+          default : this.answers.projectName,
           validate: async (input) => {
             const split = input.split('.');
             if (split.length === registrarDomainLengh && !input.endsWith(registrarDomainSuffix)) {
@@ -98,20 +98,23 @@ module.exports = class extends Generator {
           transformer: (input) => `${input}${registrarDomainSuffix}`,
         },
       ]);
-      const userRuntime = await getRuntime(domainAnswers.mnemonic);
+      const userRuntime = await getRuntime(mnemonic.mnemonic);
       const accountId = userRuntime.activeAccount;
-      this.answers.dappsDomain = `${this.domain.domain}${registrarDomainSuffixWithoutEvan}`;
+      this.answers.dappsDomain = `${domain.domain}`.replace(/\.evan$/, '');
       this.answers.deploymentAccountId = accountId;
       this.answers.deploymentPrivateKey = await userRuntime.accountStore.getPrivateKey(accountId);
+
+      await userRuntime.dfs.stop();
+      await userRuntime.web3.currentProvider.connection.close();
     }
-    this.answers.deploymentConfigLocation = path.normalize(`${this.destinationPath()}/${this.answers.projectName}/scripts/config/deployment.js`);
+    this.answers.deploymentConfigLocation = path.normalize(`${this.destinationPath()}/${this.answers.projectName}/scripts/config/deployment.js`).replace(/\\/g, '\\\\');
   }
 
   /**
    * Copy all files from the origin into the destination and replace the placeholders.
    */
-  writing() {
-    this.fs.copyTpl(
+  async writing() {
+    await this.fs.copyTpl(
       this.templatePath('**'),
       this.destinationPath(`${ this.destinationRoot() }/${ this.answers.projectName }`),
       this.answers,
@@ -121,5 +124,9 @@ module.exports = class extends Generator {
         } 
       }
     );
+  }
+
+  end() {
+    process.exit();
   }
 };
