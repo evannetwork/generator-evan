@@ -264,7 +264,7 @@ module.exports = {
         if (joinSchema === 0 || joinSchema === 2 || (joinSchema === 3 && runtimes[accountId])) {
           // join as new member
           console.log(`joining with account "${accountId}"`);
-          await runtimes[accountId].executeContractTransaction(bcContract, 'join', { from: accountId, });
+          await runtimes[accountId].executor.executeContractTransaction(bcContract, 'join', { from: accountId, });
         }
         // if join schema is AddOnly or Handshake, if JoinOrAdd and no member runtime
         if (joinSchema === 1 || joinSchema === 2 || (joinSchema === 3 && !runtimes[accountId])) {

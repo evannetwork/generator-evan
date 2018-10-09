@@ -12,6 +12,12 @@
 
 ### Deprecations
 
+## Version 1.2.1
+### Features
+### Fixes
+- fix correct version of blockchain-core
+### Deprecations
+
 ## Version 1.2.0
 ### Features
 - add deployment flow for dapps
