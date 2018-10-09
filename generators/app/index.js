@@ -106,8 +106,12 @@ module.exports = class extends Generator {
 
       await userRuntime.dfs.stop();
       await userRuntime.web3.currentProvider.connection.close();
+    } else {
+      this.answers.dappsDomain = '';
+      this.answers.deploymentAccountId = '';
+      this.answers.deploymentPrivateKey = '';
     }
-    this.answers.deploymentConfigLocation = path.normalize(`${this.destinationPath()}/${this.answers.projectName}/scripts/config/deployment.js`).replace(/\\/g, '\\\\');
+    this.answers.deploymentConfigLocation = path.normalize(`${this.destinationPath()}/scripts/config/deployment.js`).replace(/\\/g, '\\\\');
   }
 
   /**
@@ -116,7 +120,7 @@ module.exports = class extends Generator {
   async writing() {
     await this.fs.copyTpl(
       this.templatePath('**'),
-      this.destinationPath(`${ this.destinationRoot() }/${ this.answers.projectName }`),
+      this.destinationPath(`${ this.destinationRoot() }`),
       this.answers,
       {
         globOptions: {

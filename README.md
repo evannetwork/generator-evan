@@ -38,6 +38,8 @@ npm install -g generator-evan
 Run the following command to create a new project structure:
 
 ```bash
+mkdir projectName
+cd projectName
 yo evan
 ```
 

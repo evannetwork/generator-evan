@@ -1,7 +1,6 @@
 # <%= projectName %>
 
-This is a evan.network DApp. To build and deploy your DApp, please visit the readme.md of your
-containing evan.network basic project.
+This is a evan.network DApp. To build and deploy your DApp, please visit the readme.md of your containing evan.network basic project.
 
 For more details about how to program DApps have a look here:
 
