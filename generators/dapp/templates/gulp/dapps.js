@@ -45,17 +45,59 @@ async function runExec(command) {
 
 const dappDirs = getDirectories(path.resolve('../dapps'))
 
+/**
+ * save latest serve and build status
+ */
+const serves = { };
+/**
+ * Show the current wachting status
+ */
+const logServing = () => {
+  console.clear();
+
+  console.log('Watching DApps');
+  console.log('--------------\n');
+
+  for (let dappDir of dappDirs) {
+    const dappName = dappDir.split('/').pop();
+    const loading = serves[dappName] && serves[dappName].loading;
+
+    console.log(`  ${ dappName }: ${ loading ? 'building' : 'watching' }`);
+
+    if (serves[dappName] && serves[dappName].error) {
+      console.log(serves[dappName].error);
+    }
+  }
+
+  console.log('\n');
+}
+
 // Run Express, auto rebuild and restart on src changes
 gulp.task('dapps-serve', function () {
-  gulp.watch(dappDirs.map(dapp => [
-    `${dapp}/**.json`,
-    `${dapp}/**.js`,
-    `${dapp}/src/**/*`,
-  ]).reduce((watchDirs, subWatches) => {
-    watchDirs = watchDirs.concat(subWatches);
+  dappDirs.forEach(dappDir => gulp.watch([
+    `${dappDir}/**.json`,
+    `${dappDir}/**.js`,
+    `${dappDir}/src/**/*`,
+  ], async () => {
+    const dappName = dappDir.split('/').pop();
 
-    return watchDirs;
-  }, []), [ 'dapps-build' ]);
+    serves[dappName] = { loading: true };
+    logServing();
+
+    try {
+      // navigate to the dapp dir and run the build command
+      process.chdir(dappDir);
+      await runExec('npm run build');
+
+      delete serves[dappName];
+    } catch (ex) {
+      serves[dappName] = { error: ex.message };
+    }
+
+    logServing();
+  }));
+
+  setTimeout(() => logServing());
 });
 
 // Run Express, auto rebuild and restart on src changes

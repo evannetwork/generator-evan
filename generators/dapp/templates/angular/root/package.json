@@ -15,6 +15,6 @@
     "SASS"
   ],
   "scripts": {
-    "build": "cd ../.. && npm run angular-build <%= projectName %>"
+    "build": "cd ../.. && npm run angular-build dapps/<%= projectName %>"
   }
 }

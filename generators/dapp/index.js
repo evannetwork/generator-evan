@@ -29,6 +29,7 @@ const fs = require('fs');
 const Generator = require('yeoman-generator');
 const path = require('path');
 const extend = require('deep-extend');
+const digitaltwinHandling = require('./digitaltwin');
 
 /**
  * Copy files from a path under the templates directory into the specific dapp folder
@@ -125,12 +126,21 @@ module.exports = class extends Generator {
                 value: 'datacontract'
               },
               {
-                name: 'Digital Twin (DApp including create and manage)',
-                value: 'datacontract'
+                name: 'Digital Twin (DApp including create and data management)',
+                value: 'digitaltwin'
               },
             ]
           }
         ])).type;
+
+        // load digital twin properties and apply them to the answers
+        if (this.answers.type === 'digitaltwin') {
+          const digitaltwinConfiguration = await digitaltwinHandling.call(this, projectName);
+
+          Object.keys(digitaltwinConfiguration).forEach(key => {
+            this.answers[key] = digitaltwinConfiguration[key];
+          });
+        }
 
         break;
       }
