@@ -13,35 +13,10 @@
 </template>
 
 <script lang="ts">
+import * as bcc from 'bcc';
 import Vue from "vue";
-import {
-  AccountStore,
-  config,
-  getCoreOptions,
-  getDomainName,
-  getLatestKeyProvider,
-  KeyProvider,
-  lightwallet,
-  queue,
-  updateCoreRuntime,
-  web3,
-  web3Helper,
-  core,
-  utils,
-} from 'dapp-browser';
-
-import {
-  getProfileForAccount
-} from "../bcc";
-
-import {
-  basePath,
-  router,
-} from '../routing';
-
-import {
-  finishedLogin
-} from '../index';
+import { bccHelper, core, } from 'dapp-browser';
+import { finishedLogin } from '../index';
 
 export default Vue.extend({
   data () {
@@ -53,22 +28,8 @@ export default Vue.extend({
   methods: {
     async login () {
       const accountId = core.activeAccount();
-      const profile = await getProfileForAccount(accountId);
 
-      profile.ipld.keyProvider.setKeysForAccount(
-        accountId,
-        lightwallet.getEncryptionKeyFromPassword(this.password)
-      );
-
-      let targetPrivateKey;
-      try {
-        targetPrivateKey = await profile.getContactKey(
-          accountId,
-          'dataKey'
-        );
-      } catch (ex) { }
-
-      if (targetPrivateKey) {
+      if (await bccHelper.isAccountPasswordValid(bcc, accountId, this.password)) {
         finishedLogin(this.password);
       } else {
         this.error = true;

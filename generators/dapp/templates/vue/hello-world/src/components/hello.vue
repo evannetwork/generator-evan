@@ -38,12 +38,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import * as bcc from 'bcc';
-import {
-  System,
-  core,
-} from 'dapp-browser';
+import Vue from "vue";
+import { System, core, } from 'dapp-browser';
   
 export default Vue.extend({
   data: function () {
@@ -63,7 +60,7 @@ export default Vue.extend({
       const ProfileRuntime = bcc.ProfileRuntime;
       const CoreRuntime = bcc.CoreRuntime;
       // load dapp description to add contract metadata
-      const dappDescription = await System.import('<%= dbcpName %>.van!ens');
+      const dappDescription = await System.import('<%= dbcpName %>.evan!ens');
 
       // clear additional properties, so we can use it for the new contract
       delete dappDescription.translated;

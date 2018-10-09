@@ -7,9 +7,9 @@
 <script lang="ts">
 import Vue from "vue";
 import * as bcc from 'bcc';
-import startBCC from "../bcc";
 import {
-  loading
+  loading,
+  bccHelper,
 } from 'dapp-browser';
 
 export default Vue.extend({
@@ -18,7 +18,11 @@ export default Vue.extend({
   },
   async created () {
     loading.finishDAppLoading();
-    await startBCC();
+
+    // if the bcc wasn't initialized for the current account, do it!
+    if (!bcc.ProfileRuntime) {
+      await bccHelper.startBCC(bcc);
+    }
   }
 });
 </script>
