@@ -14,38 +14,25 @@
   limitations under the License.
 */
 
-<%= cleanName %>-create {
-  ion-row {
-    ion-col:nth-child(odd) {
-      padding-left: 0 !important;
-    }
-   
-    @media (min-width: 769px) {
-      ion-col:nth-child(even) {
-        padding-left: 25px !important;
-      }
-    }
-  }
-  
-  .picture-container {
-    .evan-relative {
-      display: inline-block;
-      width: 300px;
-      margin-right: 10px;
-    }
-  }
+import {
+  Injectable,      // @angular/core
+} from 'angular-libs';
 
-  .banner-img {
-    text-align: center;
+import {
+  EvanTranslationService
+} from 'angular-core';
 
-    img {
-      max-height: 500px;
-      max-width: 500px;
-      border-radius: 50%;
-    }
+import { en } from './en';
+import { de } from './de';
 
-    evan-file-select.img-select {
-      display: none;
-    }
+export const translations = {
+  en, de
+};
+
+@Injectable()
+export class Translations {
+  constructor(translate: EvanTranslationService) {
+    translate.setTranslation('en', en);
+    translate.setTranslation('de', de);
   }
 }

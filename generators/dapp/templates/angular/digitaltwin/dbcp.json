@@ -29,8 +29,8 @@
     },
     "imgSquare": "<%= img %>",
     "dataSchema": {
-      "metadata": {
-        "$id": "metadata",
+      "entry_settable_by_owner": {
+        "$id": "entry_settable_by_owner",
         "additionalProperties": true,
         "properties": <%- digitaltwinDBCPFields %>,
         "type": "object",

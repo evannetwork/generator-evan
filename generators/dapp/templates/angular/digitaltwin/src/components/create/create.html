@@ -15,33 +15,95 @@
 -->
 
 <evan-loading *ngIf="loading"></evan-loading>
-<form *ngIf="!loading" #createForm="ngForm">
-  <div class="evan-content">
-    <h3 class="content-header m-b-0 m-t-0">
-      {{ '<%= dbcpName %>' | translate }}
-    </h3>
-    <p ion-text class="m-b-0 m-t-0">
-      {{ '_<%= dbcpName %>.description' | translate }}
-    </p>
-    
-    <%- digitaltwinEditTpl %>
-    
-    <div text-center padding-bottom margin-top>
-      <button ion-button round icon-left outline
-        (click)="create()"
-        [disabled]="ngForm.invalid">
-        <ion-icon name="add" *ngIf="!creating"></ion-icon>
-        <ion-spinner color="light" *ngIf="creating"></ion-spinner>
+<form *ngIf="!loading && !contractAddress" #createForm="ngForm">
+  <ng-container *ngIf="!creating">
+    <div class="evan-content">
+      <div class="banner-img">
+        <img class="clickable"
+          [src]="formData.bannerImg[0].blobURI"
+          (click)="openPictureDetail(formData.bannerImg[0].blobURI)"
+        />
+        <evan-file-select name="bannerPictures" margin-top #bannerFileSelectComp
+          class="img-select"
+          [(ngModel)]="bannerFileSelect"
+          [accept]="'image/x-png,image/gif,image/jpeg'"
+          [multiple]="false"
+          (onChange)="bannerFilesChanged()">
+        </evan-file-select>
+        <br>
+        <button ion-button round outline icon-start margin-top
+          (click)="chooseBannerImg()">
+          <ion-icon name="document"></ion-icon>
+          {{ '_<%= dbcpName %>.choose-banner-img' | translate }}
+        </button>
+        <button ion-button round outline icon-start margin-top
+          (click)="takeSnapshot(formData.bannerImg, true)">
+          <ion-icon name="camera"></ion-icon>
+          {{ '_<%= dbcpName %>.take-a-picture' | translate }}
+        </button>
+      </div>
+
+      <ion-item>
+        <ion-label stacked>{{ '_<%= dbcpName %>.type.text' | translate }}*</ion-label>
+        <ion-input name="type" required
+          [(ngModel)]="formData.type"
+          [placeholder]="'_<%= dbcpName %>.type.desc' | translate"
+          (ionChange)="ref.detectChanges()">
+        </ion-input>
+      </ion-item>
+      <ion-chip class="error-hint" *ngIf="showError('type')" color="danger">
+        <ion-icon name="close" color="danger"></ion-icon>
+        <ion-label>{{ '_<%= dbcpName %>.type.error' | translate }}</ion-label>
+      </ion-chip>
+
+      <contract-members #_membersComp
+        [(members)]="formData.sharedMembers"
+        (onChange)="ref.detectChanges()">
+        <h3 label>{{ '_<%= dbcpName %>.members' | translate }}</h3>
+      </contract-members>
+    </div>
+    <div class="evan-content">
+      <h3 class="content-header m-b-0 m-t-0">
+        {{ '_<%= dbcpName %>.metadata' | translate }}
+      </h3>
+      <p ion-text class="m-b-0 m-t-0">
+        {{ '_<%= dbcpName %>.fill-empty' | translate }}
+      </p>
       
-        <span>Create</span>
+      <%- digitaltwinEditTpl %>
+      
+      <div text-center padding-bottom margin-top>
+        <button ion-button round icon-left outline
+          (click)="create()"
+          [disabled]="createForm.invalid">
+          <ion-icon name="add"></ion-icon>
+        
+          <span>{{ '_<%= dbcpName %>.create' | translate }}</span>
+        </button>
+      </div>
+    </div>
+    <div text-center padding-bottom margin-top>
+      <button ion-button round icon-left outline color="transparency"
+        (click)="create()"
+        [disabled]="createForm.invalid">
+        <ion-icon name="add"></ion-icon>
+      
+        <span>{{ '_<%= dbcpName %>.create' | translate }}</span>
       </button>
     </div>
-  </div>
-  <div class="evan-content" *ngIf="contractAddress">
-    <h3 class="content-header m-b-0 m-t-0">
-      New Contract
+  </ng-container>
+  <div class="evan-content creating-container transparent" text-center *ngIf="creating">
+    <ion-spinner margin-top color="light"></ion-spinner>
+    <h3 margin-top>
+      {{ '_<%= dbcpName %>.dt-creating' | translate }}
     </h3>
-
-    <a routerLink="./{{ contractAddress }}">{{ contractAddress }}</a>
   </div>
 </form>
+
+<div class="evan-content" *ngIf="!loading && contractAddress">
+  <h3 class="content-header m-b-0 m-t-0">
+    {{ '_<%= dbcpName %>.new-contract' | translate }}
+  </h3>
+
+  <a routerLink="./{{ contractAddress }}">{{ contractAddress }}</a>
+</div>

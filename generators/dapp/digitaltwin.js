@@ -127,6 +127,8 @@ module.exports = async function(projectName) {
     digitaltwinDBCPRequiredFields.push(field.technical);
     switch (field.type) {
       case 'text':
+      case 'files':
+      case 'pictures':
       case 'date': {
         digitaltwinDBCPFields[field.technical] = {
           'type': 'string'
@@ -140,14 +142,6 @@ module.exports = async function(projectName) {
             'type': 'string'
           },
           'type': 'array'
-        };
-
-        break;
-      }
-      case 'files':
-      case 'pictures': {
-        digitaltwinDBCPFields[field.technical] = {
-          "type": "object"
         };
 
         break;
@@ -228,7 +222,7 @@ module.exports = async function(projectName) {
         <contract-members #${ field.technical }Comp
           [(members)]="formData.${ field.technical }"
           (onChange)="ref.detectChanges()">
-          <h3 label>${ field.display }*</h3>
+          <h3 label>${ field.display }</h3>
         </contract-members>
         <ion-chip class="error-hint" *ngIf="${ field.technical }Comp.touched && formData.${ field.technical }.length === 0" color="danger">
           <ion-label>Please insert value for ${ field.display }</ion-label>
@@ -239,9 +233,9 @@ module.exports = async function(projectName) {
         digitaltwinDetailTpl.push(`
       <ion-col col-12 col-md-6>
         <contract-members #${ field.technical }Comp
-          [(members)]="formData.${ field.technical }"
+          [(origin)]="formData.${ field.technical }"
           [readonly]="true">
-          <h3 label>${ field.display }*</h3>
+          <h3 label>${ field.display }</h3>
         </contract-members>
       </ion-col>
         `);
@@ -253,21 +247,18 @@ module.exports = async function(projectName) {
         digitaltwinFormData[field.technical] = [ ];
         digitaltwinEditTpl.push(`
       <ion-col col-12 col-md-6>
-        <ion-label class="standalone">${ field.display }*</ion-label>
-        <evan-file-select name="${ field.technical }" #${ field.technical }FileSelect
+        <ion-label class="standalone">${ field.display }</ion-label>
+        <evan-file-select name="${ field.technical }" #${ field.technical }FileSelect text-center
           [minFiles]="1"
           [(ngModel)]="formData.${ field.technical }"
           (onChange)="ref.detectChanges()">
         </evan-file-select>
-        <ion-chip class="error-hint" *ngIf="${ field.technical }FileSelect.touched && formData.${ field.technical }.length === 0" color="danger">
-          <ion-label>Please insert value for ${ field.display }</ion-label>
-        </ion-chip>
       </ion-col>
         `);
 
         digitaltwinDetailTpl.push(`
       <ion-col col-12 col-md-6>
-        <ion-label class="standalone">${ field.display }*</ion-label>
+        <ion-label class="standalone">${ field.display }</ion-label>
         <evan-file-select name="${ field.technical }" #${ field.technical }FileSelect
           [minFiles]="1"
           [(ngModel)]="formData.${ field.technical }"
@@ -302,16 +293,19 @@ module.exports = async function(projectName) {
               </button>
             </div>
             <br>
-            <div class="empty-pictures" *ngIf="formData.${ field.technical }.length === 0">
+            <div class="empty-pictures" margin-bottom
+              *ngIf="formData.${ field.technical }.length === 0">
               no pictures taken
             </div>
-            <button ion-button round outline icon-start
-              (click)="takeSnapshot(formData.${ field.technical })">
-              <ion-icon name="camera"></ion-icon>
-              take snapshot
-            </button>
           </div>
         </ion-item>
+        <div text-center margin-top>
+          <button ion-button round outline icon-start
+            (click)="takeSnapshot(formData.${ field.technical })">
+            <ion-icon name="camera"></ion-icon>
+            take snapshot
+          </button>
+        </div>
       </ion-col>
         `);
 

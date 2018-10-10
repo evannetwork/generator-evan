@@ -27,11 +27,13 @@ import {
 } from 'angular-libs';
 
 import {
+  EvanBCCService,
+  EvanCoreService,
+  EvanDescriptionService,
+  EvanFileService,
+  EvanTranslationService,
   EvanUtilService,
   SingletonService,
-  EvanBCCService,
-  EvanDescriptionService,
-  EvanCoreService
 } from 'angular-core';
 
 /**************************************************************************************************/
@@ -47,7 +49,9 @@ export class <%= cleanName %>Service implements OnDestroy {
     public bcc: EvanBCCService,
     public core: EvanCoreService,
     public descriptionService: EvanDescriptionService,
+    public fileService: EvanFileService,
     public singleton: SingletonService,
+    public translate: EvanTranslationService,
   ) {
     return singleton.create(<%= cleanName %>Service, this, () => {
 

@@ -41,6 +41,13 @@ import {
 } from '../services/service';
 
 /**************************************************************************************************/
+/**
+ * used to format files and pictures into the correct format for saving
+ */
+const pictureProps: Array<string> = <%- digitaltwinPicProps %>;
+const fileProps: Array<string> = <%- digitaltwinFileProps %>;
+
+pictureProps.push('bannerImg');
 
 export const <%= cleanName %>Dispatcher = new QueueDispatcher(
   [
@@ -49,6 +56,7 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
       '_<%= cleanName %>.dispatcher.description',
       async (service: <%= cleanName %>Service, queueEntry: any) => {
         const results = [ ];
+        const activeAccount = service.core.activeAccount();
 
         for (let entry of queueEntry.data) {
           // get description for the current dapp and use it as contract metadata preset
@@ -60,18 +68,143 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
           // create the new data contract
           const contract = await service.bcc.dataContract.create(
             'testdatacontract',
-            service.bcc.core.activeAccount(),
+            activeAccount,
             null,
             { public : description }
           );
 
+          // load the latest block number, so the encryption will work only for data after this
+          // block
+          const blockNumber = await service.bcc.web3.eth.getBlockNumber();
+
+          // search for files and pictures that needs to be encrypted
+          const formDataKeys = Object.keys(entry);
+          const metadataToSave: any = { };
+          for (let key of formDataKeys) {
+            metadataToSave[key] = entry[key];
+
+            // transform files into the correct format
+            if (fileProps.indexOf(key) !== -1) {
+              metadataToSave[key] = await service.fileService.readFilesAsArrayBuffer(metadataToSave[key]);
+            }
+
+            // the its a file or a picture, encrypt it!
+            if (fileProps.indexOf(key) !== -1 || pictureProps.indexOf(key) !== -1) {
+              // if the encryption should be disabled, continue with the next element
+              if (metadataToSave[key].length > 0 && metadataToSave[key][0].disableEncryption) {
+                continue;
+              }
+
+              metadataToSave[key] = await service.bcc.dataContract.encrypt(
+                {
+                  private: metadataToSave[key]
+                },
+                contract,
+                activeAccount,
+                '*',
+                blockNumber,
+                'aesBlob'
+              )
+            }
+          }
+
           // set datacontract entry
           await service.bcc.dataContract.setEntry(
             contract,
-            'entry_settable_by_member',
-            entry,
-            service.core.activeAccount()
+            'entry_settable_by_owner',
+            metadataToSave,
+            activeAccount
           );
+
+          const [
+            hashKeyToShare,
+            contentKeyToShare,
+            sharings,
+          ] = await Promise.all([
+            // extend sharings only once
+            service.bcc.sharing.getHashKey(contract.options.address, activeAccount),
+            service.bcc.sharing.getKey(contract.options.address, activeAccount, 'entry_settable_by_owner', blockNumber),
+            service.bcc.sharing.getSharingsFromContract(contract)
+          ]);
+
+
+          // iterate through all members, check if there are within the contract and extend the sharings
+          const membersToInvite = [ ];
+          for (let member of metadataToSave.sharedMembers) {
+            const isContractMember = await service.bcc.executor.executeContractCall(
+              contract,
+              'isConsumer',
+              member,
+              { from: activeAccount, }
+            );
+
+            // only invite members once
+            if (!isContractMember) {
+              membersToInvite.push(member);
+            }
+
+            await service.bcc.sharing.extendSharings(
+              sharings,
+              activeAccount,
+              member,
+              '*',
+              0,
+              contentKeyToShare,
+              null
+            );
+
+            // if the member is within the furtherInformation specific scope => share it!
+            await service.bcc.sharing.extendSharings(
+              sharings,
+              activeAccount,
+              member,
+              '*',
+              'hashKey',
+              hashKeyToShare,
+              null
+            );
+          }
+
+          await service.bcc.sharing.saveSharingsToContract(
+            contract.options.address,
+            sharings,
+            activeAccount
+          );
+
+          if (membersToInvite.length > 0) {
+            // build bmail for invited user
+            const bMailContent = {
+              content: {
+                from: activeAccount,
+                fromAlias: await service.bcc.profile.getProfileKey('alias', activeAccount),
+                title: service.translate.instant('_<%= dbcpName %>.contract-invitation.text-title'),
+                body: service.translate.instant('_<%= dbcpName %>.contract-invitation.text-body', {
+                  contractAddress: contract.options.address,
+                }),
+                attachments: [{
+                  address: contract.options.address,
+                  type: 'contract',
+                }]
+              }
+            };
+
+            // invite all members into the contract and send an invitation mail
+            await Promise.all(membersToInvite.map(member => {
+              return Promise.all([
+                service.bcc.dataContract.inviteToContract(
+                  null,
+                  contract.options.address,
+                  activeAccount,
+                  member
+                ),
+                service.bcc.mailbox.sendMail(
+                  bMailContent,
+                  activeAccount,
+                  member
+                ),
+              ]);
+            }));
+          }
 
           results.push(contract._address);
         }

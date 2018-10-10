@@ -20,7 +20,7 @@ import {
 
 import {
   Component, OnInit, ViewChild,     // @angular/core
-  DomSanitizer, ChangeDetectorRef, ChangeDetectionStrategy
+  DomSanitizer, ChangeDetectorRef, ChangeDetectionStrategy,
 } from 'angular-libs';
 
 import {
@@ -29,9 +29,11 @@ import {
   EvanBCCService,
   EvanCoreService,
   EvanDescriptionService,
+  EvanModalService,
   EvanQrCodeService,
   EvanQueue,
   EvanRoutingService,
+  EvanTranslationService,
   QueueId,
 } from 'angular-core';
 
@@ -62,14 +64,17 @@ export class DetailComponent extends AsyncComponent {
   private formData: any;
 
   constructor(
+    private _DomSanitizer: DomSanitizer,
     private alertService: EvanAlertService,
     private bcc: EvanBCCService,
     private core: EvanCoreService,
+    private descriptionService: EvanDescriptionService,
+    private modalService: EvanModalService,
     private qrCodeService: EvanQrCodeService,
     private queueService: EvanQueue,
     private ref: ChangeDetectorRef,
     private routingService: EvanRoutingService,
-    private descriptionService: EvanDescriptionService,
+    private translateService: EvanTranslationService,
     private <%= cleanName %>ServiceInstance: <%= cleanName %>Service
   ) {
     super(ref);
@@ -83,10 +88,57 @@ export class DetailComponent extends AsyncComponent {
     this.contractAddress = await this.routingService.getHashParam('address');
 
     // load the details
-    this.formData = JSON.stringify(await this.bcc.dataContract.getEntry(
+    this.formData = await this.bcc.dataContract.getEntry(
       this.contractAddress,
-      'metadata',
+      'entry_settable_by_owner',
       this.core.activeAccount()
-    ), null, 2);
+    );
+
+    // search for files and pictures that needs to be decrypted
+    for (let key of Object.keys(this.formData)) {
+      if (typeof this.formData[key] === 'string') {
+        try {
+          const parsed = JSON.parse(this.formData[key]);
+
+          if (parsed.private) {
+            this.formData[key] = (await this.bcc.dataContract.decrypt(
+              this.formData[key],
+              this.contractAddress,
+              this.core.activeAccount(),
+              '*'
+            )).private;
+
+            // transform blobURI to security trust url, so the ui can show it
+            if (Array.isArray(this.formData[key])) {
+              const urlCreator = (<any>window).URL || (<any>window).webkitURL;
+
+              for (let entry of this.formData[key]) {
+                if (entry.blobURI) {
+                  entry.file = new Blob([entry.file], { type: entry.fileType });
+                  entry.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(
+                    urlCreator.createObjectURL(entry.file)
+                  );
+                }
+              }
+            }
+          }
+        } catch (ex) { }
+      }
+    }
+  }
+
+  /**
+   * Uses an img and shows it within an modal on full screen
+   *
+   * @param      {string}         dataUrl  url of the img
+   */
+  async openPictureDetail(dataUrl) {
+    try {
+      await this.modalService.showBigPicture(
+        'alertTitle',
+        'alertText',
+        dataUrl,
+      );
+    } catch (ex) { }
   }
 }

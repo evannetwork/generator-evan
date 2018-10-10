@@ -65,21 +65,24 @@ function getRoutes(): Routes {
         component: CreateComponent,
         data: {
           state: 'create',
-          navigateBack: true
+          navigateBack: true,
+          reload: true,
         }
       },
       {
         path: `:address`,
         data: {
           state: 'contract',
-          navigateBack: true
+          navigateBack: true,
+          reload: true,
         },
         children: [
           {
             path: ``,
             data: {
               state: 'contract',
-              navigateBack: true
+              navigateBack: true,
+              reload: true,
             },
             component: DetailComponent
           },
@@ -87,7 +90,8 @@ function getRoutes(): Routes {
             path: '**',
             data: {
               state: 'unknown',
-              navigateBack: true
+              navigateBack: true,
+              reload: true,
             },
             component: DAppLoaderComponent,
           }
