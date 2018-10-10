@@ -55,11 +55,6 @@ import {
  */
 export class CreateComponent extends AsyncComponent {
   /**
-   * Initialized queueId to simple add data to a queue.
-   */
-  private queueId: QueueId;
-
-  /**
    * Function to unsubscribe from queue results.
    */
   private queueWatcher: Function;
@@ -75,9 +70,14 @@ export class CreateComponent extends AsyncComponent {
   private creating: boolean;
 
   /**
-   * Contract ID of the newly created contract
+   * contract id for editing
    */
   private contractAddress: string;
+
+  /**
+   * Contract ID of the newly created contract
+   */
+  private newAddress: string;
 
   /**
    * used to select labelpictures also using the file-select component
@@ -116,37 +116,37 @@ export class CreateComponent extends AsyncComponent {
    * Test if service and dispatcher are working.
    */
   async _ngOnInit() {
-    this.formData.bannerImg = [{
-      blobURI: this._DomSanitizer.bypassSecurityTrustUrl(
-        'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgo8c3ZnIGlkPSJzdmcyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAwIiB3aWR0aD0iMjAwIiB2ZXJzaW9uPSIxLjAiPgogPHBhdGggaWQ9InBhdGgyMzgyIiBkPSJtMTY1LjMzIDExMy40NGExMDMuNjEgMTAzLjYxIDAgMSAxIC0yMDcuMjIgMCAxMDMuNjEgMTAzLjYxIDAgMSAxIDIwNy4yMiAweiIgdHJhbnNmb3JtPSJtYXRyaXgoLjkzNzM5IDAgMCAuOTM3MzkgNDIuMTQzIC02LjMzOTIpIiBzdHJva2Utd2lkdGg9IjAiIGZpbGw9IiNmZmYiLz4KIDxnIGlkPSJsYXllcjEiPgogIDxwYXRoIGlkPSJwYXRoMjQxMyIgZD0ibTEwMCAwYy01NS4yIDAtMTAwIDQ0LjgtMTAwIDEwMC01LjA0OTVlLTE1IDU1LjIgNDQuOCAxMDAgMTAwIDEwMHMxMDAtNDQuOCAxMDAtMTAwLTQ0LjgtMTAwLTEwMC0xMDB6bTAgMTIuODEyYzQ4LjEzIDAgODcuMTkgMzkuMDU4IDg3LjE5IDg3LjE4OHMtMzkuMDYgODcuMTktODcuMTkgODcuMTktODcuMTg4LTM5LjA2LTg3LjE4OC04Ny4xOSAzOS4wNTgtODcuMTg4IDg3LjE4OC04Ny4xODh6bTEuNDcgMjEuMjVjLTUuNDUgMC4wMy0xMC42NTMgMC43MzctMTUuMjgyIDIuMDYzLTQuNjk5IDEuMzQ2LTkuMTI2IDMuNDg0LTEyLjg3NiA2LjIxOS0zLjIzOCAyLjM2Mi02LjMzMyA1LjM5MS04LjY4NyA4LjUzMS00LjE1OSA1LjU0OS02LjQ2MSAxMS42NTEtNy4wNjMgMTguNjg3LTAuMDQgMC40NjgtMC4wNyAwLjg2OC0wLjA2MiAwLjg3NiAwLjAxNiAwLjAxNiAyMS43MDIgMi42ODcgMjEuODEyIDIuNjg3IDAuMDUzIDAgMC4xMTMtMC4yMzQgMC4yODItMC45MzcgMS45NDEtOC4wODUgNS40ODYtMTMuNTIxIDEwLjk2OC0xNi44MTMgNC4zMi0yLjU5NCA5LjgwOC0zLjYxMiAxNS43NzgtMi45NjkgMi43NCAwLjI5NSA1LjIxIDAuOTYgNy4zOCAyIDIuNzEgMS4zMDEgNS4xOCAzLjM2MSA2Ljk0IDUuODEzIDEuNTQgMi4xNTYgMi40NiA0LjU4NCAyLjc1IDcuMzEyIDAuMDggMC43NTkgMC4wNSAyLjQ4LTAuMDMgMy4yMTktMC4yMyAxLjgyNi0wLjcgMy4zNzgtMS41IDQuOTY5LTAuODEgMS41OTctMS40OCAyLjUxNC0yLjc2IDMuODEyLTIuMDMgMi4wNzctNS4xOCA0LjgyOS0xMC43OCA5LjQwNy0zLjYgMi45NDQtNi4wNCA1LjE1Ni04LjEyIDcuMzQzLTQuOTQzIDUuMTc5LTcuMTkxIDkuMDY5LTguNTY0IDE0LjcxOS0wLjkwNSAzLjcyLTEuMjU2IDcuNTUtMS4xNTYgMTMuMTkgMC4wMjUgMS40IDAuMDYyIDIuNzMgMC4wNjIgMi45N3YwLjQzaDIxLjU5OGwwLjAzLTIuNGMwLjAzLTMuMjcgMC4yMS01LjM3IDAuNTYtNy40MSAwLjU3LTMuMjcgMS40My01IDMuOTQtNy44MSAxLjYtMS44IDMuNy0zLjc2IDYuOTMtNi40NyA0Ljc3LTMuOTkxIDguMTEtNi45OSAxMS4yNi0xMC4xMjUgNC45MS00LjkwNyA3LjQ2LTguMjYgOS4yOC0xMi4xODcgMS40My0zLjA5MiAyLjIyLTYuMTY2IDIuNDYtOS41MzIgMC4wNi0wLjgxNiAwLjA3LTMuMDMgMC0zLjk2OC0wLjQ1LTcuMDQzLTMuMS0xMy4yNTMtOC4xNS0xOS4wMzItMC44LTAuOTA5LTIuNzgtMi44ODctMy43Mi0zLjcxOC00Ljk2LTQuMzk0LTEwLjY5LTcuMzUzLTE3LjU2LTkuMDk0LTQuMTktMS4wNjItOC4yMy0xLjYtMTMuMzUtMS43NS0wLjc4LTAuMDIzLTEuNTktMC4wMzYtMi4zNy0wLjAzMnptLTEwLjkwOCAxMDMuNnYyMmgyMS45OTh2LTIyaC0yMS45OTh6Ii8+CiA8L2c+Cjwvc3ZnPgo='
-      ),
-      disableEncryption: true
-    }];
-    this.formData.sharedMembers = [ ];
+    // get current contract address from url
+    this.contractAddress = await this.routingService.getHashParam('address');
 
-    // test dispatcher functionallity
-    this.queueId = new QueueId(
-      `<%= dbcpName %>.${ getDomainName() }`,
-      '<%= cleanName %>Dispatcher',
-      '<%= cleanName %>'
-    );
+    if (this.contractAddress) {
+      // load the details
+      this.formData = await this.<%= cleanName %>ServiceInstance.loadDigitalTwinData(this.contractAddress);
+    } else {
+      this.formData.bannerImg = [{
+        blobURI: this._DomSanitizer.bypassSecurityTrustUrl(
+          'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgo8c3ZnIGlkPSJzdmcyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAwIiB3aWR0aD0iMjAwIiB2ZXJzaW9uPSIxLjAiPgogPHBhdGggaWQ9InBhdGgyMzgyIiBkPSJtMTY1LjMzIDExMy40NGExMDMuNjEgMTAzLjYxIDAgMSAxIC0yMDcuMjIgMCAxMDMuNjEgMTAzLjYxIDAgMSAxIDIwNy4yMiAweiIgdHJhbnNmb3JtPSJtYXRyaXgoLjkzNzM5IDAgMCAuOTM3MzkgNDIuMTQzIC02LjMzOTIpIiBzdHJva2Utd2lkdGg9IjAiIGZpbGw9IiNmZmYiLz4KIDxnIGlkPSJsYXllcjEiPgogIDxwYXRoIGlkPSJwYXRoMjQxMyIgZD0ibTEwMCAwYy01NS4yIDAtMTAwIDQ0LjgtMTAwIDEwMC01LjA0OTVlLTE1IDU1LjIgNDQuOCAxMDAgMTAwIDEwMHMxMDAtNDQuOCAxMDAtMTAwLTQ0LjgtMTAwLTEwMC0xMDB6bTAgMTIuODEyYzQ4LjEzIDAgODcuMTkgMzkuMDU4IDg3LjE5IDg3LjE4OHMtMzkuMDYgODcuMTktODcuMTkgODcuMTktODcuMTg4LTM5LjA2LTg3LjE4OC04Ny4xOSAzOS4wNTgtODcuMTg4IDg3LjE4OC04Ny4xODh6bTEuNDcgMjEuMjVjLTUuNDUgMC4wMy0xMC42NTMgMC43MzctMTUuMjgyIDIuMDYzLTQuNjk5IDEuMzQ2LTkuMTI2IDMuNDg0LTEyLjg3NiA2LjIxOS0zLjIzOCAyLjM2Mi02LjMzMyA1LjM5MS04LjY4NyA4LjUzMS00LjE1OSA1LjU0OS02LjQ2MSAxMS42NTEtNy4wNjMgMTguNjg3LTAuMDQgMC40NjgtMC4wNyAwLjg2OC0wLjA2MiAwLjg3NiAwLjAxNiAwLjAxNiAyMS43MDIgMi42ODcgMjEuODEyIDIuNjg3IDAuMDUzIDAgMC4xMTMtMC4yMzQgMC4yODItMC45MzcgMS45NDEtOC4wODUgNS40ODYtMTMuNTIxIDEwLjk2OC0xNi44MTMgNC4zMi0yLjU5NCA5LjgwOC0zLjYxMiAxNS43NzgtMi45NjkgMi43NCAwLjI5NSA1LjIxIDAuOTYgNy4zOCAyIDIuNzEgMS4zMDEgNS4xOCAzLjM2MSA2Ljk0IDUuODEzIDEuNTQgMi4xNTYgMi40NiA0LjU4NCAyLjc1IDcuMzEyIDAuMDggMC43NTkgMC4wNSAyLjQ4LTAuMDMgMy4yMTktMC4yMyAxLjgyNi0wLjcgMy4zNzgtMS41IDQuOTY5LTAuODEgMS41OTctMS40OCAyLjUxNC0yLjc2IDMuODEyLTIuMDMgMi4wNzctNS4xOCA0LjgyOS0xMC43OCA5LjQwNy0zLjYgMi45NDQtNi4wNCA1LjE1Ni04LjEyIDcuMzQzLTQuOTQzIDUuMTc5LTcuMTkxIDkuMDY5LTguNTY0IDE0LjcxOS0wLjkwNSAzLjcyLTEuMjU2IDcuNTUtMS4xNTYgMTMuMTkgMC4wMjUgMS40IDAuMDYyIDIuNzMgMC4wNjIgMi45N3YwLjQzaDIxLjU5OGwwLjAzLTIuNGMwLjAzLTMuMjcgMC4yMS01LjM3IDAuNTYtNy40MSAwLjU3LTMuMjcgMS40My01IDMuOTQtNy44MSAxLjYtMS44IDMuNy0zLjc2IDYuOTMtNi40NyA0Ljc3LTMuOTkxIDguMTEtNi45OSAxMS4yNi0xMC4xMjUgNC45MS00LjkwNyA3LjQ2LTguMjYgOS4yOC0xMi4xODcgMS40My0zLjA5MiAyLjIyLTYuMTY2IDIuNDYtOS41MzIgMC4wNi0wLjgxNiAwLjA3LTMuMDMgMC0zLjk2OC0wLjQ1LTcuMDQzLTMuMS0xMy4yNTMtOC4xNS0xOS4wMzItMC44LTAuOTA5LTIuNzgtMi44ODctMy43Mi0zLjcxOC00Ljk2LTQuMzk0LTEwLjY5LTcuMzUzLTE3LjU2LTkuMDk0LTQuMTktMS4wNjItOC4yMy0xLjYtMTMuMzUtMS43NS0wLjc4LTAuMDIzLTEuNTktMC4wMzYtMi4zNy0wLjAzMnptLTEwLjkwOCAxMDMuNnYyMmgyMS45OTh2LTIyaC0yMS45OTh6Ii8+CiA8L2c+Cjwvc3ZnPgo='
+        ),
+        disableEncryption: true
+      }];
+      this.formData.sharedMembers = [ ];
+    }
 
     // wait for dispatcher to be finished
-    this.queueWatcher = await this.queueService.onQueueFinish(this.queueId, async (reload, results) => {
+    this.queueWatcher = await this.queueService.onQueueFinish(this.<%= cleanName %>ServiceInstance.queueId, async (reload, results) => {
       // if the function was called by finishing the queue, everything is fine.
       if (reload) {
         console.log('Dispatcher is working');
 
         // sample UI data update
-        this.contractAddress = results[0][0];
+        this.newAddress = results[0][0];
         this.creating = false;
         this.ref.detectChanges();
       }
     });
 
     // if anything is in the queue, wait for finishing
-    this.creating = this.queueService.getQueueEntry(this.queueId, true).data
-      .filter(entry => !entry.contractAddress).length > 0;
+    this.creating = this.queueService.getQueueEntry(this.<%= cleanName %>ServiceInstance.queueId, true).data.length > 0;
   }
 
   /**
@@ -164,11 +164,19 @@ export class CreateComponent extends AsyncComponent {
 
     // submit new data to the queue
     this.queueService.addQueueData(
-      this.queueId,
-      this.formData
+      this.<%= cleanName %>ServiceInstance.queueId,
+      {
+        contractAddress: this.contractAddress,
+        formData: this.formData
+      }
     );
 
     this.ref.detectChanges();
+
+    // if we are editing a contract, navigate back to the detail view
+    if (this.contractAddress) {
+      this.routingService.goBack();
+    }
   }
 
   /**

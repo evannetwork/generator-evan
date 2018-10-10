@@ -16,6 +16,7 @@
 
 export const de = {
   "sample": "<%= dbcpName %>",
+  "editcontract": "Digitalen Zwilling bearbeiten",
   "_<%= dbcpName %>": {
     "description": "<%= description %>",
     "dispatcher": {
@@ -39,6 +40,7 @@ export const de = {
     "contract-invitation": {
       "text-title": "<%= projectName %> Vertrag freigegeben",
       "text-body": "Ein neuer Digitaler Zwilling wurde für Sie freigegeben."
-    }
+    },
+    "edit": "Digitalen Zwilling bearbeiten"
   }
 };

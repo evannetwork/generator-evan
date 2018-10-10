@@ -59,6 +59,9 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
         const activeAccount = service.core.activeAccount();
 
         for (let entry of queueEntry.data) {
+          const formData = entry.formData;
+          const contractAddress = entry.contractAddress;
+
           // get description for the current dapp and use it as contract metadata preset
           const description = await service.descriptionService.getDescription(
             `<%= dbcpName %>.${ getDomainName() }`,
@@ -66,22 +69,30 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
           );
 
           // create the new data contract
-          const contract = await service.bcc.dataContract.create(
-            'testdatacontract',
-            activeAccount,
-            null,
-            { public : description }
-          );
+          let contract;
+          if (contractAddress) {
+            contract = service.bcc.contractLoader.loadContract(
+              'DataContractInterface',
+              contractAddress
+            );
+          } else {
+            contract = await service.bcc.dataContract.create(
+              'testdatacontract',
+              activeAccount,
+              null,
+              { public : description }
+            );
+          }
 
           // load the latest block number, so the encryption will work only for data after this
           // block
           const blockNumber = await service.bcc.web3.eth.getBlockNumber();
 
           // search for files and pictures that needs to be encrypted
-          const formDataKeys = Object.keys(entry);
+          const formDataKeys = Object.keys(formData);
           const metadataToSave: any = { };
           for (let key of formDataKeys) {
-            metadataToSave[key] = entry[key];
+            metadataToSave[key] = formData[key];
 
             // transform files into the correct format
             if (fileProps.indexOf(key) !== -1) {

@@ -15,7 +15,7 @@
 -->
 
 <evan-loading *ngIf="loading"></evan-loading>
-<form *ngIf="!loading && !contractAddress" #createForm="ngForm">
+<form *ngIf="!loading && !newAddress" #createForm="ngForm">
   <ng-container *ngIf="!creating">
     <div class="evan-content">
       <div class="banner-img">
@@ -71,24 +71,19 @@
       </p>
       
       <%- digitaltwinEditTpl %>
-      
-      <div text-center padding-bottom margin-top>
-        <button ion-button round icon-left outline
-          (click)="create()"
-          [disabled]="createForm.invalid">
-          <ion-icon name="add"></ion-icon>
-        
-          <span>{{ '_<%= dbcpName %>.create' | translate }}</span>
-        </button>
-      </div>
     </div>
     <div text-center padding-bottom margin-top>
       <button ion-button round icon-left outline color="transparency"
         (click)="create()"
         [disabled]="createForm.invalid">
-        <ion-icon name="add"></ion-icon>
-      
-        <span>{{ '_<%= dbcpName %>.create' | translate }}</span>
+        <ng-container *ngIf="!contractAddress">
+          <ion-icon name="add"></ion-icon>
+          <span>{{ '_<%= dbcpName %>.create' | translate }}</span>
+        </ng-container>
+        <ng-container *ngIf="contractAddress">
+          <ion-icon name="create"></ion-icon>
+          <span>{{ '_<%= dbcpName %>.edit' | translate }}</span>
+        </ng-container>
       </button>
     </div>
   </ng-container>
@@ -100,10 +95,10 @@
   </div>
 </form>
 
-<div class="evan-content" *ngIf="!loading && contractAddress">
+<div class="evan-content" *ngIf="!loading && newAddress">
   <h3 class="content-header m-b-0 m-t-0">
     {{ '_<%= dbcpName %>.new-contract' | translate }}
   </h3>
 
-  <a routerLink="./{{ contractAddress }}">{{ contractAddress }}</a>
+  <a routerLink="./{{ newAddress }}">{{ newAddress }}</a>
 </div>

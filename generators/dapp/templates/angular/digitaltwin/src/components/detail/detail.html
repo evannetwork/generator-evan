@@ -34,6 +34,15 @@
         <h3 label>{{ '_<%= dbcpName %>.members' | translate }}</h3>
       </contract-members>
     </div>
+
+    <div text-center margin-top *ngIf="canEdit">
+      <button ion-button round icon-left outline
+        (click)="openEdit()">
+        <ion-icon name="create"></ion-icon>
+      
+        <span>{{ '_<%= dbcpName %>.edit' | translate }}</span>
+      </button>
+    </div>
   </div>
 
   <div class="evan-content" evan-content>

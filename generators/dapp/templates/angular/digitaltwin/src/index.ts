@@ -87,13 +87,13 @@ function getRoutes(): Routes {
             component: DetailComponent
           },
           {
-            path: '**',
+            path: 'edit-contract',
             data: {
-              state: 'unknown',
+              state: 'edit',
               navigateBack: true,
               reload: true,
             },
-            component: DAppLoaderComponent,
+            component: CreateComponent,
           }
         ]
       },

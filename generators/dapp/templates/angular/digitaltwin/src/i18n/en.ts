@@ -16,6 +16,7 @@
 
 export const en = {
   "sample": "<%= dbcpName %>",
+  "editcontract": "Edit Digital Twin",
   "_<%= dbcpName %>": {
     "description": "<%= description %>",
     "dispatcher": {
@@ -39,6 +40,7 @@ export const en = {
     "contract-invitation": {
       "text-title": "<%= projectName %> Contract shared",
       "text-body": "A new Digital Twin has been shared with you."
-    }
+    },
+    "edit": "edit Digital Twin"
   }
 };

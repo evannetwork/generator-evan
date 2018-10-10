@@ -63,6 +63,16 @@ export class DetailComponent extends AsyncComponent {
    */
   private formData: any;
 
+  /**
+   * Is the user permitted to edit the metatada of the twin?
+   */
+  private canEdit: boolean;
+
+  /**
+   * { item_description }
+   */
+  private saving: boolean;
+
   constructor(
     private _DomSanitizer: DomSanitizer,
     private alertService: EvanAlertService,
@@ -88,43 +98,18 @@ export class DetailComponent extends AsyncComponent {
     this.contractAddress = await this.routingService.getHashParam('address');
 
     // load the details
-    this.formData = await this.bcc.dataContract.getEntry(
-      this.contractAddress,
-      'entry_settable_by_owner',
-      this.core.activeAccount()
-    );
+    this.formData = await this.<%= cleanName %>ServiceInstance.loadDigitalTwinData(this.contractAddress);
 
-    // search for files and pictures that needs to be decrypted
-    for (let key of Object.keys(this.formData)) {
-      if (typeof this.formData[key] === 'string') {
-        try {
-          const parsed = JSON.parse(this.formData[key]);
-
-          if (parsed.private) {
-            this.formData[key] = (await this.bcc.dataContract.decrypt(
-              this.formData[key],
-              this.contractAddress,
-              this.core.activeAccount(),
-              '*'
-            )).private;
-
-            // transform blobURI to security trust url, so the ui can show it
-            if (Array.isArray(this.formData[key])) {
-              const urlCreator = (<any>window).URL || (<any>window).webkitURL;
-
-              for (let entry of this.formData[key]) {
-                if (entry.blobURI) {
-                  entry.file = new Blob([entry.file], { type: entry.fileType });
-                  entry.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(
-                    urlCreator.createObjectURL(entry.file)
-                  );
-                }
-              }
-            }
-          }
-        } catch (ex) { }
-      }
+    // load the members and all the roles of the contract and check, if the current logged in user
+    // is in the owner role
+    const members = await this.bcc.rightsAndRoles.getMembers(this.contractAddress);
+    if (members[0] && members[0].indexOf(this.core.activeAccount()) !== -1) {
+      this.canEdit = true;
     }
+
+    // check if currently anything is saving?
+    this.saving = this.queueService.getQueueEntry(this.<%= cleanName %>ServiceInstance.queueId,
+      true).data.length > 0;
   }
 
   /**
@@ -140,5 +125,12 @@ export class DetailComponent extends AsyncComponent {
         dataUrl,
       );
     } catch (ex) { }
+  }
+
+  /**
+   * Opens the edit page for the contract.
+   */
+  openEdit() {
+    this.routingService.navigate('./edit-contract');
   }
 }
