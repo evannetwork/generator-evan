@@ -32,11 +32,12 @@ import {
   EvanCoreService,
   EvanDescriptionService,
   EvanFileService,
+  EvanPictureService,
+  EvanQueue,
   EvanTranslationService,
   EvanUtilService,
   QueueId,
   SingletonService,
-  EvanQueue,
 } from 'angular-core';
 
 /**************************************************************************************************/
@@ -51,19 +52,28 @@ export class <%= cleanName %>Service implements OnDestroy {
   public queueId: QueueId;
 
   /**
+   * used to format files and pictures into the correct format for saving
+   */
+  public pictureProps: Array<string> = <%- digitaltwinPicProps %>;
+  public fileProps: Array<string> = <%- digitaltwinFileProps %>;
+
+  /**
    * Create a singleton service instance. 
    */
   constructor(
+    public _DomSanitizer: DomSanitizer,
     public bcc: EvanBCCService,
     public core: EvanCoreService,
     public descriptionService: EvanDescriptionService,
     public fileService: EvanFileService,
+    public pictureService: EvanPictureService,
+    public queueService: EvanQueue,
     public singleton: SingletonService,
     public translate: EvanTranslationService,
-    public queueService: EvanQueue,
-    public _DomSanitizer: DomSanitizer,
   ) {
     return singleton.create(<%= cleanName %>Service, this, () => {
+      this.pictureProps.push('bannerImg');
+
       // test dispatcher functionallity
       this.queueId = new QueueId(
         `<%= dbcpName %>.${ getDomainName() }`,
@@ -98,7 +108,7 @@ export class <%= cleanName %>Service implements OnDestroy {
 
     // search for files and pictures that needs to be decrypted
     for (let key of Object.keys(formData)) {
-      if (typeof formData[key] === 'string') {
+      if (this.fileProps.indexOf(key) !== -1 || this.pictureProps.indexOf(key) !== -1) {
         try {
           const parsed = JSON.parse(formData[key]);
 
@@ -111,18 +121,9 @@ export class <%= cleanName %>Service implements OnDestroy {
             )).private;
 
             // transform blobURI to security trust url, so the ui can show it
-            if (Array.isArray(formData[key])) {
-              const urlCreator = (<any>window).URL || (<any>window).webkitURL;
-
-              for (let entry of formData[key]) {
-                if (entry.blobURI) {
-                  entry.file = new Blob([entry.file], { type: entry.fileType });
-                  entry.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(
-                    urlCreator.createObjectURL(entry.file)
-                  );
-                }
-              }
-            }
+            formData[key] = await this.fileService.equalizeFileStructure(formData[key]);
+          } else {
+            formData[key] = parsed;
           }
         } catch (ex) { }
       }

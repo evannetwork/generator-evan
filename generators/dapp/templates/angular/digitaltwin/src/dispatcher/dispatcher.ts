@@ -41,13 +41,6 @@ import {
 } from '../services/service';
 
 /**************************************************************************************************/
-/**
- * used to format files and pictures into the correct format for saving
- */
-const pictureProps: Array<string> = <%- digitaltwinPicProps %>;
-const fileProps: Array<string> = <%- digitaltwinFileProps %>;
-
-pictureProps.push('bannerImg');
 
 export const <%= cleanName %>Dispatcher = new QueueDispatcher(
   [
@@ -94,18 +87,20 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
           for (let key of formDataKeys) {
             metadataToSave[key] = formData[key];
 
-            // transform files into the correct format
-            if (fileProps.indexOf(key) !== -1) {
-              metadataToSave[key] = await service.fileService.readFilesAsArrayBuffer(metadataToSave[key]);
-            }
-
             // the its a file or a picture, encrypt it!
-            if (fileProps.indexOf(key) !== -1 || pictureProps.indexOf(key) !== -1) {
+            if (service.fileProps.indexOf(key) !== -1 || service.pictureProps.indexOf(key) !== -1) {
               // if the encryption should be disabled, continue with the next element
-              if (metadataToSave[key].length > 0 && metadataToSave[key][0].disableEncryption) {
+              if (metadataToSave[key].length === 0 || (metadataToSave[key].length > 0 &&
+                  metadataToSave[key][0].disableEncryption)) {
+                metadataToSave[key] = JSON.stringify(metadataToSave[key]);
                 continue;
               }
 
+              // use the correct format for saving
+              metadataToSave[key] = await service.fileService.equalizeFileStructure(
+                metadataToSave[key]);
+
+              // encrypt the data
               metadataToSave[key] = await service.bcc.dataContract.encrypt(
                 {
                   private: metadataToSave[key]

@@ -54,6 +54,11 @@ import {
  */
 export class DetailComponent extends AsyncComponent {
   /**
+   * Function to unsubscribe from queue results.
+   */
+  private queueWatcher: Function;
+
+  /**
    * contract id that should be loaded
    */
   private contractAddress: string;
@@ -97,19 +102,34 @@ export class DetailComponent extends AsyncComponent {
     // get current contract address from url
     this.contractAddress = await this.routingService.getHashParam('address');
 
-    // load the details
-    this.formData = await this.<%= cleanName %>ServiceInstance.loadDigitalTwinData(this.contractAddress);
-
-    // load the members and all the roles of the contract and check, if the current logged in user
-    // is in the owner role
-    const members = await this.bcc.rightsAndRoles.getMembers(this.contractAddress);
-    if (members[0] && members[0].indexOf(this.core.activeAccount()) !== -1) {
-      this.canEdit = true;
-    }
-
     // check if currently anything is saving?
     this.saving = this.queueService.getQueueEntry(this.<%= cleanName %>ServiceInstance.queueId,
       true).data.length > 0;
+
+    this.queueWatcher = await this.queueService.onQueueFinish(this.<%= cleanName %>ServiceInstance.queueId,
+      async (reload, results) => {
+        // load the details
+        this.formData = await this.<%= cleanName %>ServiceInstance.loadDigitalTwinData(this.contractAddress);
+
+        // load the members and all the roles of the contract and check, if the current logged in user
+        // is in the owner role
+        const members = await this.bcc.rightsAndRoles.getMembers(this.contractAddress);
+        if (members[0] && members[0].indexOf(this.core.activeAccount()) !== -1) {
+          this.canEdit = true;
+        }
+
+        if (reload) {
+          this.ref.detectChanges();
+        }
+      }
+    );
+  }
+
+  /**
+   * Clear the queue watcher
+   */
+  async _ngOnDestroy() {
+    this.queueWatcher();
   }
 
   /**
