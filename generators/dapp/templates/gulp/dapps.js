@@ -43,13 +43,35 @@ async function runExec(command) {
   });
 }
 
-const dappDirs = getDirectories(path.resolve('../dapps'))
+const dappDirs = getDirectories(path.resolve('../dapps'));
+let longestDAppName = 0;
+
+for (let dappDir of dappDirs) {
+  const dappNameLength = dappDir.split('/').pop().length;
+
+  if (longestDAppName < dappNameLength) {
+    longestDAppName = dappNameLength;
+  }
+}
+
+/**
+ * Fill dapp name with spaces to create an clean watching log.
+ *
+ * @param      {string}  dappName  dapp name
+ * @return     {string}  filled dapp name
+ */
+const getFilledDAppName = (dappName) => {
+  while (dappName.length < longestDAppName + 5) {
+    dappName += ' ';
+  }
+
+  return dappName;
+}
 
 /**
  * save latest serve and build status
  */
 const serves = { };
-
 dappDirs.forEach(dappDir => {
   const dappName = dappDir.split('/').pop();
 
@@ -67,14 +89,15 @@ const logServing = () => {
 
   for (let dappDir of dappDirs) {
     const dappName = dappDir.split('/').pop();
+    const logDAppName = getFilledDAppName(dappName);
 
     // load the status of the dapp
     if (serves[dappName].rebuild) {
-      console.log(`  ${ dappName }: rebuilding`);
+      console.log(`  ${ logDAppName }: rebuilding`);
     } else if (serves[dappName].loading) {
-      console.log(`  ${ dappName }: building`);
+      console.log(`  ${ logDAppName }: building`);
     } else {
-      console.log(`  ${ dappName }: watching`);
+      console.log(`  ${ logDAppName }: watching`);
     }
 
     if (serves[dappName].stderr) {
@@ -97,7 +120,7 @@ const logServing = () => {
  * @param      {string}  dappDir  the directory of the dapp
  * @return     {Promise<void>}  resolved when done
  */
-const buildDApp = async (dappDir, event) => {
+const buildDApp = async (dappDir) => {
   // if its not already building, build the dapp
   const dappName = dappDir.split('/').pop();
   if (!serves[dappName].loading) {
@@ -134,7 +157,7 @@ const buildDApp = async (dappDir, event) => {
 // Run Express, auto rebuild and restart on src changes
 gulp.task('dapps-serve', () => {
   dappDirs.forEach(dappDir =>
-    gulp.watch(`${dappDir}/src/**/*`, (event) => buildDApp(dappDir, event))
+    gulp.watch(`${dappDir}/src/**/*`, (event) => buildDApp(dappDir))
   );
 
   setTimeout(() => logServing());
@@ -145,8 +168,7 @@ gulp.task('dapps-build', async function () {
   for (let dappDir of dappDirs) {
     try {
       // navigate to the dapp dir and run the build command
-      process.chdir(dappDir);
-      await runExec('npm run build');
+      await buildDApp(dappDir);
     } catch (ex) {
       console.error(ex);
     }
