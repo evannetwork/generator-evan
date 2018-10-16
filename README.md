@@ -356,13 +356,17 @@ yo evan:dapp
 ```
 
 This sub generator will ask for each data that is needed to specify the basic structure of your
-dapp. Each new dapp will placed within the "dapps" folder of your basi project.You can shoose one of
-4 DApp templates for a fast development start.
+dapp. Each new dapp will placed within the "dapps" folder of your basi project. You can shoose one
+of several templates for a fast development start.
 
-1. Single DApp = Mostly used for handling OnePage Apps for a Dashboard or Contract Select View.
-2. Dashboard DApp = Represents a DApp that handles a Dashboard with left side panel navigation, that can organize and open other DApps.
-3. DataContract DApp = A single DApp for creating and viewing a DataContract. The DApp includes the basic routing for contract addresses and the logic for creating a new data contract and setting some data.
-4. Custom Contract DApp = A single DApp that includes your custom smart contract ABI definition. The DApp includes the basic routing for contract addresses and the logic for creating a new data contract and setting some data.
+1. Angular 5
+  1. Single DApp = Mostly used for handling OnePage Apps for a Dashboard or Contract Select View.
+  2. Dashboard DApp = Represents a DApp that handles a Dashboard with left side panel navigation, that can organize and open other DApps.
+  3. DataContract DApp = A single DApp for creating and viewing a DataContract. The DApp includes the basic routing for contract addresses and the logic for creating a new data contract and setting some data.
+  4. Digital Twin = Create, view and change data of your own digital twin. The yeoman script will generate a customized formular for you, that allows to enter several metadata.
+
+2. VueJS
+  1. Hello World = DApp that handles basic login and contract creation.
 
 After you created your DApp, you can now build your DApps by running:
 

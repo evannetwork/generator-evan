@@ -6,6 +6,7 @@
 - split into multiple dapp frameworks (Angular 5, VueJS)
 - add package.json enhancement for dapp dependencies
 - remove default angular-gulp for serve / build job => use minimal gulp job and each dapp will specify its own build job
+- generate digital twin DApps
 
 ### Fixes
 - fix empty undefined answer values `dappsDomain`, `deploymentAccountId`, `deploymentPrivateKey` when generating root structure without custom ens dapps domain
