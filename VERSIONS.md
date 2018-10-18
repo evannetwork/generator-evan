@@ -3,6 +3,7 @@
 ## Next Version
 ### Features
 ### Fixes
+- fix deployment path when app is generated
 ### Deprecations
 
 ## Version 1.3.0
