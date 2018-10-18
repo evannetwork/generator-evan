@@ -13,5 +13,8 @@
     "Ionic",
     "DApp",
     "SASS"
-  ]
+  ],
+  "scripts": {
+    "build": "cd ../.. && npm run angular-build dapps/<%= projectName %>"
+  }
 }

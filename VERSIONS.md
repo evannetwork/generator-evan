@@ -5,10 +5,21 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.3.0
+### Features
+- `yo evan` does not generates a new folder
+- split into multiple dapp frameworks (Angular 5, VueJS)
+- add package.json enhancement for dapp dependencies
+- remove default angular-gulp for serve / build job => use minimal gulp job and each dapp will specify its own build job
+- generate digital twin DApps
+
+### Fixes
+- fix empty undefined answer values `dappsDomain`, `deploymentAccountId`, `deploymentPrivateKey` when generating root structure without custom ens dapps domain
+
 ## Version 1.2.1
 ### Features
 ### Fixes
-- fix correct versions of blockchain core
+- fix correct version of blockchain-core
 ### Deprecations
 
 ## Version 1.2.0

@@ -13,15 +13,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 const path = require('path')
 
-const evan = null
+const { Solc } = require('@evan.network/smart-contracts-core')
+
 
 function compile(src, dst) {
   return async () => {
-    const Solc = require('@evan.network/smart-contracts-core').Solc
-
     const scc = new Solc({ log: console.log, config: { compileContracts: true } })
     const srcR = path.resolve(process.cwd(), src)
     const dstR = path.resolve(process.cwd(), dst)
@@ -29,16 +27,4 @@ function compile(src, dst) {
   }
 }
 
-function instantiate(name, arguments, gas, owner) {
-  evan = evan || require('./evan.access.js')
-  evan.init()
-  if(!evan.bcc.contractLoader.contracts[name]) return console.error('Could not find: ', name)
-  if(!owner) owner = evan.bcc.activeAccount
-
-  evan.bcc.executor.createContract( name, arguments, { from: A, gas: gas })
-    .then(c => { })
-  
-  evan.close()
-}
-
-module.exports = { compile, instantiate }
+module.exports = { compile }
