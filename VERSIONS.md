@@ -3,6 +3,9 @@
 ## Next Version
 ### Features
 ### Fixes
+- add missing mailbox light styling
+- fix dappName for empty dappsDomain
+
 ### Deprecations
 
 ## Version 1.3.1

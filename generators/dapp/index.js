@@ -173,12 +173,17 @@ module.exports = class extends Generator {
     // require deployment config to get the ENS Path (if exists)
     try {
       const deploymentConfig = require(`${ this.destinationRoot() }/scripts/config/deployment.js`);
-      this.answers.dbcpName = `${projectName}.${deploymentConfig.bcConfig.nameResolver.domains.dappsDomain}`;
-      this.answers.cleanName = this.answers.dbcpName.replace(/\./g, '');
+      this.answers.dbcpName = projectName;
+
+      if (deploymentConfig.bcConfig.nameResolver.domains.dappsDomain) {
+        this.answers.dbcpName = `${ projectName }.${ deploymentConfig.bcConfig.nameResolver.domains.dappsDomain }`;
+      }
+
+      this.answers.cleanName = this.answers.dbcpName.replace(/\.|\-/g, '');
     } catch(e) {
       // silent
-      this.answers.dbcpName = `${projectName}`;
-      this.answers.cleanName = this.answers.dbcpName.replace(/\./g, '');
+      this.answers.dbcpName = projectName;
+      this.answers.cleanName = this.answers.dbcpName.replace(/\.|\-/g, '');
     }
 
     // append projectName into the answers object to handle it within the 
