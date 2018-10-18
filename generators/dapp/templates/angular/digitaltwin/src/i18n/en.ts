@@ -15,32 +15,35 @@
 */
 
 export const en = {
-  "sample": "<%= dbcpName %>",
-  "editcontract": "Edit Digital Twin",
   "_<%= dbcpName %>": {
+    "choose-banner-img": "Select banner image",
+    "contract-invitation": {
+      "text-body": "A new Digital Twin has been shared with you.",
+      "text-title": "<%= projectName %> Contract shared"
+    },
+    "create": "create",
     "description": "<%= description %>",
     "dispatcher": {
-      "title": "<%= dbcpName %> Dispatcher",
       "description": "Handles data saving for the <%= dbcpName %> DApp.",
+      "title": "<%= dbcpName %> Dispatcher"
     },
-    "metadata": "Metadata",
-    "fill-empty": "Please fill in all fields marked with an *.",
-    "dt-creation": "Creation of a Digital Twin: ",
     "dt-creating": "Creating Digital Twin...",
-    "choose-banner-img": "Select banner image",
-    "take-a-picture": "Take snapshot",
+    "dt-creation": "Creation of a Digital Twin: ",
+    "edit": "edit Digital Twin",
+    "favorite-added": "Digital twin has been created",
+    "favorite-added-desc": "Your digital twin has been added to your favorites.",
+    "fill-empty": "Please fill in all fields marked with an *.",
     "members": "Shared members",
-    "create": "create",
+    "metadata": "Metadata",
     "new-contract": "New Digital Twin",
+    "ok": "ok",
+    "take-a-picture": "Take snapshot",
     "type": {
-      "text": "Type",
       "desc": "Type of the digital twin",
-      "error": "Please indicate a type!"
-    },
-    "contract-invitation": {
-      "text-title": "<%= projectName %> Contract shared",
-      "text-body": "A new Digital Twin has been shared with you."
-    },
-    "edit": "edit Digital Twin"
-  }
+      "error": "Please indicate a type!",
+      "text": "Type"
+    }
+  },
+  "editcontract": "Edit Digital Twin",
+  "sample": "<%= dbcpName %>"
 };

@@ -15,32 +15,35 @@
 */
 
 export const de = {
-  "sample": "<%= dbcpName %>",
-  "editcontract": "Digitalen Zwilling bearbeiten",
   "_<%= dbcpName %>": {
+    "choose-banner-img": "Banner Bild aussuchen",
+    "contract-invitation": {
+      "text-body": "Ein neuer Digitaler Zwilling wurde für Sie freigegeben.",
+      "text-title": "<%= projectName %> Vertrag freigegeben"
+    },
+    "create": "erstellen",
     "description": "<%= description %>",
     "dispatcher": {
-      "title": "<%= dbcpName %> Dispatcher",
-      "description": "Führt die Datenspeicherung für die <%= dbcpName %> DApp durch."
+      "description": "Führt die Datenspeicherung für die <%= dbcpName %> DApp durch.",
+      "title": "<%= dbcpName %> Dispatcher"
     },
-    "metadata": "Metadaten",
-    "fill-empty": "Bitte füllen Sie alle mit einem * gekennzeichneten Felder aus.",
-    "dt-creation": "Erstellung eines Digitaler Zwillings: ",
     "dt-creating": "Digitaler Zwilling wird erstellt...",
-    "choose-banner-img": "Banner Bild aussuchen",
-    "take-a-picture": "Bild aufnehmen",
+    "dt-creation": "Erstellung eines Digitaler Zwillings: ",
+    "edit": "Digitalen Zwilling bearbeiten",
+    "favorite-added": "Digitalen Zwilling wurde erstellt",
+    "favorite-added-desc": "Ihr digitaler Zwilling wurde zu Ihren Favoriten hinzugefügt.",
+    "fill-empty": "Bitte füllen Sie alle mit einem * gekennzeichneten Felder aus.",
     "members": "Freigegebene Mitglieder",
-    "create": "erstellen",
+    "metadata": "Metadaten",
     "new-contract": "Neuer Digitaler Zwilling",
+    "ok": "ok",
+    "take-a-picture": "Bild aufnehmen",
     "type": {
-      "text": "Typ",
       "desc": "Type des Digitalen Zwillings",
-      "error": "Bitte geben Sie einen Typ an!"
-    },
-    "contract-invitation": {
-      "text-title": "<%= projectName %> Vertrag freigegeben",
-      "text-body": "Ein neuer Digitaler Zwilling wurde für Sie freigegeben."
-    },
-    "edit": "Digitalen Zwilling bearbeiten"
-  }
+      "error": "Bitte geben Sie einen Typ an!",
+      "text": "Typ"
+    }
+  },
+  "editcontract": "Digitalen Zwilling bearbeiten",
+  "sample": "<%= dbcpName %>"
 };
