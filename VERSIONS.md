@@ -2,6 +2,11 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+## Version 1.3.0
+### Features
 - `yo evan` does not generates a new folder
 - split into multiple dapp frameworks (Angular 5, VueJS)
 - add package.json enhancement for dapp dependencies
@@ -10,8 +15,6 @@
 
 ### Fixes
 - fix empty undefined answer values `dappsDomain`, `deploymentAccountId`, `deploymentPrivateKey` when generating root structure without custom ens dapps domain
-
-### Deprecations
 
 ## Version 1.2.1
 ### Features
