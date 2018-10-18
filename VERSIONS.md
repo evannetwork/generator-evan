@@ -3,8 +3,15 @@
 ## Next Version
 ### Features
 ### Fixes
-- fix deployment path when app is generated
 ### Deprecations
+
+## Version 1.3.1
+### Features
+- digital twin DApp: add created contract to favorites 
+
+### Fixes
+- fix deployment path when app is generated
+- add missing package.json depdency for DApp's
 
 ## Version 1.3.0
 ### Features
