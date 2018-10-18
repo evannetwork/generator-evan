@@ -37,6 +37,9 @@
     "DApp",
     "SASS"
   ],
+  "scripts": {
+    "deploy": "gulp --gulpfile node_modules/@evan.network/ui-dapp-browser/gulp/deployment.js deploy --config <%= deploymentConfigLocation %>"
+  },
   "license": "Apache-2.0",
   "name": "<%= projectName %>",
   "version": "1.0.0"

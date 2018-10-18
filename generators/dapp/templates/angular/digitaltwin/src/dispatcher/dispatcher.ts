@@ -212,6 +212,18 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             }));
           }
 
+          // add the bookmark if its not exists before
+          if (!contractAddress) {
+            description.trimmedName = formData.type.replace(/\s|\./g, '');
+            description.i18n.name = {
+              de: formData.type,
+              en: formData.type,
+            };
+            await service.bcc.profile.loadForAccount(service.bcc.profile.treeLabels.bookmarkedDapps);
+            await service.bcc.profile.addDappBookmark(contract.options.address, description);
+            await service.bcc.profile.storeForAccount(service.bcc.profile.treeLabels.bookmarkedDapps);
+          }
+
           results.push(contract._address);
         }
 

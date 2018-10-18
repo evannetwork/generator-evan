@@ -136,11 +136,18 @@ export class CreateComponent extends AsyncComponent {
     this.queueWatcher = await this.queueService.onQueueFinish(this.<%= cleanName %>ServiceInstance.queueId, async (reload, results) => {
       // if the function was called by finishing the queue, everything is fine.
       if (reload) {
-        console.log('Dispatcher is working');
+        try {
+          await this
+            .alertService.showSubmitAlert(
+              '_<%= dbcpName %>.favorite-added',
+              '_<%= dbcpName %>.favorite-added-desc',
+              '_<%= dbcpName %>.ok',
+              '',
+            );
+        } catch (ex) { }
 
         // sample UI data update
-        this.newAddress = results[0][0];
-        this.creating = false;
+        this.routingService.navigate(`./${ results[0][0] }`);
         this.ref.detectChanges();
       }
     });
