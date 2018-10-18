@@ -19,7 +19,6 @@
   "scripts": {
     "dapps-build": "gulp --gulpfile gulp/dapps.js dapps-build",
     "dapps-serve": "gulp --gulpfile gulp/dapps.js dapps-serve",
-    "deploy": "gulp --gulpfile node_modules/@evan.network/ui-dapp-browser/gulp/deployment.js deploy --config <%= deploymentConfigLocation %>",
     "serve": "gulp --gulpfile node_modules/@evan.network/ui-dapp-browser/gulp/serve.js serve"
   }
 }

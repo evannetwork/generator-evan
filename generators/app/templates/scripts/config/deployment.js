@@ -118,7 +118,12 @@ module.exports = {
   options: runtimeConfig
 }
 
-const evan = require('../evan.access.js')
+try {
+  const evan = require('../evan.access.js')
 
-module.exports['runtimeConfig'] = evan.getAccountConfig(runtimeConfig, externalAccounts, managedAccounts)
+  module.exports['runtimeConfig'] = evan.getAccountConfig(runtimeConfig, externalAccounts, managedAccounts)
+} catch(e) {
+  // silent
+}
+
 
