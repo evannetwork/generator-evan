@@ -7,6 +7,7 @@
 - fix dappName for empty dappsDomain
 
 ### Deprecations
+- remove light DApp design (is included by `@evan.network/ui-angular-sass` custom themes now)
 
 ## Version 1.3.1
 ### Features
