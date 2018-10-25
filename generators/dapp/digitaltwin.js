@@ -1,365 +1,561 @@
-module.exports = async function(projectName) {
+module.exports = async function(projectName, dbcpName) {
   let stop;
-  const digitaltwinFields = [
+
+  const dataSets = [
     {
-      display: 'Text',
-      technical: 'text',
-      type: 'text',
-    },
-    {
-      display: 'Date',
-      technical: 'date',
-      type: 'date',
-    },
-    {
-      display: 'Members',
-      technical: 'members',
-      type: 'members',
-    },
-    {
-      display: 'Files',
-      technical: 'files',
-      type: 'files',
-    },
-    {
-      display: 'Pictures',
-      technical: 'pictures',
-      type: 'pictures',
-    },
+      display: 'Dataset 1',
+      technical: 'default',
+      fields: [
+        {
+          display: 'Text',
+          technical: 'text',
+          type: 'text',
+        },
+        {
+          display: 'Date',
+          technical: 'date',
+          type: 'date',
+        },
+        {
+          display: 'Members',
+          technical: 'members',
+          type: 'members',
+        },
+        {
+          display: 'Files',
+          technical: 'files',
+          type: 'files',
+        },
+        {
+          display: 'Pictures',
+          technical: 'pictures',
+          type: 'pictures',
+        },
+      ]
+    }
   ];
 
+  /**
+   * use this function for required inquirer fields
+   */
+  const validateFunc = (input) => {
+    if (!input) {
+      return 'Please specify a value!';
+    } else {
+      return true;
+    }
+  }
 
   while (!stop) {
     console.clear();
     console.log('New Digitaltwin template: ' + projectName);
     console.log('----------------------------------------\n');
 
-    if (digitaltwinFields.length > 0) {
-      console.log('Fields: \n');
+    dataSets.forEach(dataSet => {
+      console.log(`${ dataSet.display } (${ dataSet.technical }): \n`);
 
-      for (let i = 0; i < digitaltwinFields.length; i++) {
-        const field = digitaltwinFields[i];
-        console.log(`  ${ i + 1 }. ${ field.display } : ${ field.technical } (${ field.type })`);
-      }
-      console.log('\n')
+      dataSet.fields.forEach((field, index) => 
+        console.log(`  ${ index + 1 }. ${ field.display } : ${ field.technical } (${ field.type })`)
+      );
+
+      console.log('\n');
+    });
+
+    // choices to select within the first menu
+    const menuChoices = [
+      {
+        name: 'Add data set',
+        value: 'add-dataset'
+      },
+      {
+        name: 'Remove data set',
+        value: 'remove-dataset'
+      },
+      {
+        name: 'Add field',
+        value: 'add-field'
+      },
+      {
+        name: 'Remove field',
+        value: 'remove-field'
+      },
+      {
+        name: 'finish',
+        value: 'finish'
+      },
+    ];
+
+    if (dataSets.length === 0) {
+      menuChoices.splice(1, 0);
     }
 
+    // ask for user action
     const menuResult = (await this.prompt([
       {
-        type    : 'list',
-        name    : 'menuResult',
+        type : 'list',
+        name : 'menuResult',
         message : 'Would you like to add metadata to your Digitaltwin?',
-        choices: [
-          {
-            name: 'Add field',
-            value: 'addmetadata'
-          },
-          {
-            name: 'finish',
-            value: 'finish'
-          },
-        ]
+        choices: menuChoices
       }
     ])).menuResult;
 
-    if (menuResult === 'finish') {
-      stop = true;
-    } else {
-      const newField = await this.prompt([
-        {
-          type    : 'input',
-          name    : 'display',
-          message : 'Displayname of the property',
-          required: true
-        },
-        {
-          type    : 'input',
-          name    : 'technical',
-          message : 'technical name of the property',
-          required: true
-        },
-        {
-          type    : 'list',
-          name    : 'type',
-          message : 'type of the property',
-          required: true,
-          choices: [
-            {
-              name: 'Text',
-              value: 'text'
-            },
-            {
-              name: 'Date',
-              value: 'date'
-            },
-            {
-              name: 'Members',
-              value: 'members'
-            },
-            {
-              name: 'Files',
-              value: 'files'
-            },
-            {
-              name: 'Pictures',
-              value: 'pictures'
-            },
-          ]
-        },
-      ]);
+    switch (menuResult) {
+      case 'add-dataset': {
+        const newDataSet = await this.prompt([
+          {
+            type : 'input',
+            name : 'display',
+            message : 'Displayname of the dataset',
+            validate: validateFunc
+          },
+          {
+            type : 'input',
+            name : 'technical',
+            message : 'technical name of the dataset',
+            validate: (input) => {
+              if (!input) {
+                return 'Please specify a value!';
+              } else if (/[^A-Za-z0-9]/.test()) {
+                return 'The technical name should not include special characters!';
+              } else if (dataSets.filter(dataSet => dataSet.technical === input).length > 0) {
+                return 'A data set with the same technical name already exists!';
+              } else {
+                return true;
+              }
+            }
+          },
+        ]);
 
-      digitaltwinFields.push(newField);
-    }
-  }
+        // add fields array
+        newDataSet.fields = [ ];
 
-  // transform field results into the dbcp field configurations
-  let digitaltwinDBCPFields = { };
-  let digitaltwinEditTpl = [ ];
-  let digitaltwinDetailTpl = [ ];
-  let digitaltwinFormData = { };
-  let digitaltwinPicProps = [ ];
-  let digitaltwinFileProps = [ ];
-  let digitaltwinDBCPRequiredFields = [ ];
+        dataSets.push(newDataSet);
 
-  digitaltwinFields.forEach((field) => {
-    field.technical = field.technical.replace(/\ /g, '');
+        break;
+      }
 
-    digitaltwinDBCPRequiredFields.push(field.technical);
-    switch (field.type) {
-      case 'text':
-      case 'files':
-      case 'pictures':
-      case 'date': {
-        digitaltwinDBCPFields[field.technical] = {
-          'type': 'string'
+      case 'remove-dataset': {
+        const toRemove = (await this.prompt([
+          {
+            type : 'checkbox',
+            name : 'toRemove',
+            message : 'Dataset that should be removed',
+            validate: validateFunc,
+            choices: dataSets.map((dataSet, index) => {
+              return {
+                name: `${ dataSet.display } (${ dataSet.technical })`,
+                value: index,
+              }
+            })
+          }
+         ])).toRemove;
+
+        for (let index of toRemove) {
+          dataSets.splice(index, 1);
         }
 
         break;
       }
-      case 'members': {
-        digitaltwinDBCPFields[field.technical] = {
-          'items': {
-            'type': 'string'
+      case 'add-field': {
+        const dataSet = (await this.prompt([
+          {
+            type : 'list',
+            name : 'dataSet',
+            message : 'Dataset to add the property to',
+            validate: validateFunc,
+            choices: dataSets.map((dataSet, index) => {
+              return {
+                name: `${ dataSet.display } (${ dataSet.technical })`,
+                value: index,
+              }
+            })
+          }])).dataSet;
+
+        const newField = await this.prompt([
+          {
+            type : 'input',
+            name : 'display',
+            message : 'Displayname of the property',
+            validate: validateFunc
           },
-          'type': 'array'
-        };
+          {
+            type : 'input',
+            name : 'technical',
+            message : 'technical name of the property',
+            validate: (input) => {
+              if (!input) {
+                return 'Please specify a value!';
+              } else if (/[^A-Za-z0-9]/.test()) {
+                return 'The technical name should not include special characters!';
+              } else {
+                const fieldsToCheck = dataSets[dataSet].fields;
+
+                if (fieldsToCheck.filter(field => field.technical === input).length > 0) {
+                  return 'A data set with the same technical name already exists!';
+                } else {
+                  return true;
+                }
+              }
+            }
+          },
+          {
+            type : 'list',
+            name : 'type',
+            message : 'type of the property',
+            validate: validateFunc,
+            choices: [
+              {
+                name: 'Text',
+                value: 'text'
+              },
+              {
+                name: 'Date',
+                value: 'date'
+              },
+              {
+                name: 'Members',
+                value: 'members'
+              },
+              {
+                name: 'Files',
+                value: 'files'
+              },
+              {
+                name: 'Pictures',
+                value: 'pictures'
+              },
+            ]
+          },
+        ]);
+
+        dataSets[dataSet].fields.push(newField);
+
+        break;
+      }
+      case 'remove-field': {
+        const dataSet = (await this.prompt([
+          {
+            type : 'list',
+            name : 'dataSet',
+            message : 'Dataset to remove the property from',
+            validate: validateFunc,
+            choices: dataSets.map((dataSet, index) => {
+              return {
+                name: `${ dataSet.display } (${ dataSet.technical })`,
+                value: index,
+              }
+            })
+          }
+        ])).dataSet;
+
+        const toRemove = (await this.prompt([
+          {
+            type : 'checkbox',
+            name : 'toRemove',
+            message : 'Fields that should be removed',
+            validate: validateFunc,
+            choices: dataSets[dataSet].fields.map((field, index) => {
+              return {
+                name: `${ index + 1 }. ${ field.display } : ${ field.technical } (${ field.type })`,
+                value: field,
+              }
+            })
+          }
+         ])).toRemove;
+
+        for (let field of toRemove) {
+          dataSets[dataSet].fields.splice(dataSets[dataSet].fields.indexOf(field), 1);
+        }
+
+        break;
+      }
+      case 'finish': {
+        stop = true;
 
         break;
       }
     }
-  });
+  }
 
-  // apply templates for each field
-  digitaltwinFields.forEach((field) => {
-    switch (field.type) {
-      case 'text': {
-        digitaltwinEditTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-item>
-          <ion-label stacked>${ field.display }*</ion-label>
-          <ion-input name="${ field.technical }" required
-            [(ngModel)]="formData.${ field.technical }"
-            placeholder="${ field.display }"
-            (ionChange)="ref.detectChanges()"
-            (focusout)="ref.detectChanges()">
-          </ion-input>
-        </ion-item>
-        <ion-chip class="error-hint" *ngIf="showError('${ field.technical }')" color="danger">
-          <ion-label>Please insert value for ${ field.display }</ion-label>
-        </ion-chip>
-      </ion-col>
-        `);
+  // all the result values
+  const digitaltwinDataSchema = { };
+  const digitaltwinDetailTpl = [ ];
+  const digitaltwinEditTpl = [ ];
+  const digitaltwinFileProps = [ ];
+  const digitaltwinFormData = [ ];
+  const digitaltwinPicProps = [ ];
 
-        digitaltwinDetailTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-label class="standalone">${ field.display }</ion-label>
-        <span>{{ formData.${ field.technical } }}</span>
-      </ion-col>
-        `);
+  // transform field results into the dbcp field configurations
+  dataSets = dataSets.forEach(dataSet => {
+    let dataSchemaProperties = { };
+    let dbcpDataSchema = { };
+    let detailTpl = [ ];
+    let editTpl = [ ];
+    let fileProperties = [ ];
+    let formData = { };
+    let pictureProperties = [ ];
+    let requiredFields = [ ];
 
-        break;
+    dataSet.fields.forEach((field) => {
+      field.technical = field.technical.replace(/\ /g, '');
+
+      requiredFields.push(field.technical);
+      switch (field.type) {
+        case 'text':
+        case 'files':
+        case 'pictures':
+        case 'date': {
+          dataSchemaProperties[field.technical] = {
+            'type': 'string'
+          }
+
+          break;
+        }
+        case 'members': {
+          dataSchemaProperties[field.technical] = {
+            'items': {
+              'type': 'string'
+            },
+            'type': 'array'
+          };
+
+          break;
+        }
       }
-      case 'date': {
-        digitaltwinEditTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-item>
-          <ion-label stacked>${ field.display }*</ion-label>
-          <ion-datetime name="${ field.technical }"
-            required="true"
-            displayFormat="DD-MM-YYYY"
-            pickerFormat="DD-MMM-YYYY"
-            [(ngModel)]="formData.${ field.technical }"
-            placeholder="${ field.display }"
-            cancelText="cancel"
-            doneText="done"
-            minuteValues="0,15,30,45"
-            [min]="now"
-            [max]="maxDate"
-            [monthShortNames]="translateService.monthShortNames"
-            (ionChange)="ref.detectChanges()"
-            (focusout)="ref.detectChanges()">
-          </ion-datetime>
-        </ion-item>
-        <ion-chip class="error-hint" *ngIf="showError('${ field.technical }')" color="danger">
-          <ion-label>Please insert value for ${ field.display }</ion-label>
-        </ion-chip>
-      </ion-col>
-        `);
+    });
 
-        digitaltwinDetailTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-label class="standalone">${ field.display }</ion-label>
-        <span>{{ formData.${ field.technical } | date:'medium':'':translateService.translate.currentLang }}</span>
-      </ion-col>
-        `);
+    // apply templates for each field
+    dataSet.fields.forEach((field) => {
+      switch (field.type) {
+        case 'text': {
+          editTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-item>
+            <ion-label stacked>${ field.display }*</ion-label>
+            <ion-input name="${ dataSet.technical }-${ field.technical }" required
+              [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+              placeholder="${ field.display }"
+              (ionChange)="ref.detectChanges()"
+              (focusout)="ref.detectChanges()">
+            </ion-input>
+          </ion-item>
+          <ion-chip class="error-hint" *ngIf="showError('${ dataSet.technical }-${ field.technical }')" color="danger">
+            <ion-label>Please insert value for ${ field.display }</ion-label>
+          </ion-chip>
+        </ion-col>
+          `);
 
-        break;
-      }
-      case 'members': {
-        digitaltwinFormData[field.technical] = [ ];
-        digitaltwinEditTpl.push(`
-      <ion-col col-12 col-md-6>
-        <contract-members #${ field.technical }Comp
-          [(members)]="formData.${ field.technical }"
-          (onChange)="ref.detectChanges()">
-          <h3 label>${ field.display }</h3>
-        </contract-members>
-        <ion-chip class="error-hint" *ngIf="${ field.technical }Comp.touched && formData.${ field.technical }.length === 0" color="danger">
-          <ion-label>Please insert value for ${ field.display }</ion-label>
-        </ion-chip>
-      </ion-col>
-        `);
+          detailTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-label class="standalone">${ field.display }</ion-label>
+          <span>{{ formData.'${ dataSet.technical }.${ field.technical }' }}</span>
+        </ion-col>
+          `);
 
-        digitaltwinDetailTpl.push(`
-      <ion-col col-12 col-md-6>
-        <contract-members #${ field.technical }Comp
-          [(origin)]="formData.${ field.technical }"
-          [readonly]="true">
-          <h3 label>${ field.display }</h3>
-        </contract-members>
-      </ion-col>
-        `);
+          break;
+        }
+        case 'date': {
+          editTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-item>
+            <ion-label stacked>${ field.display }*</ion-label>
+            <ion-datetime name="${ dataSet.technical }-${ field.technical }"
+              required="true"
+              displayFormat="DD-MM-YYYY"
+              pickerFormat="DD-MMM-YYYY"
+              [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+              placeholder="${ field.display }"
+              cancelText="cancel"
+              doneText="done"
+              minuteValues="0,15,30,45"
+              [min]="now"
+              [max]="maxDate"
+              [monthShortNames]="translateService.monthShortNames"
+              (ionChange)="ref.detectChanges()"
+              (focusout)="ref.detectChanges()">
+            </ion-datetime>
+          </ion-item>
+          <ion-chip class="error-hint" *ngIf="showError('${ dataSet.technical }-${ field.technical }')" color="danger">
+            <ion-label>Please insert value for ${ field.display }</ion-label>
+          </ion-chip>
+        </ion-col>
+          `);
 
-        break;
-      }
-      case 'files': {
-        digitaltwinFileProps.push(field.technical);
-        digitaltwinFormData[field.technical] = [ ];
-        digitaltwinEditTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-label class="standalone">${ field.display }</ion-label>
-        <evan-file-select name="${ field.technical }" #${ field.technical }FileSelect text-center
-          [minFiles]="1"
-          [(ngModel)]="formData.${ field.technical }"
-          (onChange)="ref.detectChanges()">
-        </evan-file-select>
-      </ion-col>
-        `);
+          detailTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-label class="standalone">${ field.display }</ion-label>
+          <span>{{ formData.'${ dataSet.technical }.${ field.technical }' | date:'medium':'':translateService.translate.currentLang }}</span>
+        </ion-col>
+          `);
 
-        digitaltwinDetailTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-label class="standalone">${ field.display }</ion-label>
-        <evan-file-select name="${ field.technical }" #${ field.technical }FileSelect
-          [minFiles]="1"
-          [(ngModel)]="formData.${ field.technical }"
-          disabled="true"
-          downloadable="true">
-        </evan-file-select>
-      </ion-col>
-        `);
+          break;
+        }
+        case 'members': {
+          formData[field.technical] = [ ];
+          editTpl.push(`
+        <ion-col col-12 col-md-6>
+          <contract-members #${ dataSet.technical }${ field.technical }Comp
+            [(members)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            (onChange)="ref.detectChanges()">
+            <h3 label>${ field.display }</h3>
+          </contract-members>
+          <ion-chip class="error-hint" *ngIf="${ dataSet.technical }${ field.technical }Comp.touched && formData.'${ dataSet.technical }.${ field.technical }'.length === 0" color="danger">
+            <ion-label>Please insert value for ${ field.display }</ion-label>
+          </ion-chip>
+        </ion-col>
+          `);
 
-        break;
-      }
-      case 'pictures': {
-        digitaltwinPicProps.push(field.technical);
-        digitaltwinFormData[field.technical] = [ ];
+          detailTpl.push(`
+        <ion-col col-12 col-md-6>
+          <contract-members #${ dataSet.technical }${ field.technical }Comp
+            [(origin)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            [readonly]="true">
+            <h3 label>${ field.display }</h3>
+          </contract-members>
+        </ion-col>
+          `);
 
-        digitaltwinEditTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-item class="evan-relative">
-          <ion-label stacked class="standalone">
-            ${ field.display }
-          </ion-label>
-          <div item-content text-left class="picture-container">
-            <div class="evan-relative"
-              *ngFor="let picture of formData.${ field.technical }; let picIndex = index">
-              <img class="clickable"
-                [src]="picture.blobURI"
-                (click)="openPictureDetail(picture.blobURI)"
-              />
-              <button class="top-right" ion-button round icon-only color="danger"
-                (click)="removePicture(formData.${ field.technical }, picIndex)">
-                <ion-icon name="trash" color="light"></ion-icon>
-              </button>
+          break;
+        }
+        case 'files': {
+          fileProperties.push(field.technical);
+          formData[field.technical] = [ ];
+          editTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-label class="standalone">${ field.display }</ion-label>
+          <evan-file-select name="${ dataSet.technical }-${ field.technical }" #${ field.technical }FileSelect text-center
+            [minFiles]="1"
+            [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            (onChange)="ref.detectChanges()">
+          </evan-file-select>
+        </ion-col>
+          `);
+
+          detailTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-label class="standalone">${ field.display }</ion-label>
+          <evan-file-select name="${ dataSet.technical }-${ field.technical }" #${ field.technical }FileSelect
+            [minFiles]="1"
+            [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            disabled="true"
+            downloadable="true">
+          </evan-file-select>
+        </ion-col>
+          `);
+
+          break;
+        }
+        case 'pictures': {
+          pictureProperties.push(field.technical);
+          formData[field.technical] = [ ];
+
+          editTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-item class="evan-relative">
+            <ion-label stacked class="standalone">
+              ${ field.display }
+            </ion-label>
+            <div item-content text-left class="picture-container">
+              <div class="evan-relative"
+                *ngFor="let picture of formData.'${ dataSet.technical }.${ field.technical }'; let picIndex = index">
+                <img class="clickable"
+                  [src]="picture.blobURI"
+                  (click)="openPictureDetail(picture.blobURI)"
+                />
+                <button class="top-right" ion-button round icon-only color="danger"
+                  (click)="removePicture(formData.'${ dataSet.technical }.${ field.technical }', picIndex)">
+                  <ion-icon name="trash" color="light"></ion-icon>
+                </button>
+              </div>
+              <br>
+              <div class="empty-pictures" margin-bottom
+                *ngIf="formData.'${ dataSet.technical }.${ field.technical }'.length === 0">
+                no pictures taken
+              </div>
             </div>
-            <br>
-            <div class="empty-pictures" margin-bottom
-              *ngIf="formData.${ field.technical }.length === 0">
-              no pictures taken
-            </div>
+          </ion-item>
+          <div text-center margin-top>
+            <button ion-button round outline icon-start
+              (click)="takeSnapshot(formData.'${ dataSet.technical }.${ field.technical }')">
+              <ion-icon name="camera"></ion-icon>
+              take snapshot
+            </button>
           </div>
-        </ion-item>
-        <div text-center margin-top>
-          <button ion-button round outline icon-start
-            (click)="takeSnapshot(formData.${ field.technical })">
-            <ion-icon name="camera"></ion-icon>
-            take snapshot
-          </button>
-        </div>
-      </ion-col>
-        `);
+        </ion-col>
+          `);
 
-        digitaltwinDetailTpl.push(`
-      <ion-col col-12 col-md-6>
-        <ion-item class="evan-relative">
-          <ion-label stacked class="standalone">
-            ${ field.display }
-          </ion-label>
-          <div item-content text-left class="picture-container">
-            <div class="evan-relative"
-              *ngFor="let picture of formData.${ field.technical }; let picIndex = index">
-              <img class="clickable"
-                [src]="picture.blobURI"
-                (click)="openPictureDetail(picture.blobURI)"
-              />
+          detailTpl.push(`
+        <ion-col col-12 col-md-6>
+          <ion-item class="evan-relative">
+            <ion-label stacked class="standalone">
+              ${ field.display }
+            </ion-label>
+            <div item-content text-left class="picture-container">
+              <div class="evan-relative"
+                *ngFor="let picture of formData.'${ dataSet.technical }.${ field.technical }'; let picIndex = index">
+                <img class="clickable"
+                  [src]="picture.blobURI"
+                  (click)="openPictureDetail(picture.blobURI)"
+                />
+              </div>
+              <br>
+              <div class="empty-pictures" *ngIf="formData.'${ dataSet.technical }.${ field.technical }'.length === 0">
+                no pictures taken
+              </div>
             </div>
-            <br>
-            <div class="empty-pictures" *ngIf="formData.${ field.technical }.length === 0">
-              no pictures taken
-            </div>
-          </div>
-        </ion-item>
-      </ion-col>
-        `);
+          </ion-item>
+        </ion-col>
+          `);
 
-        break;
+          break;
+        }
       }
-    }
-  });
+    });
 
-  digitaltwinDBCPFields = JSON.stringify(digitaltwinDBCPFields, null, 2);
-  digitaltwinEditTpl = `
-    <ion-row>
-      ${ digitaltwinEditTpl.join('\n') }
-    </ion-row>
-  `;
-  digitaltwinDetailTpl = `
-    <ion-row>
-      ${ digitaltwinDetailTpl.join('\n') }
-    </ion-row>
-  `;
-  digitaltwinFormData = JSON.stringify(digitaltwinFormData, null, 2);
-  digitaltwinPicProps = JSON.stringify(digitaltwinPicProps, null, 2);
-  digitaltwinFileProps = JSON.stringify(digitaltwinFileProps, null, 2);
-  digitaltwinDBCPRequiredFields = JSON.stringify(digitaltwinDBCPRequiredFields, null, 2);
+    digitaltwinDataSchema[dataSet.technicacl] = {
+      "$id": `${ dataSet.technical }_schema`,
+      "additionalProperties": true,
+      "properties": dataSchemaProperties,
+      "type": "object",
+      "required": requiredFields
+    };
+
+    digitaltwinDetailTpl.push(`
+      <div class="evan-content evan-relative">
+        <h3 class="content-header m-b-0 m-t-0">
+          ${ dataSet.display }
+        </h3>
+        <ion-row margin-top>
+          ${ editTpl.join('\n') }
+        </ion-row>
+      </div>
+    `);
+
+    digitaltwinEditTpl.push(`
+      <div class="evan-content evan-relative">
+        <h3 class="content-header m-b-0 m-t-0">
+          ${ dataSet.display }
+        </h3>
+        <p ion-text class="m-b-0 m-t-0">
+          {{ '_${ dbcpName }.fill-empty' | translate }}
+        </p>
+        <ion-row margin-top>
+          ${ editTpl.join('\n') }
+        </ion-row>
+      </div>
+    `);
+
+    digitaltwinFileProps[dataSet.technical] = fileProperties;
+    digitaltwinPicProps[dataSet.technical] = pictureProperties;
+    digitaltwinFormData[dataSet.technical] = formData; 
+  });
 
   return {
-    digitaltwinDBCPFields,
-    digitaltwinDBCPRequiredFields,
-    digitaltwinDetailTpl,
-    digitaltwinEditTpl,
-    digitaltwinFileProps,
-    digitaltwinFormData,
-    digitaltwinPicProps,
+    JSON.stringify(digitaltwinDataSchema, null, 2),
+    digitaltwinDetailTpl.join('\n\n'),
+    digitaltwinEditTpl.join('\n\n'),
+    JSON.stringify(digitaltwinFileProps, null, 2),
+    JSON.stringify(digitaltwinFormData, null, 2),
+    JSON.stringify(digitaltwinPicProps, null, 2),
   }
 }

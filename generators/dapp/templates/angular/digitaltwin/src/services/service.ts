@@ -54,8 +54,8 @@ export class <%= cleanName %>Service implements OnDestroy {
   /**
    * used to format files and pictures into the correct format for saving
    */
-  public pictureProps: Array<string> = <%- digitaltwinPicProps %>;
-  public fileProps: Array<string> = <%- digitaltwinFileProps %>;
+  public pictureProps: any = <%- digitaltwinPicProps %>;
+  public fileProps: any = <%- digitaltwinFileProps %>;
 
   /**
    * Create a singleton service instance. 
