@@ -61,6 +61,9 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             true
           );
 
+          // all data set keys that should be saved
+          const dataSetKeys = Object.keys(description.dataSchema);
+
           // create the new data contract
           let contract;
           if (contractAddress) {
@@ -75,100 +78,133 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
               null,
               { public : description }
             );
+
+            // allow all the dbcp dataSchema properties setting
+            await Promise.all(dataSetKeys.map(dataSetKey =>
+              Promise.all(['set'].map(modificationType =>
+                service.bcc.rightsAndRoles.setOperationPermission(
+                  contract,
+                  activeAccount,
+                  0,
+                  dataSetKey,
+                  service.bcc.web3.utils.sha3('entry'),
+                  service.bcc.web3.utils.sha3(modificationType),
+                  true,
+                )
+              ))
+            ));
           }
 
           // load the latest block number, so the encryption will work only for data after this
           // block
           const blockNumber = await service.bcc.web3.eth.getBlockNumber();
 
-          // search for files and pictures that needs to be encrypted
-          const formDataKeys = Object.keys(formData);
+          // search for files and pictures that needs to be encrypted !important!: create new
+          // metadataToSave object, to keep original queue data reference (it would throw, if we
+          // adjust the files for encryption and the original object and it gets persistet into the
+          // IndexDB)
           const metadataToSave: any = { };
-          for (let key of formDataKeys) {
-            metadataToSave[key] = formData[key];
+          for (let dataSetKey of dataSetKeys) {
+            const dataSet = metadataToSave[dataSetKey] = { };
 
-            // the its a file or a picture, encrypt it!
-            if (service.fileProps.indexOf(key) !== -1 || service.pictureProps.indexOf(key) !== -1) {
-              // if the encryption should be disabled, continue with the next element
-              if (metadataToSave[key].length === 0 || (metadataToSave[key].length > 0 &&
-                  metadataToSave[key][0].disableEncryption)) {
-                metadataToSave[key] = JSON.stringify(metadataToSave[key]);
-                continue;
+            for (let key of Object.keys(formData[dataSetKey])) {
+              dataSet[key] = formData[dataSetKey][key];
+
+              // the its a file or a picture, encrypt it!
+              if (service.fileProps[dataSetKey].indexOf(key) !== -1 ||
+                  service.pictureProps[dataSetKey].indexOf(key) !== -1) {
+                // if the encryption should be disabled, continue with the next element
+                if (dataSet[key].length === 0 || (dataSet[key].length > 0 &&
+                    dataSet[key][0].disableEncryption)) {
+                  dataSet[key] = JSON.stringify(dataSet[key]);
+                  continue;
+                }
+
+                // use the correct format for saving
+                dataSet[key] = await service.fileService.equalizeFileStructure(
+                  dataSet[key]);
+
+                // encrypt the data
+                dataSet[key] = await service.bcc.dataContract.encrypt(
+                  {
+                    private: dataSet[key]
+                  },
+                  contract,
+                  activeAccount,
+                  '*',
+                  blockNumber,
+                  'aesBlob'
+                )
               }
-
-              // use the correct format for saving
-              metadataToSave[key] = await service.fileService.equalizeFileStructure(
-                metadataToSave[key]);
-
-              // encrypt the data
-              metadataToSave[key] = await service.bcc.dataContract.encrypt(
-                {
-                  private: metadataToSave[key]
-                },
-                contract,
-                activeAccount,
-                '*',
-                blockNumber,
-                'aesBlob'
-              )
             }
           }
 
-          // set datacontract entry
-          await service.bcc.dataContract.setEntry(
-            contract,
-            'entry_settable_by_owner',
-            metadataToSave,
-            activeAccount
-          );
+          // set all datacontract data sets
+          await Promise.all(dataSetKeys.map(dataSetKey => 
+            service.bcc.dataContract.setEntry(
+              contract,
+              dataSetKey,
+              metadataToSave[dataSetKey],
+              activeAccount
+            )
+          ));
 
+          const contentKeys = { };
           const [
             hashKeyToShare,
-            contentKeyToShare,
             sharings,
           ] = await Promise.all([
             // extend sharings only once
             service.bcc.sharing.getHashKey(contract.options.address, activeAccount),
-            service.bcc.sharing.getKey(contract.options.address, activeAccount, 'entry_settable_by_owner', blockNumber),
-            service.bcc.sharing.getSharingsFromContract(contract)
+            service.bcc.sharing.getSharingsFromContract(contract),
+            Promise.all(dataSetKeys.map(async (dataSetKey) => {
+              contentKeys[dataSetKey] = await service.bcc.sharing.getKey(
+                contract.options.address,
+                activeAccount,
+                dataSetKey,
+                blockNumber
+              );
+            }))
           ]);
 
-
-          // iterate through all members, check if there are within the contract and extend the sharings
+          // iterate through all members, check if there are within the contract and extend the
+          // sharings
           const membersToInvite = [ ];
-          for (let member of metadataToSave.sharedMembers) {
-            const isContractMember = await service.bcc.executor.executeContractCall(
-              contract,
-              'isConsumer',
-              member,
-              { from: activeAccount, }
-            );
+          for (let dataSetKey of dataSetKeys) {
+            for (let member of metadataToSave[dataSetKey].sharedMembers) {
+              const isContractMember = await service.bcc.executor.executeContractCall(
+                contract,
+                'isConsumer',
+                member,
+                { from: activeAccount, }
+              );
 
-            // only invite members once
-            if (!isContractMember) {
-              membersToInvite.push(member);
+              // only invite members once
+              if (!isContractMember) {
+                membersToInvite.push(member);
+              }
+
+              await service.bcc.sharing.extendSharings(
+                sharings,
+                activeAccount,
+                member,
+                dataSetKey,
+                0,
+                contentKeys[dataSetKey],
+                null
+              );
+
+              // extend the hashKey sharing
+              await service.bcc.sharing.extendSharings(
+                sharings,
+                activeAccount,
+                member,
+                '*',
+                'hashKey',
+                hashKeyToShare,
+                null
+              );
             }
-
-            await service.bcc.sharing.extendSharings(
-              sharings,
-              activeAccount,
-              member,
-              '*',
-              0,
-              contentKeyToShare,
-              null
-            );
-
-            // if the member is within the furtherInformation specific scope => share it!
-            await service.bcc.sharing.extendSharings(
-              sharings,
-              activeAccount,
-              member,
-              '*',
-              'hashKey',
-              hashKeyToShare,
-              null
-            );
           }
 
           await service.bcc.sharing.saveSharingsToContract(
@@ -195,7 +231,7 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             };
 
             // invite all members into the contract and send an invitation mail
-            await Promise.all(membersToInvite.map(member => {
+            await Promise.all(membersToInvite.map(async (member) => {
               return Promise.all([
                 service.bcc.dataContract.inviteToContract(
                   null,
@@ -214,10 +250,10 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
 
           // add the bookmark if its not exists before
           if (!contractAddress) {
-            description.trimmedName = formData.type.replace(/\s|\./g, '');
+            description.trimmedName = formData.dtGeneral.type.replace(/\s|\./g, '');
             description.i18n.name = {
-              de: formData.type,
-              en: formData.type,
+              de: formData.dtGeneral.type,
+              en: formData.dtGeneral.type,
             };
             await service.bcc.profile.loadForAccount(service.bcc.profile.treeLabels.bookmarkedDapps);
             await service.bcc.profile.addDappBookmark(contract.options.address, description);

@@ -1,10 +1,41 @@
 module.exports = async function(projectName, dbcpName) {
   let stop;
 
-  const dataSets = [
+  let dataSets = [
     {
       display: 'Dataset 1',
-      technical: 'default',
+      technical: 'dataset1',
+      fields: [
+        {
+          display: 'Text',
+          technical: 'text',
+          type: 'text',
+        },
+        {
+          display: 'Date',
+          technical: 'date',
+          type: 'date',
+        },
+        {
+          display: 'Members',
+          technical: 'members',
+          type: 'members',
+        },
+        {
+          display: 'Files',
+          technical: 'files',
+          type: 'files',
+        },
+        {
+          display: 'Pictures',
+          technical: 'pictures',
+          type: 'pictures',
+        },
+      ]
+    },
+    {
+      display: 'Dataset 2',
+      technical: 'dataset2',
       fields: [
         {
           display: 'Text',
@@ -115,8 +146,10 @@ module.exports = async function(projectName, dbcpName) {
             validate: (input) => {
               if (!input) {
                 return 'Please specify a value!';
-              } else if (/[^A-Za-z0-9]/.test()) {
+              } else if (/[^A-Za-z0-9]/.test(input)) {
                 return 'The technical name should not include special characters!';
+              } else if (input === 'dtGeneral') {
+                return 'The dataset "dtGeneral" is reserved!';
               } else if (dataSets.filter(dataSet => dataSet.technical === input).length > 0) {
                 return 'A data set with the same technical name already exists!';
               } else {
@@ -185,8 +218,10 @@ module.exports = async function(projectName, dbcpName) {
             validate: (input) => {
               if (!input) {
                 return 'Please specify a value!';
-              } else if (/[^A-Za-z0-9]/.test()) {
+              } else if (/[^A-Za-z0-9]/.test(input)) {
                 return 'The technical name should not include special characters!';
+              } if (input === 'sharedMembers') {
+                return 'The dataset "sharedMembers" is reserved!';
               } else {
                 const fieldsToCheck = dataSets[dataSet].fields;
 
@@ -278,21 +313,62 @@ module.exports = async function(projectName, dbcpName) {
   }
 
   // all the result values
-  const digitaltwinDataSchema = { };
-  const digitaltwinDetailTpl = [ ];
-  const digitaltwinEditTpl = [ ];
-  const digitaltwinFileProps = [ ];
-  const digitaltwinFormData = [ ];
-  const digitaltwinPicProps = [ ];
+  let digitaltwinDataSchema = {
+    'dtGeneral': {
+      '$id': 'dataset2_schema',
+      'additionalProperties': true,
+      'properties': {
+        'bannerImg': {
+          'type': 'string'
+        },
+        'type': {
+          'type': 'string'
+        },
+        'sharedMembers': {
+          'items': {
+            'type': 'string'
+          },
+          'type': 'array'
+        }
+      },
+      'type': 'object',
+      'required': [
+        'bannerImg',
+        'type',
+        'sharedMembers'
+      ]
+    }
+  };
+  let digitaltwinDetailTpl = [ ];
+  let digitaltwinEditTpl = [ ];
+  let digitaltwinFileProps = {
+    dtGeneral: [ ]
+  };
+  let digitaltwinFormData = {
+    dtGeneral: {
+      sharedMembers: [ ]
+    }
+  };
+  let digitaltwinPicProps = {
+    dtGeneral: [ 'bannerImg' ]
+  };
 
   // transform field results into the dbcp field configurations
   dataSets = dataSets.forEach(dataSet => {
-    let dataSchemaProperties = { };
-    let dbcpDataSchema = { };
+    let dataSchemaProperties = {
+      'sharedMembers': {
+        'items': {
+          'type': 'string'
+        },
+        'type': 'array'
+      }
+    };
     let detailTpl = [ ];
     let editTpl = [ ];
     let fileProperties = [ ];
-    let formData = { };
+    let formData = {
+      sharedMembers: [ ]
+    };
     let pictureProperties = [ ];
     let requiredFields = [ ];
 
@@ -333,7 +409,7 @@ module.exports = async function(projectName, dbcpName) {
           <ion-item>
             <ion-label stacked>${ field.display }*</ion-label>
             <ion-input name="${ dataSet.technical }-${ field.technical }" required
-              [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+              [(ngModel)]="formData.${ dataSet.technical }.${ field.technical }"
               placeholder="${ field.display }"
               (ionChange)="ref.detectChanges()"
               (focusout)="ref.detectChanges()">
@@ -348,7 +424,7 @@ module.exports = async function(projectName, dbcpName) {
           detailTpl.push(`
         <ion-col col-12 col-md-6>
           <ion-label class="standalone">${ field.display }</ion-label>
-          <span>{{ formData.'${ dataSet.technical }.${ field.technical }' }}</span>
+          <span>{{ formData.${ dataSet.technical }.${ field.technical } }}</span>
         </ion-col>
           `);
 
@@ -363,7 +439,7 @@ module.exports = async function(projectName, dbcpName) {
               required="true"
               displayFormat="DD-MM-YYYY"
               pickerFormat="DD-MMM-YYYY"
-              [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+              [(ngModel)]="formData.${ dataSet.technical }.${ field.technical }"
               placeholder="${ field.display }"
               cancelText="cancel"
               doneText="done"
@@ -384,7 +460,7 @@ module.exports = async function(projectName, dbcpName) {
           detailTpl.push(`
         <ion-col col-12 col-md-6>
           <ion-label class="standalone">${ field.display }</ion-label>
-          <span>{{ formData.'${ dataSet.technical }.${ field.technical }' | date:'medium':'':translateService.translate.currentLang }}</span>
+          <span>{{ formData.${ dataSet.technical }.${ field.technical } | date:'medium':'':translateService.translate.currentLang }}</span>
         </ion-col>
           `);
 
@@ -395,11 +471,11 @@ module.exports = async function(projectName, dbcpName) {
           editTpl.push(`
         <ion-col col-12 col-md-6>
           <contract-members #${ dataSet.technical }${ field.technical }Comp
-            [(members)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            [(members)]="formData.${ dataSet.technical }.${ field.technical }"
             (onChange)="ref.detectChanges()">
             <h3 label>${ field.display }</h3>
           </contract-members>
-          <ion-chip class="error-hint" *ngIf="${ dataSet.technical }${ field.technical }Comp.touched && formData.'${ dataSet.technical }.${ field.technical }'.length === 0" color="danger">
+          <ion-chip class="error-hint" *ngIf="${ dataSet.technical }${ field.technical }Comp.touched && formData.${ dataSet.technical }.${ field.technical }.length === 0" color="danger">
             <ion-label>Please insert value for ${ field.display }</ion-label>
           </ion-chip>
         </ion-col>
@@ -408,7 +484,7 @@ module.exports = async function(projectName, dbcpName) {
           detailTpl.push(`
         <ion-col col-12 col-md-6>
           <contract-members #${ dataSet.technical }${ field.technical }Comp
-            [(origin)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            [(origin)]="formData.${ dataSet.technical }.${ field.technical }"
             [readonly]="true">
             <h3 label>${ field.display }</h3>
           </contract-members>
@@ -425,7 +501,7 @@ module.exports = async function(projectName, dbcpName) {
           <ion-label class="standalone">${ field.display }</ion-label>
           <evan-file-select name="${ dataSet.technical }-${ field.technical }" #${ field.technical }FileSelect text-center
             [minFiles]="1"
-            [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            [(ngModel)]="formData.${ dataSet.technical }.${ field.technical }"
             (onChange)="ref.detectChanges()">
           </evan-file-select>
         </ion-col>
@@ -436,7 +512,7 @@ module.exports = async function(projectName, dbcpName) {
           <ion-label class="standalone">${ field.display }</ion-label>
           <evan-file-select name="${ dataSet.technical }-${ field.technical }" #${ field.technical }FileSelect
             [minFiles]="1"
-            [(ngModel)]="formData.'${ dataSet.technical }.${ field.technical }'"
+            [(ngModel)]="formData.${ dataSet.technical }.${ field.technical }"
             disabled="true"
             downloadable="true">
           </evan-file-select>
@@ -457,26 +533,26 @@ module.exports = async function(projectName, dbcpName) {
             </ion-label>
             <div item-content text-left class="picture-container">
               <div class="evan-relative"
-                *ngFor="let picture of formData.'${ dataSet.technical }.${ field.technical }'; let picIndex = index">
+                *ngFor="let picture of formData.${ dataSet.technical }.${ field.technical }; let picIndex = index">
                 <img class="clickable"
                   [src]="picture.blobURI"
                   (click)="openPictureDetail(picture.blobURI)"
                 />
                 <button class="top-right" ion-button round icon-only color="danger"
-                  (click)="removePicture(formData.'${ dataSet.technical }.${ field.technical }', picIndex)">
+                  (click)="removePicture(formData.${ dataSet.technical }.${ field.technical }, picIndex)">
                   <ion-icon name="trash" color="light"></ion-icon>
                 </button>
               </div>
               <br>
               <div class="empty-pictures" margin-bottom
-                *ngIf="formData.'${ dataSet.technical }.${ field.technical }'.length === 0">
+                *ngIf="formData.${ dataSet.technical }.${ field.technical }.length === 0">
                 no pictures taken
               </div>
             </div>
           </ion-item>
           <div text-center margin-top>
             <button ion-button round outline icon-start
-              (click)="takeSnapshot(formData.'${ dataSet.technical }.${ field.technical }')">
+              (click)="takeSnapshot(formData.${ dataSet.technical }.${ field.technical })">
               <ion-icon name="camera"></ion-icon>
               take snapshot
             </button>
@@ -492,14 +568,14 @@ module.exports = async function(projectName, dbcpName) {
             </ion-label>
             <div item-content text-left class="picture-container">
               <div class="evan-relative"
-                *ngFor="let picture of formData.'${ dataSet.technical }.${ field.technical }'; let picIndex = index">
+                *ngFor="let picture of formData.${ dataSet.technical }.${ field.technical }; let picIndex = index">
                 <img class="clickable"
                   [src]="picture.blobURI"
                   (click)="openPictureDetail(picture.blobURI)"
                 />
               </div>
               <br>
-              <div class="empty-pictures" *ngIf="formData.'${ dataSet.technical }.${ field.technical }'.length === 0">
+              <div class="empty-pictures" *ngIf="formData.${ dataSet.technical }.${ field.technical }.length === 0">
                 no pictures taken
               </div>
             </div>
@@ -512,7 +588,7 @@ module.exports = async function(projectName, dbcpName) {
       }
     });
 
-    digitaltwinDataSchema[dataSet.technicacl] = {
+    digitaltwinDataSchema[dataSet.technical] = {
       "$id": `${ dataSet.technical }_schema`,
       "additionalProperties": true,
       "properties": dataSchemaProperties,
@@ -526,7 +602,7 @@ module.exports = async function(projectName, dbcpName) {
           ${ dataSet.display }
         </h3>
         <ion-row margin-top>
-          ${ editTpl.join('\n') }
+          ${ detailTpl.join('\n') }
         </ion-row>
       </div>
     `);
@@ -551,11 +627,11 @@ module.exports = async function(projectName, dbcpName) {
   });
 
   return {
-    JSON.stringify(digitaltwinDataSchema, null, 2),
-    digitaltwinDetailTpl.join('\n\n'),
-    digitaltwinEditTpl.join('\n\n'),
-    JSON.stringify(digitaltwinFileProps, null, 2),
-    JSON.stringify(digitaltwinFormData, null, 2),
-    JSON.stringify(digitaltwinPicProps, null, 2),
+    digitaltwinDataSchema: JSON.stringify(digitaltwinDataSchema, null, 2),
+    digitaltwinDetailTpl: digitaltwinDetailTpl.join('\n\n'),
+    digitaltwinEditTpl: digitaltwinEditTpl.join('\n\n'),
+    digitaltwinFileProps: JSON.stringify(digitaltwinFileProps, null, 2),
+    digitaltwinFormData: JSON.stringify(digitaltwinFormData, null, 2),
+    digitaltwinPicProps: JSON.stringify(digitaltwinPicProps, null, 2),
   }
 }

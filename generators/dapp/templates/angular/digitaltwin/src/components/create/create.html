@@ -20,8 +20,8 @@
     <div class="evan-content">
       <div class="banner-img">
         <img class="clickable"
-          [src]="formData.bannerImg[0].blobURI"
-          (click)="openPictureDetail(formData.bannerImg[0].blobURI)"
+          [src]="formData.dtGeneral.bannerImg[0].blobURI"
+          (click)="openPictureDetail(formData.dtGeneral.bannerImg[0].blobURI)"
         />
         <evan-file-select name="bannerPictures" margin-top #bannerFileSelectComp
           class="img-select"
@@ -37,7 +37,7 @@
           {{ '_<%= dbcpName %>.choose-banner-img' | translate }}
         </button>
         <button ion-button round outline icon-start margin-top
-          (click)="takeSnapshot(formData.bannerImg, true)">
+          (click)="takeSnapshot(formData.dtGeneral.bannerImg, true)">
           <ion-icon name="camera"></ion-icon>
           {{ '_<%= dbcpName %>.take-a-picture' | translate }}
         </button>
@@ -46,7 +46,7 @@
       <ion-item>
         <ion-label stacked>{{ '_<%= dbcpName %>.type.text' | translate }}*</ion-label>
         <ion-input name="type" required
-          [(ngModel)]="formData.type"
+          [(ngModel)]="formData.dtGeneral.type"
           [placeholder]="'_<%= dbcpName %>.type.desc' | translate"
           (ionChange)="ref.detectChanges()">
         </ion-input>
@@ -57,21 +57,14 @@
       </ion-chip>
 
       <contract-members #_membersComp
-        [(members)]="formData.sharedMembers"
+        [(members)]="formData.dtGeneral.sharedMembers"
         (onChange)="ref.detectChanges()">
         <h3 label>{{ '_<%= dbcpName %>.members' | translate }}</h3>
       </contract-members>
     </div>
-    <div class="evan-content">
-      <h3 class="content-header m-b-0 m-t-0">
-        {{ '_<%= dbcpName %>.metadata' | translate }}
-      </h3>
-      <p ion-text class="m-b-0 m-t-0">
-        {{ '_<%= dbcpName %>.fill-empty' | translate }}
-      </p>
       
-      <%- digitaltwinEditTpl %>
-    </div>
+    <%- digitaltwinEditTpl %>
+
     <div text-center padding-bottom margin-top>
       <button ion-button round icon-left outline color="transparency"
         (click)="create()"

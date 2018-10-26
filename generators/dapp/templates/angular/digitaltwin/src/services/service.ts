@@ -72,8 +72,6 @@ export class <%= cleanName %>Service implements OnDestroy {
     public translate: EvanTranslationService,
   ) {
     return singleton.create(<%= cleanName %>Service, this, () => {
-      this.pictureProps.push('bannerImg');
-
       // test dispatcher functionallity
       this.queueId = new QueueId(
         `<%= dbcpName %>.${ getDomainName() }`,
@@ -98,36 +96,7 @@ export class <%= cleanName %>Service implements OnDestroy {
    */
   public async loadDigitalTwinData(contractAddress: string) {
     const activeAccount = this.core.activeAccount();
-
-    // load the details
-    let formData = await this.bcc.dataContract.getEntry(
-      contractAddress,
-      'entry_settable_by_owner',
-      activeAccount
-    );
-
-    // search for files and pictures that needs to be decrypted
-    for (let key of Object.keys(formData)) {
-      if (this.fileProps.indexOf(key) !== -1 || this.pictureProps.indexOf(key) !== -1) {
-        try {
-          const parsed = JSON.parse(formData[key]);
-
-          if (parsed.private) {
-            formData[key] = (await this.bcc.dataContract.decrypt(
-              formData[key],
-              contractAddress,
-              activeAccount,
-              '*'
-            )).private;
-
-            // transform blobURI to security trust url, so the ui can show it
-            formData[key] = await this.fileService.equalizeFileStructure(formData[key]);
-          } else {
-            formData[key] = parsed;
-          }
-        } catch (ex) { }
-      }
-    }
+    const formData = { };
 
     // check if currently anything is saving?
     const queueData = this.queueService.getQueueEntry(this.queueId, true).data;
@@ -135,7 +104,52 @@ export class <%= cleanName %>Service implements OnDestroy {
       // overwrite the formData with the queue data
       for (let entry of queueData) {
         if (entry.contractAddress === contractAddress) {
-          formData = entry.formData;
+          return entry.formData;
+        }
+      }
+    }
+
+    // load the description to view the dataSchema to know, which dataSets are available
+    const description = await this.descriptionService.getDescription(contractAddress, true);
+    const dataSetKeys = Object.keys(description.dataSchema);
+
+    // load all defined data schema properties
+    await Promise.all(dataSetKeys.map(async (dataSetKey) => {
+      // each data set can be shared seperated, so it could be possible, that some users only have
+      // access to one data set, all other data sets, that could not be decrypted, will throw
+      try {
+        formData[dataSetKey] = await this.bcc.dataContract.getEntry(
+          contractAddress,
+          dataSetKey,
+          activeAccount
+        );
+      } catch (ex) { }
+    }));
+
+    // search for files and pictures that needs to be decrypted
+    for (let dataSetKey of Object.keys(formData)) {
+      const dataSet = formData[dataSetKey];
+
+      for (let key of Object.keys(dataSet)) {
+        if (this.fileProps[dataSetKey].indexOf(key) !== -1 ||
+            this.pictureProps[dataSetKey].indexOf(key) !== -1) {
+          try {
+            const parsed = JSON.parse(dataSet[key]);
+
+            if (parsed.private) {
+              dataSet[key] = (await this.bcc.dataContract.decrypt(
+                dataSet[key],
+                contractAddress,
+                activeAccount,
+                '*'
+              )).private;
+
+              // transform blobURI to security trust url, so the ui can show it
+              dataSet[key] = await this.fileService.equalizeFileStructure(dataSet[key]);
+            } else {
+              dataSet[key] = parsed;
+            }
+          } catch (ex) { }
         }
       }
     }

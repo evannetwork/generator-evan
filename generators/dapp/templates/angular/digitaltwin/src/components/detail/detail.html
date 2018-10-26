@@ -19,13 +19,13 @@
   <div class="evan-content">
     <div class="banner-img">
       <img class="clickable"
-        [src]="formData.bannerImg[0].blobURI"
-        (click)="openPictureDetail(formData.bannerImg[0].blobURI)"
+        [src]="formData.dtGeneral.bannerImg[0].blobURI"
+        (click)="openPictureDetail(formData.dtGeneral.bannerImg[0].blobURI)"
       />
-      <h3>{{ formData.type }}</h3>
+      <h3>{{ formData.dtGeneral.type }}</h3>
       <p>{{ contractAddress }}</p>
       <contract-members #_membersComp
-        [(origin)]="formData.sharedMembers"
+        [(origin)]="formData.dtGeneral.sharedMembers"
         [readonly]="true">
         <h3 label>{{ '_<%= dbcpName %>.members' | translate }}</h3>
       </contract-members>
@@ -41,10 +41,5 @@
     </div>
   </div>
 
-  <div class="evan-content" evan-content>
-    <h3 class="content-header m-b-0 m-t-0">
-      {{ '_<%= dbcpName %>.metadata' | translate }}
-    </h3>
-    <%- digitaltwinDetailTpl %>
-  </div>
+  <%- digitaltwinDetailTpl %>
 </ng-container>
