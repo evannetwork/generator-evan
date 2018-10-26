@@ -55,14 +55,20 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
           const formData = entry.formData;
           const contractAddress = entry.contractAddress;
 
+          // dont clear the cache while extending new sharing keys
+          service.lockLoadClearCache = true;
+
           // get description for the current dapp and use it as contract metadata preset
           const description = await service.descriptionService.getDescription(
             `<%= dbcpName %>.${ getDomainName() }`,
             true
           );
 
-          // all data set keys that should be saved
-          const dataSetKeys = Object.keys(description.dataSchema);
+          // all data set keys that should be saved and filter them for the available data within
+          // the formData object
+          const dataSetKeys = Object
+            .keys(description.dataSchema)
+            .filter(dataSetKey => !!formData[dataSetKey]);
 
           // create the new data contract
           let contract;
@@ -131,11 +137,19 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
                   },
                   contract,
                   activeAccount,
-                  '*',
+                  dataSetKey,
                   blockNumber,
                   'aesBlob'
                 )
               }
+            }
+
+            // merge all members together and remove the new members array from the dataset
+            if (formData[dataSetKey].newMembers) {
+              metadataToSave[dataSetKey].sharedMembers = metadataToSave[dataSetKey].sharedMembers
+                .concat(metadataToSave[dataSetKey].newMembers);
+
+              delete metadataToSave[dataSetKey].newMembers;
             }
           }
 
@@ -262,6 +276,9 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
 
           results.push(contract._address);
         }
+
+        // enable clear cache to load latest data everytime
+        service.lockLoadClearCache = false;
 
         return results;
       }

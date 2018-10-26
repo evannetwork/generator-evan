@@ -33,6 +33,7 @@ export const de = {
     "favorite-added": "Digitalen Zwilling wurde erstellt",
     "favorite-added-desc": "Ihr digitaler Zwilling wurde zu Ihren Favoriten hinzugefügt.",
     "fill-empty": "Bitte füllen Sie alle mit einem * gekennzeichneten Felder aus.",
+    "invite-people": "Neue Mitglieder einladen",
     "members": "Freigegebene Mitglieder",
     "metadata": "Metadaten",
     "new-contract": "Neuer Digitaler Zwilling",

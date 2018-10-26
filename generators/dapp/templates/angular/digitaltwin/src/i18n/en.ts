@@ -33,6 +33,7 @@ export const en = {
     "favorite-added": "Digital twin has been created",
     "favorite-added-desc": "Your digital twin has been added to your favorites.",
     "fill-empty": "Please fill in all fields marked with an *.",
+    "invite-people": "Invite new members",
     "members": "Shared members",
     "metadata": "Metadata",
     "new-contract": "New Digital Twin",

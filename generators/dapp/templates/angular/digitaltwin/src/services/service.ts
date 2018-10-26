@@ -58,6 +58,12 @@ export class <%= cleanName %>Service implements OnDestroy {
   public fileProps: any = <%- digitaltwinFileProps %>;
 
   /**
+   * load dt details triggers sharing.clearCache, but while the dispatchers running, clearCache will
+   * triggers errors!
+   */
+  public lockLoadClearCache: boolean;
+
+  /**
    * Create a singleton service instance. 
    */
   constructor(
@@ -91,22 +97,16 @@ export class <%= cleanName %>Service implements OnDestroy {
   /**
    * Load the details for a digital twin
    *
-   * @param      {<type>}  contractAddress  The contract address
-   * @return     {<type>}  { description_of_the_return_value }
+   * @param      {string}        contractAddress  contract address to load the data for
+   * @return     {Promise<any>}  the details
    */
   public async loadDigitalTwinData(contractAddress: string) {
     const activeAccount = this.core.activeAccount();
-    const formData = { };
+    let formData = { };
 
-    // check if currently anything is saving?
-    const queueData = this.queueService.getQueueEntry(this.queueId, true).data;
-    if (queueData.length > 0) {
-      // overwrite the formData with the queue data
-      for (let entry of queueData) {
-        if (entry.contractAddress === contractAddress) {
-          return entry.formData;
-        }
-      }
+    // if no queue is running, clear the sharing cache to directly access new data that was shared with me, without reloading the page
+    if (!this.lockLoadClearCache) {
+      this.bcc.sharing.clearCache();
     }
 
     // load the description to view the dataSchema to know, which dataSets are available
@@ -123,6 +123,9 @@ export class <%= cleanName %>Service implements OnDestroy {
           dataSetKey,
           activeAccount
         );
+
+        // add empty new members array to be able to invite new users
+        formData[dataSetKey].newMembers = [ ];
       } catch (ex) { }
     }));
 
@@ -141,7 +144,7 @@ export class <%= cleanName %>Service implements OnDestroy {
                 dataSet[key],
                 contractAddress,
                 activeAccount,
-                '*'
+                dataSetKey
               )).private;
 
               // transform blobURI to security trust url, so the ui can show it
@@ -150,6 +153,17 @@ export class <%= cleanName %>Service implements OnDestroy {
               dataSet[key] = parsed;
             }
           } catch (ex) { }
+        }
+      }
+    }
+
+    // check if currently anything is saving?
+    const queueData = this.queueService.getQueueEntry(this.queueId, true).data;
+    if (queueData.length > 0) {
+      // overwrite the formData with the queue data
+      for (let entry of queueData) {
+        if (entry.contractAddress === contractAddress) {
+          formData = Object.assign(formData, entry.formData);
         }
       }
     }

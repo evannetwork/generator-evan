@@ -57,7 +57,8 @@
       </ion-chip>
 
       <contract-members #_membersComp
-        [(members)]="formData.dtGeneral.sharedMembers"
+        [(members)]="formData.dtGeneral.newMembers"
+        [(origin)]="formData.dtGeneral.sharedMembers"
         (onChange)="ref.detectChanges()">
         <h3 label>{{ '_<%= dbcpName %>.members' | translate }}</h3>
       </contract-members>

@@ -5,6 +5,7 @@
 ### Fixes
 - add missing mailbox light styling
 - fix dappName for empty dappsDomain
+- enhance digital twin DApp generator to support multiple, dynamic datasets
 
 ### Deprecations
 - remove light DApp design (is included by `@evan.network/ui-angular-sass` custom themes now)

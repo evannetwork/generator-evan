@@ -32,37 +32,6 @@ module.exports = async function(projectName, dbcpName) {
           type: 'pictures',
         },
       ]
-    },
-    {
-      display: 'Dataset 2',
-      technical: 'dataset2',
-      fields: [
-        {
-          display: 'Text',
-          technical: 'text',
-          type: 'text',
-        },
-        {
-          display: 'Date',
-          technical: 'date',
-          type: 'date',
-        },
-        {
-          display: 'Members',
-          technical: 'members',
-          type: 'members',
-        },
-        {
-          display: 'Files',
-          technical: 'files',
-          type: 'files',
-        },
-        {
-          display: 'Pictures',
-          technical: 'pictures',
-          type: 'pictures',
-        },
-      ]
     }
   ];
 
@@ -346,7 +315,8 @@ module.exports = async function(projectName, dbcpName) {
   };
   let digitaltwinFormData = {
     dtGeneral: {
-      sharedMembers: [ ]
+      newMembers: [ ],
+      sharedMembers: [ ],
     }
   };
   let digitaltwinPicProps = {
@@ -367,7 +337,8 @@ module.exports = async function(projectName, dbcpName) {
     let editTpl = [ ];
     let fileProperties = [ ];
     let formData = {
-      sharedMembers: [ ]
+      sharedMembers: [ ],
+      newMembers: [ ]
     };
     let pictureProperties = [ ];
     let requiredFields = [ ];
@@ -422,10 +393,10 @@ module.exports = async function(projectName, dbcpName) {
           `);
 
           detailTpl.push(`
-        <ion-col col-12 col-md-6>
-          <ion-label class="standalone">${ field.display }</ion-label>
-          <span>{{ formData.${ dataSet.technical }.${ field.technical } }}</span>
-        </ion-col>
+      <ion-col col-12 col-md-6>
+        <ion-label class="standalone">${ field.display }</ion-label>
+        <span>{{ formData.${ dataSet.technical }.${ field.technical } }}</span>
+      </ion-col>
           `);
 
           break;
@@ -458,10 +429,10 @@ module.exports = async function(projectName, dbcpName) {
           `);
 
           detailTpl.push(`
-        <ion-col col-12 col-md-6>
-          <ion-label class="standalone">${ field.display }</ion-label>
-          <span>{{ formData.${ dataSet.technical }.${ field.technical } | date:'medium':'':translateService.translate.currentLang }}</span>
-        </ion-col>
+      <ion-col col-12 col-md-6>
+        <ion-label class="standalone">${ field.display }</ion-label>
+        <span>{{ formData.${ dataSet.technical }.${ field.technical } | date:'medium':'':translateService.translate.currentLang }}</span>
+      </ion-col>
           `);
 
           break;
@@ -482,13 +453,13 @@ module.exports = async function(projectName, dbcpName) {
           `);
 
           detailTpl.push(`
-        <ion-col col-12 col-md-6>
-          <contract-members #${ dataSet.technical }${ field.technical }Comp
-            [(origin)]="formData.${ dataSet.technical }.${ field.technical }"
-            [readonly]="true">
-            <h3 label>${ field.display }</h3>
-          </contract-members>
-        </ion-col>
+      <ion-col col-12 col-md-6>
+        <contract-members #${ dataSet.technical }${ field.technical }Comp
+          [(origin)]="formData.${ dataSet.technical }.${ field.technical }"
+          [readonly]="true">
+          <h3 label>${ field.display }</h3>
+        </contract-members>
+      </ion-col>
           `);
 
           break;
@@ -508,15 +479,15 @@ module.exports = async function(projectName, dbcpName) {
           `);
 
           detailTpl.push(`
-        <ion-col col-12 col-md-6>
-          <ion-label class="standalone">${ field.display }</ion-label>
-          <evan-file-select name="${ dataSet.technical }-${ field.technical }" #${ field.technical }FileSelect
-            [minFiles]="1"
-            [(ngModel)]="formData.${ dataSet.technical }.${ field.technical }"
-            disabled="true"
-            downloadable="true">
-          </evan-file-select>
-        </ion-col>
+      <ion-col col-12 col-md-6>
+        <ion-label class="standalone">${ field.display }</ion-label>
+        <evan-file-select name="${ dataSet.technical }-${ field.technical }" #${ field.technical }FileSelect
+          [minFiles]="1"
+          [(ngModel)]="formData.${ dataSet.technical }.${ field.technical }"
+          disabled="true"
+          downloadable="true">
+        </evan-file-select>
+      </ion-col>
           `);
 
           break;
@@ -561,32 +532,65 @@ module.exports = async function(projectName, dbcpName) {
           `);
 
           detailTpl.push(`
-        <ion-col col-12 col-md-6>
-          <ion-item class="evan-relative">
-            <ion-label stacked class="standalone">
-              ${ field.display }
-            </ion-label>
-            <div item-content text-left class="picture-container">
-              <div class="evan-relative"
-                *ngFor="let picture of formData.${ dataSet.technical }.${ field.technical }; let picIndex = index">
-                <img class="clickable"
-                  [src]="picture.blobURI"
-                  (click)="openPictureDetail(picture.blobURI)"
-                />
-              </div>
-              <br>
-              <div class="empty-pictures" *ngIf="formData.${ dataSet.technical }.${ field.technical }.length === 0">
-                no pictures taken
-              </div>
+      <ion-col col-12 col-md-6>
+        <ion-item class="evan-relative">
+          <ion-label stacked class="standalone">
+            ${ field.display }
+          </ion-label>
+          <div item-content text-left class="picture-container">
+            <div class="evan-relative"
+              *ngFor="let picture of formData.${ dataSet.technical }.${ field.technical }; let picIndex = index">
+              <img class="clickable"
+                [src]="picture.blobURI"
+                (click)="openPictureDetail(picture.blobURI)"
+              />
             </div>
-          </ion-item>
-        </ion-col>
+            <br>
+            <div class="empty-pictures" *ngIf="formData.${ dataSet.technical }.${ field.technical }.length === 0">
+              no pictures taken
+            </div>
+          </div>
+        </ion-item>
+      </ion-col>
           `);
 
           break;
         }
       }
     });
+
+    /**
+     * Template for contract-members component to add it at the top of each dataset
+     *
+     * @param      {boolean}  detailPage  Indicates if we are on the detail page or not
+     * @return     {string}   the template
+     */
+    const inviteTpl = (detailPage) => {
+      return `
+    <div class="top-right">
+      <ng-container${ detailPage ? ' *ngIf="canEdit"' : '' }>
+        <span>{{ formData.${ dataSet.technical }.sharedMembers.length + formData.${ dataSet.technical }.newMembers.length }}</span>
+        <contract-members #${ dataSet.technical }SharedMemberComp
+          [(origin)]="formData.${ dataSet.technical }.sharedMembers"
+          [(members)]="formData.${ dataSet.technical }.newMembers"
+          ${ detailPage ? '[readonly]="!canEdit"' : '' }
+          (onChange)="ref.detectChanges()">
+        </contract-members>
+        <button ion-button icon-only clear round
+          (click)="${ dataSet.technical }SharedMemberComp.openMenu()">
+          <ion-icon name="people"></ion-icon>
+        </button>
+      </ng-container>
+    ` + (
+      detailPage ? `
+      <button ion-button icon-only clear round
+        (click)="hiddenDataSets.${ dataSet.technical } = !hiddenDataSets.${ dataSet.technical }; ref.detectChanges()">
+        <ion-icon name="arrow-down" *ngIf="hiddenDataSets.${ dataSet.technical }"></ion-icon>
+        <ion-icon name="arrow-up" *ngIf="!hiddenDataSets.${ dataSet.technical }"></ion-icon>
+      </button>
+      ` : '') +
+    '</div>';
+  };
 
     digitaltwinDataSchema[dataSet.technical] = {
       "$id": `${ dataSet.technical }_schema`,
@@ -597,28 +601,42 @@ module.exports = async function(projectName, dbcpName) {
     };
 
     digitaltwinDetailTpl.push(`
-      <div class="evan-content evan-relative">
-        <h3 class="content-header m-b-0 m-t-0">
-          ${ dataSet.display }
-        </h3>
-        <ion-row margin-top>
-          ${ detailTpl.join('\n') }
-        </ion-row>
-      </div>
+  <div class="evan-content evan-relative" *ngIf="formData.${ dataSet.technical }">
+    <h3 class="content-header m-b-0 m-t-0">
+      ${ dataSet.display }
+    </h3>
+    ${ inviteTpl(true) }
+    <ion-row margin-top *ngIf="!hiddenDataSets.${ dataSet.technical }">
+      ${ detailTpl.join('\n') }
+    </ion-row>
+
+    <div text-center>
+      <button margin-top ion-button round icon-left outline color="green"
+        *ngIf="formData.${ dataSet.technical }.newMembers.length > 0"
+        (click)="inviteNewMembers('${ dataSet.technical }')"
+        [disabled]="saving"
+        (onChange)="ref.detectChanges()">
+        <ion-icon name="person-add" *ngIf="!saving"></ion-icon>
+        <ion-spinner *ngIf="saving"></ion-spinner>
+        <span>{{ '_${ dbcpName }.invite-people' | translate }}</span>
+      </button>
+    </div>
+  </div>
     `);
 
     digitaltwinEditTpl.push(`
-      <div class="evan-content evan-relative">
-        <h3 class="content-header m-b-0 m-t-0">
-          ${ dataSet.display }
-        </h3>
-        <p ion-text class="m-b-0 m-t-0">
-          {{ '_${ dbcpName }.fill-empty' | translate }}
-        </p>
-        <ion-row margin-top>
-          ${ editTpl.join('\n') }
-        </ion-row>
-      </div>
+    <div class="evan-content evan-relative" *ngIf="formData.${ dataSet.technical }">
+      <h3 class="content-header m-b-0 m-t-0">
+        ${ dataSet.display }
+      </h3>
+      <p ion-text class="m-b-0 m-t-0">
+        {{ '_${ dbcpName }.fill-empty' | translate }}
+      </p>
+      ${ inviteTpl(false) }
+      <ion-row margin-top>
+        ${ editTpl.join('\n') }
+      </ion-row>
+    </div>
     `);
 
     digitaltwinFileProps[dataSet.technical] = fileProperties;

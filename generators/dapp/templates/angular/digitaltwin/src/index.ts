@@ -55,11 +55,37 @@ export {
 
 /**************************************************************************************************/
 
-function getRoutes(): Routes {
-  return buildModuleRoutes(
-    `<%= dbcpName %>.${ getDomainName() }`,
-    RootComponent,
-    [
+/**
+ * load the routes for a either the directly opened DApp or the contract address.
+ *
+ * @param      {string}  ensAddress  opened ens address (`<%= dbcpName %>.${ getDomainName() }` or
+ *                                   contract address)
+ */
+function getRoutes(ensAddress: string = ''): Routes {
+  let routes;
+  if (ensAddress.indexOf('0x') === 0) {
+    routes = [
+      {
+        path: '',
+        component: DetailComponent,
+        data: {
+          state: 'contract',
+          navigateBack: true,
+          reload: true,
+        }
+      },
+      {
+        path: 'edit-contract',
+        data: {
+          state: 'edit',
+          navigateBack: true,
+          reload: true,
+        },
+        component: CreateComponent,
+      }
+    ];
+  } else {
+    routes = [
       {
         path: '',
         component: CreateComponent,
@@ -96,8 +122,14 @@ function getRoutes(): Routes {
             component: CreateComponent,
           }
         ]
-      },
-    ]
+      }
+    ];
+  }
+
+  return buildModuleRoutes(
+    `<%= dbcpName %>.${ getDomainName() }`,
+    RootComponent,
+    routes
   );
 }
 
@@ -152,13 +184,13 @@ class <%= cleanName %>Module {
   constructor(private translations: Translations) { }
 }
 
-export async function startDApp(container, dbcpName) {
+export async function startDApp(container, dbcpName, ensAddress) {
   const ionicAppEl = createIonicAppElement(container, dbcpName);
   
   // Add project class name to the ion-app / .evan-dapp element for generalized styling
   // ionicAppEl.className += ' .<%= dbcpName %>-style';
 
-  await startAngularApplication(<%= cleanName %>Module, getRoutes());
+  await startAngularApplication(<%= cleanName %>Module, getRoutes(ensAddress));
 
   container.appendChild(ionicAppEl);
 }

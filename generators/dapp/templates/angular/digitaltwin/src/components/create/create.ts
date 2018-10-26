@@ -117,7 +117,7 @@ export class CreateComponent extends AsyncComponent {
    */
   async _ngOnInit() {
     // get current contract address from url
-    this.contractAddress = await this.routingService.getHashParam('address');
+    this.contractAddress = this.routingService.getContractAddress();
 
     if (this.contractAddress) {
       // load the details
