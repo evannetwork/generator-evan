@@ -29,6 +29,7 @@ import {
 
 import {
   EvanBCCService,
+  EvanBcService,
   EvanCoreService,
   EvanDescriptionService,
   EvanFileService,
@@ -68,6 +69,7 @@ export class <%= cleanName %>Service implements OnDestroy {
    */
   constructor(
     public _DomSanitizer: DomSanitizer,
+    public bc: EvanBcService,
     public bcc: EvanBCCService,
     public core: EvanCoreService,
     public descriptionService: EvanDescriptionService,

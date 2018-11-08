@@ -6,6 +6,7 @@
 - add missing mailbox light styling
 - fix dappName for empty dappsDomain
 - enhance digital twin DApp generator to support multiple, dynamic datasets
+- generate business-center on app container generation + add business center support for DataContract + DigitalTwin DApps 
 
 ### Deprecations
 - remove light DApp design (is included by `@evan.network/ui-angular-sass` custom themes now)

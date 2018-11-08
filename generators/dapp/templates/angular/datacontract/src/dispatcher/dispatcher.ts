@@ -50,6 +50,50 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
       async (service: <%= cleanName %>Service, queueEntry: any) => {
         const results = [ ];
 
+        const activeAccount = service.core.activeAccount();
+        let bcDomain = '<%= bcDomain %>';
+        let joinSchema = '<%= joinSchema %>';
+        let dataContract = service.bcc.dataContract;
+
+        // if a business center is used, load the business center interface, so we can check which
+        // users are within the business center
+        if (bcDomain) {
+          const [
+            businessCenter,
+            businessAddress,
+          ] = await Promise.all([
+            service.bc.getCurrentBusinessCenter(bcDomain),
+            service.bcc.nameResolver.getAddress(bcDomain)
+          ]);
+
+          let businessCenterContract = await service.bcc.contractLoader.loadContract(
+            'BusinessCenter',
+            businessAddress
+          );
+          dataContract = businessCenter.dataContract;
+
+          // check if the current member is within the bc
+          const isBCMember = await service.bcc.executor.executeContractCall(
+            businessCenterContract,
+            'isMember',
+            activeAccount,
+            { from: activeAccount, }
+          );
+
+          if (!isBCMember) {
+            // joinOnly or joinOrAdd
+            if (joinSchema === '0' || joinSchema === '2') {
+              await service.bcc.executor.executeContractTransaction(
+                businessCenterContract,
+                'join',
+                { from: activeAccount, },
+              );
+            } else {
+              throw new Error('You are\'nt a member of the bc and it does not allow self join.');
+            }
+          }
+        }
+
         for (let entry of queueEntry.data) {
           // get description for the current dapp and use it as contract metadata preset
           const description = await service.descriptionService.getDescription(
@@ -57,16 +101,15 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             true
           );
 
-          // create the new data contract
-          const contract = await service.bcc.dataContract.create(
-            'testdatacontract',
+          const contract = await dataContract.create(
+            'testdatacontract.factory.<%= bcDomain %>',
             service.bcc.core.activeAccount(),
-            null,
+            bcDomain,
             { public : description }
           );
 
           // set datacontract entry
-          await service.bcc.dataContract.setEntry(
+          await dataContract.setEntry(
             contract,
             'entry_settable_by_member',
             entry,

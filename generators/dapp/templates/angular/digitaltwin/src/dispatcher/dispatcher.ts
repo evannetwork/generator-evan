@@ -50,6 +50,49 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
       async (service: <%= cleanName %>Service, queueEntry: any) => {
         const results = [ ];
         const activeAccount = service.core.activeAccount();
+        let businessCenterContract;
+        let bcDomain = '<%= bcDomain %>';
+        let joinSchema = '<%= joinSchema %>';
+        let dataContract = service.bcc.dataContract;
+
+        // if a business center is used, load the business center interface, so we can check which
+        // users are within the business center
+        if (bcDomain) {
+          const [
+            businessCenter,
+            businessAddress,
+          ] = await Promise.all([
+            service.bc.getCurrentBusinessCenter(bcDomain),
+            service.bcc.nameResolver.getAddress(bcDomain)
+          ]);
+
+          businessCenterContract = await service.bcc.contractLoader.loadContract(
+            'BusinessCenter',
+            businessAddress
+          );
+          dataContract = businessCenter.dataContract;
+
+          // check if the current member is within the bc
+          const isBCMember = await service.bcc.executor.executeContractCall(
+            businessCenterContract,
+            'isMember',
+            activeAccount,
+            { from: activeAccount, }
+          );
+
+          if (!isBCMember) {
+            // joinOnly or joinOrAdd
+            if (joinSchema == '0' || joinSchema == '2') {
+              await service.bcc.executor.executeContractTransaction(
+                businessCenterContract,
+                'join',
+                { from: activeAccount, },
+              );
+            } else {
+              throw new Error('You are\'nt a member of the bc and it does not allow self join.');
+            }
+          }
+        }
 
         for (let entry of queueEntry.data) {
           const formData = entry.formData;
@@ -70,6 +113,33 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             .keys(description.dataSchema)
             .filter(dataSetKey => !!formData[dataSetKey]);
 
+          // if a business center is enabled, check the new invites users, if they are already
+          // members in the business center
+          const bcInvites = [ ];
+          if (bcDomain) {
+            for (let dataSetKey of dataSetKeys) {
+              if (formData[dataSetKey].newMembers) {
+                for (let member of formData[dataSetKey].newMembers) {
+                  const isBCMember = await service.bcc.executor.executeContractCall(
+                    businessCenterContract,
+                    'isMember',
+                    member,
+                    { from: activeAccount, }
+                  );
+
+                  // if its not a bc member, invite!
+                  if (!isBCMember) {
+                    if (joinSchema == '1' || joinSchema == '3') {
+                      bcInvites.push(member);
+                    } else {
+                      throw new Error(`The member ${ member } is'nt a member of the bc and it does not allow invites.`);
+                    }
+                  }
+                }
+              }
+            }
+          }
+
           // create the new data contract
           let contract;
           if (contractAddress) {
@@ -78,10 +148,10 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
               contractAddress
             );
           } else {
-            contract = await service.bcc.dataContract.create(
-              'testdatacontract',
-              activeAccount,
-              null,
+            contract = await dataContract.create(
+              `testdatacontract.factory.${ bcDomain }`,
+              service.bcc.core.activeAccount(),
+              bcDomain,
               { public : description }
             );
 
@@ -227,6 +297,18 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             activeAccount
           );
 
+          // if new bc invites are availabled, invite the new members
+          if (bcInvites.length > 0) {
+            await Promise.all(bcInvites.map((notMember) => {
+              return service.bcc.executor.executeContractTransaction(
+                businessCenterContract,
+                'invite',
+                { from: activeAccount, autoGas: 1.1, },
+                notMember
+              );
+            }));
+          }
+
           if (membersToInvite.length > 0) {
             // build bmail for invited user
             const bMailContent = {
@@ -248,7 +330,7 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             await Promise.all(membersToInvite.map(async (member) => {
               return Promise.all([
                 service.bcc.dataContract.inviteToContract(
-                  null,
+                  bcDomain,
                   contract.options.address,
                   activeAccount,
                   member

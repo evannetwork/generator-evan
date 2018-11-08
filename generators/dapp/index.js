@@ -113,6 +113,16 @@ module.exports = class extends Generator {
         this.answers.dbcpName = `${ projectName }.${ deploymentConfig.bcConfig.nameResolver.domains.dappsDomain }`;
       }
 
+      if (deploymentConfig.bcConfig.nameResolver.domains.bcDomain) {
+        this.answers.bcDomain = deploymentConfig.bcConfig.nameResolver.domains.bcDomain;
+        this.answers.factoryPath = `testdatacontract.${ this.answers.bcDomain }`;
+        this.answers.joinSchema = deploymentConfig.bcConfig.nameResolver.domains.joinSchema;
+      } else {
+        this.answers.bcDomain = '';
+        this.answers.joinSchema = '';
+        this.answers.factoryPath = `testdatacontract`;
+      }
+
       this.answers.cleanName = this.answers.dbcpName.replace(/\.|\-/g, '');
     } catch(e) {
       // silent
