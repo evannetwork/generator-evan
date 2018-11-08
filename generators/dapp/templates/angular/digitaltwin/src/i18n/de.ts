@@ -17,34 +17,48 @@
 export const de = {
   "_<%= dbcpName %>": {
     "choose-banner-img": "Banner Bild aussuchen",
+    "choose-csv": "CSV auswählen",
     "contract-invitation": {
       "text-body": "Ein neuer Digitaler Zwilling wurde für Sie freigegeben.",
       "text-title": "<%= projectName %> Vertrag freigegeben"
     },
     "create": "erstellen",
+    "csv-overview": "Import Übersicht",
+    "csv-template": "Sie haben noch keine CSV Datein hochgeladen. Nutzen Sie den folgenden Button, um sich eine Vorlage herunterzuladen.",
     "description": "<%= description %>",
     "dispatcher": {
       "description": "Führt die Datenspeicherung für die <%= dbcpName %> DApp durch.",
       "title": "<%= dbcpName %> Dispatcher"
     },
+    "done": "abgeschlossen",
+    "download-csv-template": "Vorlage herunterladen",
+    "download-status-csv": "Status CSV downloaden",
     "dt-creating": "Digitaler Zwilling wird erstellt...",
     "dt-creation": "Erstellung eines Digitaler Zwillings: ",
     "edit": "Digitalen Zwilling bearbeiten",
     "favorite-added": "Digitalen Zwilling wurde erstellt",
     "favorite-added-desc": "Ihr digitaler Zwilling wurde zu Ihren Favoriten hinzugefügt.",
     "fill-empty": "Bitte füllen Sie alle mit einem * gekennzeichneten Felder aus.",
+    "import-csv": "CSV Importieren",
+    "import-csv-desc": "Über das CSV importieren lassen sich mehrere Digitalen Zwillinge auf einmal erstellen. Bitte beachten Sie, dass keine Dateien oder Bilder importiert werden können.",
+    "invalid-csv": "Ungültige CSV Datei",
+    "invalid-csv-desc": "Die von Ihnen ausgewählte Datei entspricht nicht dem korrekten Format. Bitte wählen Sie die korrekte Datei.",
     "invite-people": "Neue Mitglieder einladen",
+    "loading": "wird erstellt...",
     "members": "Freigegebene Mitglieder",
     "metadata": "Metadaten",
     "new-contract": "Neuer Digitaler Zwilling",
     "ok": "ok",
+    "status": "Status",
     "take-a-picture": "Bild aufnehmen",
     "type": {
       "desc": "Type des Digitalen Zwillings",
       "error": "Bitte geben Sie einen Typ an!",
       "text": "Typ"
-    }
+    },
+    "waiting": "warte..."
   },
+  "csvimport": "CSV Importieren",
   "editcontract": "Digitalen Zwilling bearbeiten",
   "sample": "<%= dbcpName %>"
 };

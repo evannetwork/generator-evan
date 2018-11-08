@@ -172,4 +172,371 @@ export class <%= cleanName %>Service implements OnDestroy {
 
     return formData;
   }
+
+  async joinBCMember(accountId: string) {
+    let businessCenterContract;
+    let bcDomain = '<%= bcDomain %>';
+    let joinSchema = '<%= joinSchema %>';
+    let dataContract = this.bcc.dataContract;
+
+    // if a business center is used, load the business center interface, so we can check which
+    // users are within the business center
+    if (bcDomain) {
+      const [
+        businessCenter,
+        businessAddress,
+      ] = await Promise.all([
+        this.bc.getCurrentBusinessCenter(bcDomain),
+        this.bcc.nameResolver.getAddress(bcDomain)
+      ]);
+
+      businessCenterContract = await this.bcc.contractLoader.loadContract(
+        'BusinessCenter',
+        businessAddress
+      );
+      dataContract = businessCenter.dataContract;
+
+      // check if the current member is within the bc
+      const isBCMember = await this.bcc.executor.executeContractCall(
+        businessCenterContract,
+        'isMember',
+        accountId,
+        { from: accountId, }
+      );
+
+      if (!isBCMember) {
+        // joinOnly or joinOrAdd
+        if (joinSchema == '0' || joinSchema == '2') {
+          await this.bcc.executor.executeContractTransaction(
+            businessCenterContract,
+            'join',
+            { from: accountId, },
+          );
+        } else {
+          throw new Error('You are\'nt a member of the bc and it does not allow self join.');
+        }
+      }
+    }
+  }
+
+  /**
+   * Create a new contract using the digital twin description.
+   *
+   * @param      {any}           dataContract  intialized bc data contract class
+   * @param      {any}           description   the digital twin description
+   * @return     {Promise<any>}  contract instance
+   */
+  async createDtContract(dataContract: any, description: any) {
+    let bcDomain = '<%= bcDomain %>';
+
+    // all data set keys that should be saved and filter them for the available data within
+    // the formData object
+    const dataSetKeys = Object.keys(description.dataSchema)
+
+    const contract = await dataContract.create(
+      `testdatacontract.factory.${ bcDomain }`,
+      this.bcc.core.activeAccount(),
+      bcDomain,
+      { public : description }
+    );
+
+    // allow all the dbcp dataSchema properties setting
+    await Promise.all(dataSetKeys.map(dataSetKey =>
+      Promise.all(['set'].map(modificationType =>
+        this.bcc.rightsAndRoles.setOperationPermission(
+          contract,
+          this.bcc.core.activeAccount(),
+          0,
+          dataSetKey,
+          this.bcc.web3.utils.sha3('entry'),
+          this.bcc.web3.utils.sha3(modificationType),
+          true,
+        )
+      ))
+    ));
+
+    return contract
+  }
+
+  /**
+   * Create multiple digital twins
+   *
+   * @param      {Array<any>}              data    array of data entries
+   * @return     {Promise<Array<string>>}  array of new contract addresses
+   */
+  async createDigitalTwins(data: Array<any>) {
+    const results = [ ];
+    const activeAccount = this.core.activeAccount();
+    let businessCenterContract;
+    let bcDomain = '<%= bcDomain %>';
+    let joinSchema = '<%= joinSchema %>';
+    let dataContract = this.bcc.dataContract;
+
+    if (bcDomain) {
+      const [
+        businessCenter,
+        businessAddress,
+      ] = await Promise.all([
+        this.bc.getCurrentBusinessCenter(bcDomain),
+        this.bcc.nameResolver.getAddress(bcDomain)
+      ]);
+
+      businessCenterContract = await this.bcc.contractLoader.loadContract(
+        'BusinessCenter',
+        businessAddress
+      );
+
+      await this.joinBCMember(activeAccount);
+    }
+
+    for (let entry of data) {
+      const formData = entry.formData;
+      const contractAddress = entry.contractAddress;
+
+      // dont clear the cache while extending new sharing keys
+      this.lockLoadClearCache = true;
+
+      // get description for the current dapp and use it as contract metadata preset
+      const description = await this.descriptionService.getDescription(
+        `<%= dbcpName %>.${ getDomainName() }`,
+        true
+      );
+
+      // all data set keys that should be saved and filter them for the available data within
+      // the formData object
+      const dataSetKeys = Object
+        .keys(description.dataSchema)
+        .filter(dataSetKey => !!formData[dataSetKey]);
+
+      // if a business center is enabled, check the new invites users, if they are already
+      // members in the business center
+      const bcInvites = [ ];
+      if (bcDomain) {
+        for (let dataSetKey of dataSetKeys) {
+          if (formData[dataSetKey].newMembers) {
+            for (let member of formData[dataSetKey].newMembers) {
+              const isBCMember = await this.bcc.executor.executeContractCall(
+                businessCenterContract,
+                'isMember',
+                member,
+                { from: activeAccount, }
+              );
+
+              // if its not a bc member, invite!
+              if (!isBCMember) {
+                if (joinSchema == '1' || joinSchema == '3') {
+                  bcInvites.push(member);
+                } else {
+                  throw new Error(`The member ${ member } is'nt a member of the bc and it does not allow invites.`);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // create the new data contract
+      let contract;
+      if (contractAddress) {
+        contract = this.bcc.contractLoader.loadContract(
+          'DataContractInterface',
+          contractAddress
+        );
+      } else {
+        contract = await this.createDtContract(dataContract, description);
+      }
+
+      // load the latest block number, so the encryption will work only for data after this
+      // block
+      const blockNumber = await this.bcc.web3.eth.getBlockNumber();
+
+      // search for files and pictures that needs to be encrypted !important!: create new
+      // metadataToSave object, to keep original queue data reference (it would throw, if we
+      // adjust the files for encryption and the original object and it gets persistet into the
+      // IndexDB)
+      const metadataToSave: any = { };
+      for (let dataSetKey of dataSetKeys) {
+        const dataSet = metadataToSave[dataSetKey] = { };
+
+        for (let key of Object.keys(formData[dataSetKey])) {
+          dataSet[key] = formData[dataSetKey][key];
+
+          // the its a file or a picture, encrypt it!
+          if (this.fileProps[dataSetKey].indexOf(key) !== -1 ||
+              this.pictureProps[dataSetKey].indexOf(key) !== -1) {
+            // if the encryption should be disabled, continue with the next element
+            if (dataSet[key].length === 0 || (dataSet[key].length > 0 &&
+                dataSet[key][0].disableEncryption)) {
+              dataSet[key] = JSON.stringify(dataSet[key]);
+              continue;
+            }
+
+            // use the correct format for saving
+            dataSet[key] = await this.fileService.equalizeFileStructure(
+              dataSet[key]);
+
+            // encrypt the data
+            dataSet[key] = await this.bcc.dataContract.encrypt(
+              {
+                private: dataSet[key]
+              },
+              contract,
+              activeAccount,
+              dataSetKey,
+              blockNumber,
+              'aesBlob'
+            )
+          }
+        }
+
+        // merge all members together and remove the new members array from the dataset
+        if (formData[dataSetKey].newMembers) {
+          metadataToSave[dataSetKey].sharedMembers = metadataToSave[dataSetKey].sharedMembers
+            .concat(metadataToSave[dataSetKey].newMembers);
+
+          delete metadataToSave[dataSetKey].newMembers;
+        }
+      }
+
+      // set all datacontract data sets
+      await Promise.all(dataSetKeys.map(dataSetKey => 
+        this.bcc.dataContract.setEntry(
+          contract,
+          dataSetKey,
+          metadataToSave[dataSetKey],
+          activeAccount
+        )
+      ));
+
+      const contentKeys = { };
+      const [
+        hashKeyToShare,
+        sharings,
+      ] = await Promise.all([
+        // extend sharings only once
+        this.bcc.sharing.getHashKey(contract.options.address, activeAccount),
+        this.bcc.sharing.getSharingsFromContract(contract),
+        Promise.all(dataSetKeys.map(async (dataSetKey) => {
+          contentKeys[dataSetKey] = await this.bcc.sharing.getKey(
+            contract.options.address,
+            activeAccount,
+            dataSetKey,
+            blockNumber
+          );
+        }))
+      ]);
+
+      // iterate through all members, check if there are within the contract and extend the
+      // sharings
+      const membersToInvite = [ ];
+      for (let dataSetKey of dataSetKeys) {
+        for (let member of metadataToSave[dataSetKey].sharedMembers) {
+          const isContractMember = await this.bcc.executor.executeContractCall(
+            contract,
+            'isConsumer',
+            member,
+            { from: activeAccount, }
+          );
+
+          // only invite members once
+          if (!isContractMember) {
+            membersToInvite.push(member);
+          }
+
+          await this.bcc.sharing.extendSharings(
+            sharings,
+            activeAccount,
+            member,
+            dataSetKey,
+            0,
+            contentKeys[dataSetKey],
+            null
+          );
+
+          // extend the hashKey sharing
+          await this.bcc.sharing.extendSharings(
+            sharings,
+            activeAccount,
+            member,
+            '*',
+            'hashKey',
+            hashKeyToShare,
+            null
+          );
+        }
+      }
+
+      await this.bcc.sharing.saveSharingsToContract(
+        contract.options.address,
+        sharings,
+        activeAccount
+      );
+
+      // if new bc invites are availabled, invite the new members
+      if (bcInvites.length > 0) {
+        await Promise.all(bcInvites.map((notMember) => {
+          return this.bcc.executor.executeContractTransaction(
+            businessCenterContract,
+            'invite',
+            { from: activeAccount, autoGas: 1.1, },
+            notMember
+          );
+        }));
+      }
+
+      if (membersToInvite.length > 0) {
+        // build bmail for invited user
+        const bMailContent = {
+          content: {
+            from: activeAccount,
+            fromAlias: await this.bcc.profile.getProfileKey('alias', activeAccount),
+            title: this.translate.instant('_<%= dbcpName %>.contract-invitation.text-title'),
+            body: this.translate.instant('_<%= dbcpName %>.contract-invitation.text-body', {
+              contractAddress: contract.options.address,
+            }),
+            attachments: [{
+              address: contract.options.address,
+              type: 'contract',
+            }]
+          }
+        };
+
+        // invite all members into the contract and send an invitation mail
+        await Promise.all(membersToInvite.map(async (member) => {
+          return Promise.all([
+            this.bcc.dataContract.inviteToContract(
+              bcDomain,
+              contract.options.address,
+              activeAccount,
+              member
+            ),
+            this.bcc.mailbox.sendMail(
+              bMailContent,
+              activeAccount,
+              member
+            ),
+          ]);
+        }));
+      }
+
+      // add the bookmark if its not exists before
+      if (!contractAddress) {
+        description.trimmedName = formData.dtGeneral.type.replace(/\s|\./g, '');
+        description.i18n.name = {
+          de: formData.dtGeneral.type,
+          en: formData.dtGeneral.type,
+        };
+        await this.bcc.profile.loadForAccount(this.bcc.profile.treeLabels.bookmarkedDapps);
+        await this.bcc.profile.addDappBookmark(contract.options.address, description);
+        await this.bcc.profile.storeForAccount(this.bcc.profile.treeLabels.bookmarkedDapps);
+      }
+
+      results.push(contract._address);
+    }
+
+    // enable clear cache to load latest data everytime
+    this.lockLoadClearCache = false;
+
+    return results;
+  }
 }

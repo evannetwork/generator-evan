@@ -36,10 +36,11 @@ import {
 } from 'angular-core';
 
 // import components
+import { CreateComponent } from './components/create/create';
+import { CSVImportComponent } from './components/csv-import/csv-import';
+import { DetailComponent } from './components/detail/detail';
 import { RootComponent } from './components/root/root';
 import { SampleComponent } from './components/sample/sample';
-import { CreateComponent } from './components/create/create';
-import { DetailComponent } from './components/detail/detail';
 
 // import services and dispatchers
 import { Translations } from './i18n/registry';
@@ -91,6 +92,15 @@ function getRoutes(ensAddress: string = ''): Routes {
         component: CreateComponent,
         data: {
           state: 'create',
+          navigateBack: true,
+          reload: true,
+        }
+      },
+      {
+        path: 'csv-import',
+        component: CSVImportComponent,
+        data: {
+          state: 'csv-import',
           navigateBack: true,
           reload: true,
         }
@@ -165,10 +175,11 @@ function getConfig(isDispatcher?: boolean) {
 
     config.declarations = [
       BootstrapComponent,
+      CreateComponent,
+      CSVImportComponent,
+      DetailComponent,
       RootComponent,
       SampleComponent,
-      CreateComponent,
-      DetailComponent,
     ];
   }
 

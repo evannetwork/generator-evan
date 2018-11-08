@@ -17,6 +17,15 @@
 <evan-loading *ngIf="loading"></evan-loading>
 <form *ngIf="!loading && !newAddress" #createForm="ngForm">
   <ng-container *ngIf="!creating">
+    <dashboard-top-buttons class="on-small-move-down"
+      *ngIf="!contractAddress">
+      <button ion-button icon-left round outline
+        (click)="routingService.navigate('./csv-import')">
+        <ion-icon name="paper"></ion-icon>
+        {{ '_<%= dbcpName %>.import-csv' | translate }}
+      </button>
+    </dashboard-top-buttons>
+
     <div class="evan-content">
       <div class="banner-img">
         <img class="clickable"
