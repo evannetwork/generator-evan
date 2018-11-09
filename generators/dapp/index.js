@@ -104,6 +104,32 @@ module.exports = class extends Generator {
       }
     ]);
 
+    // require deployment config to get the ENS Path (if exists)
+    try {
+      const deploymentConfig = require(`${ this.destinationRoot() }/scripts/config/deployment.js`);
+      this.answers.dbcpName = projectName;
+
+      if (deploymentConfig.bcConfig.nameResolver.domains.dappsDomain) {
+        this.answers.dbcpName = `${ projectName }.${ deploymentConfig.bcConfig.nameResolver.domains.dappsDomain }`;
+      }
+
+      if (deploymentConfig.bcConfig.nameResolver.domains.bcDomain) {
+        this.answers.bcDomain = deploymentConfig.bcConfig.nameResolver.domains.bcDomain;
+        this.answers.factoryPath = `testdatacontract.${ this.answers.bcDomain }`;
+        this.answers.joinSchema = deploymentConfig.bcConfig.nameResolver.domains.joinSchema;
+      } else {
+        this.answers.bcDomain = '';
+        this.answers.joinSchema = '';
+        this.answers.factoryPath = `testdatacontract`;
+      }
+
+      this.answers.cleanName = this.answers.dbcpName.replace(/\.|\-/g, '');
+    } catch(e) {
+      // silent
+      this.answers.dbcpName = projectName;
+      this.answers.cleanName = this.answers.dbcpName.replace(/\.|\-/g, '');
+    }
+
     // as for dapp types specific for each framework
     switch (framework) {
       case 'angular': {
@@ -135,7 +161,7 @@ module.exports = class extends Generator {
 
         // load digital twin properties and apply them to the answers
         if (this.answers.type === 'digitaltwin') {
-          const digitaltwinConfiguration = await digitaltwinHandling.call(this, projectName);
+          const digitaltwinConfiguration = await digitaltwinHandling.call(this, projectName, this.answers.dbcpName);
 
           Object.keys(digitaltwinConfiguration).forEach(key => {
             this.answers[key] = digitaltwinConfiguration[key];
@@ -168,17 +194,6 @@ module.exports = class extends Generator {
       this.answers.standalone = true;
     } else {
       this.answers.standalone = false;
-    }
-
-    // require deployment config to get the ENS Path (if exists)
-    try {
-      const deploymentConfig = require(`${ this.destinationRoot() }/scripts/config/deployment.js`);
-      this.answers.dbcpName = `${projectName}.${deploymentConfig.bcConfig.nameResolver.domains.dappsDomain}`;
-      this.answers.cleanName = this.answers.dbcpName.replace(/\./g, '');
-    } catch(e) {
-      // silent
-      this.answers.dbcpName = `${projectName}`;
-      this.answers.cleanName = this.answers.dbcpName.replace(/\./g, '');
     }
 
     // append projectName into the answers object to handle it within the 

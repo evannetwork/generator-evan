@@ -28,15 +28,7 @@
       }
     },
     "imgSquare": "<%= img %>",
-    "dataSchema": {
-      "entry_settable_by_owner": {
-        "$id": "entry_settable_by_owner",
-        "additionalProperties": true,
-        "properties": <%- digitaltwinDBCPFields %>,
-        "type": "object",
-        "required": <%- digitaltwinDBCPRequiredFields %>
-      }
-    },
+    "dataSchema": <%- digitaltwinDataSchema %>,
     "name": "<%= dbcpName %>",
     "tags": [
       "dapp",

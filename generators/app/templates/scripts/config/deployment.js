@@ -29,7 +29,7 @@ const bcConfig = {
     ensAddress: process.env.ENS_ADDRESS || '0x937bbC1d3874961CA38726E9cD07317ba81eD2e1',
     ensResolver: process.env.ENS_RESOLVER || '0xDC18774FA2E472D26aB91deCC4CDd20D9E82047e',
     labels: {
-      businessCenterRoot: process.env.BC_ROOT || 'testbc.evan',
+      businessCenterRoot: process.env.BC_ROOT || '<%= bcDomain %>' || 'testbc.evan',
       ensRoot: process.env.ENS_ROOT || 'evan',
       factory: 'factory',
       admin: 'admin',
@@ -46,7 +46,9 @@ const bcConfig = {
       profile: process.env.ENS_PROFILES || ['profile', 'ensRoot'],
       profileFactory: ['profile', 'factory', 'ensRoot'],
       mailbox: process.env.ENS_MAILBOX || ['mailbox', 'ensRoot'],
+      bcDomain: '<%= bcDomain %>',
       dappsDomain: '<%= dappsDomain %>',
+      joinSchema: '<%= joinSchema %>',
     },
   },
   alwaysAutoGasLimit: 1.1

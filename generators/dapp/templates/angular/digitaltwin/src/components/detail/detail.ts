@@ -74,9 +74,14 @@ export class DetailComponent extends AsyncComponent {
   private canEdit: boolean;
 
   /**
-   * { item_description }
+   * is currently something in save process?
    */
   private saving: boolean;
+
+  /**
+   * hide / show content of data set
+   */
+  private hiddenDataSets: any = { };
 
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -100,17 +105,21 @@ export class DetailComponent extends AsyncComponent {
    */
   async _ngOnInit() {
     // get current contract address from url
-    this.contractAddress = await this.routingService.getHashParam('address');
-
-    // check if currently anything is saving?
-    this.saving = this.queueService.getQueueEntry(this.<%= cleanName %>ServiceInstance.queueId,
-      true).data.length > 0;
+    this.contractAddress = this.routingService.getContractAddress();
 
     this.queueWatcher = await this.queueService.onQueueFinish(this.<%= cleanName %>ServiceInstance.queueId,
       async (reload, results) => {
+        if (reload) {
+          await this.core.utils.timeout(0);
+        }
+
         // load the details
         this.formData = await this.<%= cleanName %>ServiceInstance.loadDigitalTwinData(this.contractAddress);
 
+        // check if currently anything is saving?
+        this.saving = this.queueService.getQueueEntry(this.<%= cleanName %>ServiceInstance.queueId,
+          true).data.length > 0;
+        
         // load the members and all the roles of the contract and check, if the current logged in user
         // is in the owner role
         const members = await this.bcc.rightsAndRoles.getMembers(this.contractAddress);
@@ -152,5 +161,28 @@ export class DetailComponent extends AsyncComponent {
    */
   openEdit() {
     this.routingService.navigate('./edit-contract');
+  }
+
+  /**
+   * Invite only the members of the given data set
+   *
+   * @param      {string}  dataSetKey  data set to invite new members to.
+   */
+  inviteNewMembers(dataSetKey: string) {
+    // save only the specific data set
+    const formDataToSave = { };
+    formDataToSave[dataSetKey] = this.formData[dataSetKey];
+
+    // submit new data to the queue
+    this.queueService.addQueueData(
+      this.<%= cleanName %>ServiceInstance.queueId,
+      {
+        contractAddress: this.contractAddress,
+        formData: formDataToSave
+      }
+    );
+    
+    this.saving = true;
+    this.ref.detectChanges();
   }
 }

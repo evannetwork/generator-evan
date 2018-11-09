@@ -38,8 +38,8 @@
     text-align: center;
 
     img {
-      max-height: 500px;
-      max-width: 500px;
+      max-height: 300px;
+      max-width: 300px;
       border-radius: 50%;
     }
 
@@ -59,6 +59,27 @@
       ion-label {
         display: none;
       }
+    }
+  }
+
+  .top-right {
+    position: absolute;
+    top: 18px;
+    right: 25px;
+
+    contract-members {
+      display: none;
+    }
+
+    & > span {
+      line-height: 49px;
+
+      display: inline-block;
+
+      height: 40px;
+      margin-right: -9px;
+
+      vertical-align: middle;
     }
   }
 }

@@ -28,6 +28,7 @@ import {
 
 import {
   EvanBCCService,
+  EvanBcService,
   EvanCoreService,
   EvanDescriptionService,
   EvanFileService,
@@ -46,6 +47,7 @@ export class <%= cleanName %>Service implements OnDestroy {
    * Create a singleton service instance. 
    */
   constructor(
+    public bc: EvanBcService,
     public bcc: EvanBCCService,
     public core: EvanCoreService,
     public descriptionService: EvanDescriptionService,

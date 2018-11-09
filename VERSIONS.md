@@ -5,6 +5,18 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.4.0
+### Features
+- enhance digital twin DApp generator to support multiple, dynamic datasets
+- generate business-center on app container generation + add business center support for DataContract + DigitalTwin DApps
+- CSV import for generated Digital Twin DApps to bulk import multiple digital twins
+
+### Fixes
+- fix dappName for empty dappsDomain
+
+### Deprecations
+- remove light DApp design (is included by `@evan.network/ui-angular-sass` custom themes now)
+
 ## Version 1.3.1
 ### Features
 - digital twin DApp: add created contract to favorites 

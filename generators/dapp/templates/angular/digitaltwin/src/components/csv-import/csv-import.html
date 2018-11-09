@@ -1,0 +1,121 @@
+<!--
+  Copyright (c) 2018-present evan GmbH.
+ 
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+ 
+      http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<div class="evan-relative evan-content">
+  <h3 class="content-header m-b-0 m-t-0">
+    {{ 'csvimport' | translate }}
+  </h3>
+  <p ion-text class="m-b-0 m-t-0">
+    {{ '_<%= dbcpName %>.import-csv-desc' | translate }}
+  </p>
+
+  <evan-file-select name="bannerPictures" margin-top #fileInput
+    [(ngModel)]="files"
+    [multiple]="false"
+    (onChange)="handleFileInput(this.files)">
+  </evan-file-select>
+
+  <div class="evan-seperator"></div>
+
+  <div class="evan-content m-l-0 m-r-0" *ngIf="csv && lines.length > 0">
+    <h3 class="content-header m-b-0 m-t-0">
+      {{ '_<%= dbcpName %>.csv-overview' | translate }} 
+
+      <ng-container *ngIf="linesToDisplay.length < lines.length">
+        ({{ currIndexingStart }} - {{ currIndexingStart + displayLimit }} / {{ lines.length }})
+      </ng-container>
+    </h3>
+
+    <div class="table-responsive" margin-vertical>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{{ '_<%= dbcpName %>.status' | translate }}</th>
+            <th *ngFor="let column of columns">{{ column }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let line of linesToDisplay">
+            <td *ngIf="line.loading">
+              <ion-spinner color="light"></ion-spinner>
+            </td>
+            <td *ngIf="!line.loading && !line.contractAddress && !line.error">
+              {{ '_<%= dbcpName %>.waiting' | translate }}
+            </td>
+            <td *ngIf="line.error">
+              {{ '_<%= dbcpName %>.error' | translate }}
+            </td>
+            <td *ngIf="line.contractAddress">
+              {{ '_<%= dbcpName %>.finished' | translate }}
+            </td>
+            <td *ngFor="let column of columns">
+              <a class="clickable"
+                *ngIf="column === 'contractAddress'"
+                (click)="openContract(line.contractAddress)">
+                {{ line.contractAddress }}
+              </a>
+              <ng-container *ngIf="column !== 'contractAddress'">
+                {{ line[column] }}
+              </ng-container>
+            </td>
+          </tr> 
+        </tbody>
+      </table>
+    </div>
+
+    <div text-right *ngIf="lines.length > displayLimit">
+      <button ion-button round outline icon-left
+        [disabled]="currIndexingStart === 0"
+        (click)="pageLines(-1 * displayLimit)">
+        {{ '_<%= dbcpName %>.page-back' | translate }}
+      </button>
+      <span margin-vertical>
+        {{ currIndexingStart }} - {{ currIndexingStart + displayLimit }} / {{ lines.length }}
+      </span>
+      <button ion-button round outline icon-left
+        [disabled]="currIndexingStart + displayLimit >= lines.length"
+        (click)="pageLines(displayLimit)">
+        {{ '_<%= dbcpName %>.page-forward' | translate }}
+      </button>
+    </div>
+
+    <p *ngIf="importingDone">{{ '_<%= dbcpName %>.done' | translate }}!</p>
+
+    <button ion-button round outline icon-left (click)="downloadStatusCSV()">
+      {{ '_<%= dbcpName %>.download-status-csv' | translate }}
+    </button>
+  </div>
+
+  <div class="evan-relative" *ngIf="!csv">
+    <p>
+     {{ '_<%= dbcpName %>.csv-template' | translate }}
+    </p>
+
+    <button ion-button round outline icon-left (click)="downloadTemplate()">
+      {{ '_<%= dbcpName %>.download-csv-template' | translate }}
+    </button>
+  </div>
+
+  <div class="evan-seperator"></div>
+  <div flex>
+    <button ion-button round outline icon-left
+      [disabled]="importing || !csv"
+      (click)="importTwins()">
+      <ion-spinner *ngIf="importing"></ion-spinner>
+      {{ '_<%= dbcpName %>.import-csv' | translate }}
+    </button>
+  </div>
+</div>

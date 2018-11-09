@@ -36,10 +36,11 @@ import {
 } from 'angular-core';
 
 // import components
+import { CreateComponent } from './components/create/create';
+import { CSVImportComponent } from './components/csv-import/csv-import';
+import { DetailComponent } from './components/detail/detail';
 import { RootComponent } from './components/root/root';
 import { SampleComponent } from './components/sample/sample';
-import { CreateComponent } from './components/create/create';
-import { DetailComponent } from './components/detail/detail';
 
 // import services and dispatchers
 import { Translations } from './i18n/registry';
@@ -55,16 +56,51 @@ export {
 
 /**************************************************************************************************/
 
-function getRoutes(): Routes {
-  return buildModuleRoutes(
-    `<%= dbcpName %>.${ getDomainName() }`,
-    RootComponent,
-    [
+/**
+ * load the routes for a either the directly opened DApp or the contract address.
+ *
+ * @param      {string}  ensAddress  opened ens address (`<%= dbcpName %>.${ getDomainName() }` or
+ *                                   contract address)
+ */
+function getRoutes(ensAddress: string = ''): Routes {
+  let routes;
+  if (ensAddress.indexOf('0x') === 0) {
+    routes = [
+      {
+        path: '',
+        component: DetailComponent,
+        data: {
+          state: 'contract',
+          navigateBack: true,
+          reload: true,
+        }
+      },
+      {
+        path: 'edit-contract',
+        data: {
+          state: 'edit',
+          navigateBack: true,
+          reload: true,
+        },
+        component: CreateComponent,
+      }
+    ];
+  } else {
+    routes = [
       {
         path: '',
         component: CreateComponent,
         data: {
           state: 'create',
+          navigateBack: true,
+          reload: true,
+        }
+      },
+      {
+        path: 'csv-import',
+        component: CSVImportComponent,
+        data: {
+          state: 'csv-import',
           navigateBack: true,
           reload: true,
         }
@@ -96,8 +132,14 @@ function getRoutes(): Routes {
             component: CreateComponent,
           }
         ]
-      },
-    ]
+      }
+    ];
+  }
+
+  return buildModuleRoutes(
+    `<%= dbcpName %>.${ getDomainName() }`,
+    RootComponent,
+    routes
   );
 }
 
@@ -133,10 +175,11 @@ function getConfig(isDispatcher?: boolean) {
 
     config.declarations = [
       BootstrapComponent,
+      CreateComponent,
+      CSVImportComponent,
+      DetailComponent,
       RootComponent,
       SampleComponent,
-      CreateComponent,
-      DetailComponent,
     ];
   }
 
@@ -152,13 +195,13 @@ class <%= cleanName %>Module {
   constructor(private translations: Translations) { }
 }
 
-export async function startDApp(container, dbcpName) {
+export async function startDApp(container, dbcpName, ensAddress) {
   const ionicAppEl = createIonicAppElement(container, dbcpName);
   
   // Add project class name to the ion-app / .evan-dapp element for generalized styling
   // ionicAppEl.className += ' .<%= dbcpName %>-style';
 
-  await startAngularApplication(<%= cleanName %>Module, getRoutes());
+  await startAngularApplication(<%= cleanName %>Module, getRoutes(ensAddress));
 
   container.appendChild(ionicAppEl);
 }
