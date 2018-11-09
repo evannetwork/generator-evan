@@ -104,7 +104,7 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
           description.abis = { own: JSON.parse(service.bcc.contracts.DataContract.interface) };
 
           const contract = await dataContract.create(
-            'testdatacontract.factory.<%= bcDomain %>',
+            `testdatacontract${ bcDomain ? '.factory.<%= bcDomain %>': '' }`,
             service.bcc.core.activeAccount(),
             bcDomain,
             { public : description }

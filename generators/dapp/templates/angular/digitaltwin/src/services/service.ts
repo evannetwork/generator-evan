@@ -292,7 +292,7 @@ export class <%= cleanName %>Service implements OnDestroy {
         );
       } else {
         contract = await dataContract.create(
-          `testdatacontract.factory.${ bcDomain }`,
+          `testdatacontract${ bcDomain ? '.factory.<%= bcDomain %>': '' }`,
           this.bcc.core.activeAccount(),
           bcDomain,
           { public : description }

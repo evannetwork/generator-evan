@@ -150,6 +150,9 @@ module.exports = class extends Generator {
 
         this.answers.bcDomain = domain;
         this.answers.joinSchema = joinSchema;
+      } else {
+        this.answers.bcDomain = '';
+        this.answers.joinSchema = '';
       }
 
       await userRuntime.dfs.stop();

@@ -55,7 +55,6 @@ const bcConfig = {
 }
 
 const runtimeConfig = {
-  web3Provider: 'ws://localhost:8546',                       // default value
   // web3Provider: 'wss://testcore.evan.network/ws',                       // default value
   // ipfs: {host: 'ipfs.evan.network', port: '443', protocol: 'https'},    // default value
   minBalance: 1000000000000000000,
