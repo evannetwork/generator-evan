@@ -36,11 +36,15 @@ export const en = {
     "dt-creating": "Creating Digital Twin...",
     "dt-creation": "Creation of a Digital Twin: ",
     "edit": "edit Digital Twin",
+    "error": "error",
     "favorite-added": "Digital twin has been created",
     "favorite-added-desc": "Your digital twin has been added to your favorites.",
     "fill-empty": "Please fill in all fields marked with an *.",
+    "finished": "finished",
     "import-csv": "import CSV",
     "import-csv-desc": "Import via CSV allows you to create several digital twins at once. Please note that no files or images can be imported.",
+    "invalid-address": "Invalid AccountID",
+    "invalid-address-desc": "The AccountID {{ address }} is invalid, this participant cannot be referenced!",
     "invalid-csv": "Invalid CSV file",
     "invalid-csv-desc": "The file you selected does not match the correct format. Please select the correct file.",
     "invite-people": "Invite new members",
@@ -49,6 +53,8 @@ export const en = {
     "metadata": "Metadata",
     "new-contract": "New Digital Twin",
     "ok": "ok",
+    "page-back": "back",
+    "page-forward": "forward",
     "status": "Status",
     "take-a-picture": "Take snapshot",
     "type": {
@@ -58,7 +64,7 @@ export const en = {
     },
     "waiting": "wait..."
   },
-  "csvimport": "Import CSV",
+  "csvimport": "CSV-Import",
   "editcontract": "Edit Digital Twin",
   "sample": "<%= dbcpName %>"
 };

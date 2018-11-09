@@ -48,7 +48,7 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
       '_<%= cleanName %>.dispatcher.title',
       '_<%= cleanName %>.dispatcher.description',
       async (service: <%= cleanName %>Service, queueEntry: any) => {
-        await service.createDigitalTwins(queueEntry.data);
+        return await service.createDigitalTwins(queueEntry.data);
       }
     )
   ],

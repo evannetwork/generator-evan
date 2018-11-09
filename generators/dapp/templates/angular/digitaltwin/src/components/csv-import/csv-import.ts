@@ -87,12 +87,12 @@ export class CSVImportComponent extends AsyncComponent {
   /**
    * limit of lines to display
    */
-  private displayLimit: number = 10;
+  private displayLimit: number = 20;
 
   /**
    * current index of line that should be imported
    */
-  private lowestDisplayIndex: number = 0;
+  private currIndexingStart: number = 0;
 
   /**
     * frontend check for importing
@@ -124,6 +124,16 @@ export class CSVImportComponent extends AsyncComponent {
    */
   private columns: Array<string>;
 
+  /**
+   * only run one file input change, could trigger multiple times
+   */
+  private handlingFileInput: boolean;
+
+  /**
+   * stopp import, when leaving the ui!
+   */
+  private stopped: boolean;
+
   constructor(
     private <%= cleanName %>ServiceInstance: <%= cleanName %>Service,
     private alertService: EvanAlertService,
@@ -147,6 +157,10 @@ export class CSVImportComponent extends AsyncComponent {
     this.columns = await this.getColumns();
   }
 
+  async _ngOnDestroy() {
+    this.stopped = true;
+  }
+
   /**
    * Reads the text from a file.
    *
@@ -167,6 +181,11 @@ export class CSVImportComponent extends AsyncComponent {
    * @param      {Array<any>}  files   selected files
    */
   async handleFileInput(files: Array<any>) {
+    if (this.handlingFileInput) {
+      return;
+    }
+
+    this.handlingFileInput = true;
     if (files.length > 0) {
       this.csv = files[0];
 
@@ -174,8 +193,13 @@ export class CSVImportComponent extends AsyncComponent {
       this.lines = await this.parseCSV();
       this.linesToDisplay = this.lines.slice(0, this.displayLimit);
 
+      // clear the files list, so uploading the same file will also trigger the file change event
+      files.splice(0, 1);
+
       this.ref.detectChanges();
     }
+
+    this.handlingFileInput = false;
   }
 
   /**
@@ -184,14 +208,16 @@ export class CSVImportComponent extends AsyncComponent {
    * @return     {Array<string>}  All columns using the following format dataset.key.
    */
   async getColumns() {
-    const columns = [ ];
+    const columns = [ 'contractAddress', 'error' ];
     const dataSetKeys = Object.keys(this.dataSchema);
 
     dataSetKeys.forEach(key => 
       Object.keys(this.dataSchema[key].properties).forEach((prop) => {
         if (this.<%= cleanName %>ServiceInstance.pictureProps[key].indexOf(prop) === -1 &&
             this.<%= cleanName %>ServiceInstance.fileProps[key].indexOf(prop) === -1) {
-          columns.push(`${ key }.${ prop }`)
+          columns.push(`${ key }.${ prop }`);
+        } else if (key === 'dtGeneral' && prop === 'bannerImg') {
+          columns.push(`${ key }.${ prop }`);
         }
       })
     );
@@ -224,7 +250,7 @@ export class CSVImportComponent extends AsyncComponent {
         let record;
 
         while (record = parser.read()) {
-          lines.push(record)
+          lines.push(record);
         }
       });
       // Catch any error
@@ -238,8 +264,11 @@ export class CSVImportComponent extends AsyncComponent {
           );
         } catch (ex) { }
 
+        delete this.csv;
         this.importing = false;
         this.ref.detectChanges();
+
+        resolve([ ]);
       });
 
       // When we are done, test that the parsed output matched what expected
@@ -254,74 +283,132 @@ export class CSVImportComponent extends AsyncComponent {
    */
   async importTwins() {
     const activeAccount = this.core.activeAccount();
-    const dataContract = (await this.<%= cleanName %>ServiceInstance.bc
-      .getCurrentBusinessCenter('<%= bcDomain %>')).dataContract;
 
     this.importing = true;
     this.ref.detectChanges();
 
-    // When we are done, test that the parsed output matched what expected
-    this.lines = await this.parseCSV();
-
-    await this.<%= cleanName %>ServiceInstance.joinBCMember(activeAccount);
-
-    for (let i = 0; i < this.lines.length; i++) {
-      if (this.lines.length > this.displayLimit && i > 5) {
-        this.linesToDisplay = this.lines.slice(i - 5, i + this.displayLimit);
-        this.lowestDisplayIndex = i - 5;
-      } else {
-        this.lowestDisplayIndex = 0;
-        this.linesToDisplay = this.lines.slice(0, this.displayLimit);
-      }
-
-      const line = this.lines[i];
-      const metadata = {
-        dtGeneral: {
-          bannerImg: '???' //TODO: add banner img stuff
-        }
-      };
-
-      for (let key of Object.keys(line)) {
-        const split = key.split('.');
-
-        metadata[split[0]] = metadata[split[0]] || { };
-
-        if (split[1] === 'sharedMembers') {
-          metadata[split[0]][split[1]] = line[key].replace(/\'|\"/g, '').split(',');
-        } else {
-          metadata[split[0]][split[1]] = line[key];
-        }
-      }
-
-      for (let dataSetKey of Object.keys(this.dataSchema)) {
-        for (let prop of Object.keys(this.dataSchema[dataSetKey])) {
-          metadata[dataSetKey] = metadata[dataSetKey] || { };
-          metadata[dataSetKey][prop] = metadata[dataSetKey][prop] || '';
-        }
-      }
-
-      line.loading = true;
+    const finishImport = () => {
+      this.importing = false;
       this.ref.detectChanges();
+    };
 
-      const contract = await this.<%= cleanName %>ServiceInstance.createDtContract(dataContract,
-        this.description);
-      // set all datacontract data sets
-      await Promise.all(Object.keys(metadata).map(dataSetKey => 
-        this.bcc.dataContract.setEntry(
-          contract,
-          dataSetKey,
-          metadata[dataSetKey],
-          activeAccount
-        )
-      ));
+    // show only lines, that are currently importing and some lines around
+    if (this.lines.length > 0) {
+      await prottle(20, this.lines.map((line, i) => async () => {
+        if (this.stopped || line.contractAddress) {
+          return;
+        }
 
-      line.contractAddress = contract.options.address;
-      line.loading = false;
-      this.ref.detectChanges();
+        //remove previous error
+        delete line.error;
+
+        // show current indexing entries
+        this.currIndexingStart = i - (i % this.displayLimit);
+        this.linesToDisplay = this.lines.slice(this.currIndexingStart,
+          this.currIndexingStart + this.displayLimit);
+
+        // iterate through the data of the line and build the correct metadata to save
+        const metadata = { };
+        for (let key of Object.keys(line)) {
+          const split = key.split('.');
+
+          if (split.length < 2) {
+            continue;
+          }
+
+          metadata[split[0]] = metadata[split[0]] || { };
+
+          // if it's a member field, try to parse it into an array and check, if valid account ids
+          // were insertedq
+          if (split[1] === 'sharedMembers' ||
+              this.dataSchema[split[0]].properties[split[1]].type === 'array') {
+            metadata[split[0]][split[1]] = line[key].replace(/\'|\"/g, '').split(',');
+
+            // remove empty accounts
+            metadata[split[0]][split[1]] = metadata[split[0]][split[1]]
+              .filter(accountId => !!accountId);
+
+            for (let accountId of metadata[split[0]][split[1]]) {
+              if (!this.bcc.web3.utils.isAddress(accountId)) {
+                line.error = this.translateService.instant(
+                  '_<%= dbcpName %>.invalid-address-desc',
+                  { address: accountId }
+                );
+
+                return;
+              }
+            }
+          } else if (split[1] === 'bannerImg') {
+            metadata[split[0]][split[1]] = [{
+              blobURI: this.<%= cleanName %>ServiceInstance.defaultBannerImg,
+              disableEncryption: true
+            }];
+          } else {
+            metadata[split[0]][split[1]] = line[key];
+          }
+        }
+
+        /**
+         * fill empty file and pictures props using an empty array
+         *
+         * @param      {any}  fileProps  file / picture properties
+         */
+        const fillFileProps = (fileProps: any) => {
+          for (let dataSetKey of Object.keys(fileProps)) {
+            for (let prop of fileProps[dataSetKey]) {
+              metadata[dataSetKey] = metadata[dataSetKey] || { };
+              metadata[dataSetKey][prop] = metadata[dataSetKey][prop] || [ ];
+            }
+          }
+        };
+
+        // fill empty file and pictures props using an empty array
+        fillFileProps(this.<%= cleanName %>ServiceInstance.fileProps);
+        fillFileProps(this.<%= cleanName %>ServiceInstance.pictureProps);
+
+        line.loading = true;
+        this.ref.detectChanges();
+
+        // create the twin!
+        try {
+          const result = await this.<%= cleanName %>ServiceInstance.createDigitalTwins([{
+            disableFavorite: true,
+            formData: metadata,
+          }]);
+
+          line.contractAddress = result[0];
+        } catch (ex) {
+          line.error = ex.message;
+        }
+
+        line.loading = false;
+        this.ref.detectChanges();
+      }));
     }
    
-    this.importing = false;
     this.importingDone = true;
+    finishImport();
+  }
+
+  /**
+   * Adjust the lines to display by paging the "pageAdjust" value (-20 / +20)
+   *
+   * @param      {number}  pageAdjust  page adjust (-20 / +20)
+   */
+  async pageLines(pageAdjust: number) {
+    this.currIndexingStart = this.currIndexingStart + pageAdjust;
+
+    if (this.currIndexingStart + this.displayLimit > this.lines.length) {
+      this.currIndexingStart = this.lines.length - this.displayLimit;
+    }
+
+    if (this.currIndexingStart < 0) {
+      this.currIndexingStart = 0;
+    }
+
+    this.linesToDisplay = this.lines.slice(this.currIndexingStart,
+      this.currIndexingStart + this.displayLimit);
+
     this.ref.detectChanges();
   }
 
@@ -332,14 +419,21 @@ export class CSVImportComponent extends AsyncComponent {
    */
   async downloadTemplate() {
     const content = [
-      this.columns.join(','), 
+      this.columns.join(';'), 
       this.columns.map((value, index) => {
         const split = value.split('.');
 
-        if (split[1] === 'sharedMembers') {
-          return `"0x000...,0x0001..."`;
+        if (split.length > 1) {
+          if (split[1] === 'sharedMembers' ||
+            this.dataSchema[split[0]].properties[split[1]].type === 'array') {
+            return `"0x000...,0x0001..."`;
+          } else if (split[0] === 'dtGeneral' && split[1] === 'bannerImg') {
+            return this.<%= cleanName %>ServiceInstance.defaultBannerImg;
+          } else {
+            return `Test value ${ index }`;
+          }
         } else {
-          return `Test value ${ index }`;
+          return '';
         }
       }).join(';'),
     ].join('\n');
@@ -355,26 +449,21 @@ export class CSVImportComponent extends AsyncComponent {
    */
   async downloadStatusCSV() {
     const content = [
-      ['Status'].concat(this.columns).join(','),
+      this.columns.join(';'),
     ].concat(
-      this.lines.map((line) => {
-        let result = [ ];
-
-        if (line.loading) {
-          result.push('loading...');
-        } else if (line.contractAddress) {
-          result.push(line.contractAddress);
-        } else {
-          result.push('waiting...');
-        }
-
-        result = result.concat(this.columns.map(column => line[column]));
-
-        return result.join(';');
-      })
+      this.lines.map((line) => this.columns.map(column => line[column]).join(';'))
     ).join('\n');
 
     let blob = new Blob([content],{type: 'text/csv;charset=utf-8;'});
     window.open(URL.createObjectURL(blob), '_blank');
+  }
+
+  /**
+   * Opens a contract address within a new window
+   *
+   * @param      {string}  contractAddress  contract address to open
+   */
+  openContract(contractAddress: string) {
+    window.open(window.location.href.replace('csv-import', contractAddress), '_blank');
   }
 }

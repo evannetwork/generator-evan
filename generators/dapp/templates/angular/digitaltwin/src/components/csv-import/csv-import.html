@@ -16,7 +16,7 @@
 
 <div class="evan-relative evan-content">
   <h3 class="content-header m-b-0 m-t-0">
-    {{ '_<%= dbcpName %>.import-csv' | translate }}
+    {{ 'csvimport' | translate }}
   </h3>
   <p ion-text class="m-b-0 m-t-0">
     {{ '_<%= dbcpName %>.import-csv-desc' | translate }}
@@ -35,11 +35,11 @@
       {{ '_<%= dbcpName %>.csv-overview' | translate }} 
 
       <ng-container *ngIf="linesToDisplay.length < lines.length">
-        ({{ lowestDisplayIndex }} - {{ linesToDisplay.length }} / {{ lines.length }})
+        ({{ currIndexingStart }} - {{ currIndexingStart + displayLimit }} / {{ lines.length }})
       </ng-container>
     </h3>
 
-    <div class="table-responsive">
+    <div class="table-responsive" margin-vertical>
       <table class="table">
         <thead>
           <tr>
@@ -52,23 +52,51 @@
             <td *ngIf="line.loading">
               <ion-spinner color="light"></ion-spinner>
             </td>
-            <td *ngIf="!line.loading && !line.contractAddress">
+            <td *ngIf="!line.loading && !line.contractAddress && !line.error">
               {{ '_<%= dbcpName %>.waiting' | translate }}
             </td>
-            <td *ngIf="line.contractAddress">{{ line.contractAddress }}</td>
+            <td *ngIf="line.error">
+              {{ '_<%= dbcpName %>.error' | translate }}
+            </td>
+            <td *ngIf="line.contractAddress">
+              {{ '_<%= dbcpName %>.finished' | translate }}
+            </td>
             <td *ngFor="let column of columns">
-              {{ line[column] }}
+              <a class="clickable"
+                *ngIf="column === 'contractAddress'"
+                (click)="openContract(line.contractAddress)">
+                {{ line.contractAddress }}
+              </a>
+              <ng-container *ngIf="column !== 'contractAddress'">
+                {{ line[column] }}
+              </ng-container>
             </td>
           </tr> 
         </tbody>
       </table>
+    </div>
 
-      <p *ngIf="importingDone">{{ '_<%= dbcpName %>.done' | translate }}!</p>
-
-      <button ion-button round outline icon-left (click)="downloadStatusCSV()">
-        {{ '_<%= dbcpName %>.download-status-csv' | translate }}
+    <div text-right *ngIf="lines.length > displayLimit">
+      <button ion-button round outline icon-left
+        [disabled]="currIndexingStart === 0"
+        (click)="pageLines(-1 * displayLimit)">
+        {{ '_<%= dbcpName %>.page-back' | translate }}
+      </button>
+      <span margin-vertical>
+        {{ currIndexingStart }} - {{ currIndexingStart + displayLimit }} / {{ lines.length }}
+      </span>
+      <button ion-button round outline icon-left
+        [disabled]="currIndexingStart + displayLimit >= lines.length"
+        (click)="pageLines(displayLimit)">
+        {{ '_<%= dbcpName %>.page-forward' | translate }}
       </button>
     </div>
+
+    <p *ngIf="importingDone">{{ '_<%= dbcpName %>.done' | translate }}!</p>
+
+    <button ion-button round outline icon-left (click)="downloadStatusCSV()">
+      {{ '_<%= dbcpName %>.download-status-csv' | translate }}
+    </button>
   </div>
 
   <div class="evan-relative" *ngIf="!csv">

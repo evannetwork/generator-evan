@@ -36,11 +36,15 @@ export const de = {
     "dt-creating": "Digitaler Zwilling wird erstellt...",
     "dt-creation": "Erstellung eines Digitaler Zwillings: ",
     "edit": "Digitalen Zwilling bearbeiten",
+    "error": "Fehler",
     "favorite-added": "Digitalen Zwilling wurde erstellt",
     "favorite-added-desc": "Ihr digitaler Zwilling wurde zu Ihren Favoriten hinzugefügt.",
     "fill-empty": "Bitte füllen Sie alle mit einem * gekennzeichneten Felder aus.",
-    "import-csv": "CSV Importieren",
-    "import-csv-desc": "Über das CSV importieren lassen sich mehrere Digitalen Zwillinge auf einmal erstellen. Bitte beachten Sie, dass keine Dateien oder Bilder importiert werden können.",
+    "finished": "abgeschlossen",
+    "import-csv": "CSV importieren",
+    "import-csv-desc": "Über den CSV-Import lassen sich mehrere Digitalen Zwillinge auf einmal erstellen. Bitte beachten Sie, dass keine Dateien oder Bilder importiert werden können.",
+    "invalid-address": "Ungültige AccountID",
+    "invalid-address-desc": "Die AccountID {{ address }} ist ungültig, dieser Teilnehmer kann nicht referenziert werden!",
     "invalid-csv": "Ungültige CSV Datei",
     "invalid-csv-desc": "Die von Ihnen ausgewählte Datei entspricht nicht dem korrekten Format. Bitte wählen Sie die korrekte Datei.",
     "invite-people": "Neue Mitglieder einladen",
@@ -49,6 +53,8 @@ export const de = {
     "metadata": "Metadaten",
     "new-contract": "Neuer Digitaler Zwilling",
     "ok": "ok",
+    "page-back": "zurück",
+    "page-forward": "nächste",
     "status": "Status",
     "take-a-picture": "Bild aufnehmen",
     "type": {
@@ -58,7 +64,7 @@ export const de = {
     },
     "waiting": "warte..."
   },
-  "csvimport": "CSV Importieren",
+  "csvimport": "CSV-Import",
   "editcontract": "Digitalen Zwilling bearbeiten",
   "sample": "<%= dbcpName %>"
 };

@@ -19,7 +19,7 @@
   <div class="evan-content" *ngIf="formData.dtGeneral">
     <div class="banner-img">
       <img class="clickable"
-        [src]="formData.dtGeneral.bannerImg[0].blobURI"
+        [src]="_DomSanitizer.bypassSecurityTrustUrl(formData.dtGeneral.bannerImg[0].blobURI)"
         (click)="openPictureDetail(formData.dtGeneral.bannerImg[0].blobURI)"
       />
       <h3>{{ formData.dtGeneral.type }}</h3>

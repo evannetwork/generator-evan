@@ -29,7 +29,7 @@
     <div class="evan-content">
       <div class="banner-img">
         <img class="clickable"
-          [src]="formData.dtGeneral.bannerImg[0].blobURI"
+          [src]="_DomSanitizer.bypassSecurityTrustUrl(formData.dtGeneral.bannerImg[0].blobURI)"
           (click)="openPictureDetail(formData.dtGeneral.bannerImg[0].blobURI)"
         />
         <evan-file-select name="bannerPictures" margin-top #bannerFileSelectComp

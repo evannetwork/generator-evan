@@ -65,6 +65,12 @@ export class <%= cleanName %>Service implements OnDestroy {
   public lockLoadClearCache: boolean;
 
   /**
+   * default banner image that is used initally for digital twin creation
+   */
+  public defaultBannerImg: string =
+    'https://ipfs.evan.network/ipfs/QmTYC9f9aiWn2Hx5j2fTDqg6EzZXNiJpK5UBwNQUgLfF1x/banner.svg';
+
+  /**
    * Create a singleton service instance. 
    */
   constructor(
@@ -106,7 +112,8 @@ export class <%= cleanName %>Service implements OnDestroy {
     const activeAccount = this.core.activeAccount();
     let formData = { };
 
-    // if no queue is running, clear the sharing cache to directly access new data that was shared with me, without reloading the page
+    // if no queue is running, clear the sharing cache to directly access new data that was shared
+    // with me, without reloading the page
     if (!this.lockLoadClearCache) {
       this.bcc.sharing.clearCache();
     }
@@ -173,7 +180,15 @@ export class <%= cleanName %>Service implements OnDestroy {
     return formData;
   }
 
-  async joinBCMember(accountId: string) {
+  /**
+   * Create multiple digital twins
+   *
+   * @param      {Array<any>}              data    array of data entries
+   * @return     {Promise<Array<string>>}  array of new contract addresses
+   */
+  async createDigitalTwins(data: Array<any>) {
+    const results = [ ];
+    const activeAccount = this.core.activeAccount();
     let businessCenterContract;
     let bcDomain = '<%= bcDomain %>';
     let joinSchema = '<%= joinSchema %>';
@@ -200,8 +215,8 @@ export class <%= cleanName %>Service implements OnDestroy {
       const isBCMember = await this.bcc.executor.executeContractCall(
         businessCenterContract,
         'isMember',
-        accountId,
-        { from: accountId, }
+        activeAccount,
+        { from: activeAccount, }
       );
 
       if (!isBCMember) {
@@ -210,83 +225,12 @@ export class <%= cleanName %>Service implements OnDestroy {
           await this.bcc.executor.executeContractTransaction(
             businessCenterContract,
             'join',
-            { from: accountId, },
+            { from: activeAccount, },
           );
         } else {
           throw new Error('You are\'nt a member of the bc and it does not allow self join.');
         }
       }
-    }
-  }
-
-  /**
-   * Create a new contract using the digital twin description.
-   *
-   * @param      {any}           dataContract  intialized bc data contract class
-   * @param      {any}           description   the digital twin description
-   * @return     {Promise<any>}  contract instance
-   */
-  async createDtContract(dataContract: any, description: any) {
-    let bcDomain = '<%= bcDomain %>';
-
-    // all data set keys that should be saved and filter them for the available data within
-    // the formData object
-    const dataSetKeys = Object.keys(description.dataSchema)
-
-    const contract = await dataContract.create(
-      `testdatacontract.factory.${ bcDomain }`,
-      this.bcc.core.activeAccount(),
-      bcDomain,
-      { public : description }
-    );
-
-    // allow all the dbcp dataSchema properties setting
-    await Promise.all(dataSetKeys.map(dataSetKey =>
-      Promise.all(['set'].map(modificationType =>
-        this.bcc.rightsAndRoles.setOperationPermission(
-          contract,
-          this.bcc.core.activeAccount(),
-          0,
-          dataSetKey,
-          this.bcc.web3.utils.sha3('entry'),
-          this.bcc.web3.utils.sha3(modificationType),
-          true,
-        )
-      ))
-    ));
-
-    return contract
-  }
-
-  /**
-   * Create multiple digital twins
-   *
-   * @param      {Array<any>}              data    array of data entries
-   * @return     {Promise<Array<string>>}  array of new contract addresses
-   */
-  async createDigitalTwins(data: Array<any>) {
-    const results = [ ];
-    const activeAccount = this.core.activeAccount();
-    let businessCenterContract;
-    let bcDomain = '<%= bcDomain %>';
-    let joinSchema = '<%= joinSchema %>';
-    let dataContract = this.bcc.dataContract;
-
-    if (bcDomain) {
-      const [
-        businessCenter,
-        businessAddress,
-      ] = await Promise.all([
-        this.bc.getCurrentBusinessCenter(bcDomain),
-        this.bcc.nameResolver.getAddress(bcDomain)
-      ]);
-
-      businessCenterContract = await this.bcc.contractLoader.loadContract(
-        'BusinessCenter',
-        businessAddress
-      );
-
-      await this.joinBCMember(activeAccount);
     }
 
     for (let entry of data) {
@@ -301,6 +245,9 @@ export class <%= cleanName %>Service implements OnDestroy {
         `<%= dbcpName %>.${ getDomainName() }`,
         true
       );
+
+      // apply latest data contract abi for evan explorer usage and documentaion
+      description.abis = { own: JSON.parse(this.bcc.contracts.DataContract.interface) };
 
       // all data set keys that should be saved and filter them for the available data within
       // the formData object
@@ -327,7 +274,8 @@ export class <%= cleanName %>Service implements OnDestroy {
                 if (joinSchema == '1' || joinSchema == '3') {
                   bcInvites.push(member);
                 } else {
-                  throw new Error(`The member ${ member } is'nt a member of the bc and it does not allow invites.`);
+                  throw new Error(`The member ${ member } is'nt a member of the bc and it does
+                    not allow invites.`);
                 }
               }
             }
@@ -343,7 +291,27 @@ export class <%= cleanName %>Service implements OnDestroy {
           contractAddress
         );
       } else {
-        contract = await this.createDtContract(dataContract, description);
+        contract = await dataContract.create(
+          `testdatacontract.factory.${ bcDomain }`,
+          this.bcc.core.activeAccount(),
+          bcDomain,
+          { public : description }
+        );
+
+        // allow all the dbcp dataSchema properties setting
+        await Promise.all(dataSetKeys.map(dataSetKey =>
+          Promise.all(['set'].map(modificationType =>
+            this.bcc.rightsAndRoles.setOperationPermission(
+              contract,
+              activeAccount,
+              0,
+              dataSetKey,
+              this.bcc.web3.utils.sha3('entry'),
+              this.bcc.web3.utils.sha3(modificationType),
+              true,
+            )
+          ))
+        ));
       }
 
       // load the latest block number, so the encryption will work only for data after this
@@ -520,7 +488,7 @@ export class <%= cleanName %>Service implements OnDestroy {
       }
 
       // add the bookmark if its not exists before
-      if (!contractAddress) {
+      if (!contractAddress && !entry.disableFavorite) {
         description.trimmedName = formData.dtGeneral.type.replace(/\s|\./g, '');
         description.i18n.name = {
           de: formData.dtGeneral.type,

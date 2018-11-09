@@ -100,6 +100,8 @@ export const <%= cleanName %>Dispatcher = new QueueDispatcher(
             `<%= dbcpName %>.${ getDomainName() }`,
             true
           );
+          // apply latest data contract abi for evan explorer usage and documentaion
+          description.abis = { own: JSON.parse(service.bcc.contracts.DataContract.interface) };
 
           const contract = await dataContract.create(
             'testdatacontract.factory.<%= bcDomain %>',
