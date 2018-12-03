@@ -394,10 +394,10 @@ More infos about DApps:
 The evan.network provides two color themes. The basic dark one, that is activated everywhere, and the light one, that can be activated by adding the **.evan-light** class to your dapps element. If you want to create a custom DApp styling, you can simply use the **@evan.network/ui-angular-sass** theme definitions. How to create custom themes, please have a look at the following documentation: [UI-SASS documentation](https://ipfs.evan.network/ipns/QmReXE5YkiXviaHNG1ASfY6fFhEoiDKuSkgY4hxgZD9Gm8/angular-sass/index.html)
 
 After your custom theme is defined, your DApp will include a full custom evan.network design. To enable this design, apply your custom-style class (or the evan-light class) to your dapp entrypoint element (e.g. within the index.ts of your DApp).
-::
 
+```
   ...
   // Add project class name to the ion-app / .evan-dapp element for generalized styling
   ionicAppEl.className += ' .evan-custom-style';
   ...
-``
+```
