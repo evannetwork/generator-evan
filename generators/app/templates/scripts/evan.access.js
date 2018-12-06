@@ -199,8 +199,6 @@ async function init(cfg = {}) {
   if (bcc) return bcc
   cfg = Object.assign(options, cfg)
   cfg = getAccountConfig(cfg)
-
-  console.log(cfg)
   
   // important!
   cfg.keyConfig[sha3('mailboxKeyExchange')] =
@@ -208,7 +206,13 @@ async function init(cfg = {}) {
 
   const web3 = new Web3()
   web3.setProvider(new web3.providers.WebsocketProvider(cfg.web3Provider))
-  const dfs = new Ipfs({ remoteNode: new IpfsApi(cfg.ipfs), })
+  const dfs = new Ipfs({
+    dfsConfig:cfg.ipfs,
+    web3: web3,
+    accountId:
+    cfg.accounts[0],
+    privateKey:cfg.accountMap[cfg.accounts[0]]
+  })
 
   return createDefaultRuntime(web3, dfs, cfg)
     .then(v => {

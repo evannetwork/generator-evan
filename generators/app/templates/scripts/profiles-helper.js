@@ -72,20 +72,20 @@ module.exports = {
     // check balances
     let notEnoughBalance;
     const accounts = Object.keys(runtimeConfig.accountMap);
-    const tasks = accounts.map((account) => {
-      return async () => {
-        const balance = parseInt(await web3.eth.getBalance(account), 10);
-        if (balance < runtimeConfig.minBalance) {
-          notEnoughBalance = true;
-          console.log(`account ${account} does not have enough funds (${web3.utils.fromWei(balance.toString())} EVE)`)
-          await promisify(rl.question).bind(rl)('Get funds at https://gitter.im/evannetwork/faucet and then press a key.');
-          const balance2 = parseInt(await web3.eth.getBalance(account), 10);
-          if(balance2 < runtimeConfig.minBalance) console.warn(`${account} still has insufficient funds.`)
-          else notEnoughBalance = false
-        }
-      };
-    });
-    await prottle(prottleMaxRequests, tasks);
+    for(let account of accounts) {
+      const balance = parseInt(await web3.eth.getBalance(account), 10);
+      if (balance < runtimeConfig.minBalance) {
+        notEnoughBalance = true;
+        console.log(`account ${account} does not have enough funds (${web3.utils.fromWei(balance.toString())} EVE)`)
+        await promisify(rl.question).bind(rl)('Get funds at https://gitter.im/evannetwork/faucet and then press a key.');
+        const balance2 = parseInt(await web3.eth.getBalance(account), 10);
+        if(balance2 < runtimeConfig.minBalance) {
+          console.warn(`${account} still has insufficient funds.`)
+        } else {
+          notEnoughBalance = false;
+        } 
+      }
+    }
     if (notEnoughBalance) {
       throw new Error(`at least one of the accounts does not have enough balance, make sure, accounts have at least ${web3.utils.fromWei(runtimeConfig.minBalance.toString())} EVE`);
     }

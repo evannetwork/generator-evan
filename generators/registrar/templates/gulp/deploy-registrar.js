@@ -39,12 +39,17 @@ gulp.task('init', async () => {
 
   web3 = new Web3();
   web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider));
-  dfs = new Ipfs({ remoteNode: new IpfsApi(runtimeConfig.ipfs), });
 
   const ensOwnerRuntimeConfig = JSON.parse(JSON.stringify(runtimeConfig))
   ensOwnerRuntimeConfig.accountMap = {};
   ensOwnerRuntimeConfig.accountMap[runtimeConfig.registrar.domainParentOwner] =
     runtimeConfig.registrar.domainParentOwnerKey;
+  dfs = new Ipfs({
+    dfsConfig:runtimeConfig.ipfs,
+    web3: web3,
+    accountId: runtimeConfig.registrar.domainParentOwner,
+    privateKey: runtimeConfig.registrar.domainParentOwnerKey
+  })
   runtime = await createDefaultRuntime(web3, dfs, ensOwnerRuntimeConfig);
 })
 

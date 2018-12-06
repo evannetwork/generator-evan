@@ -2,7 +2,9 @@
 
 ## Next Version
 ### Features
+- add ipfs identification header to enable future ipfs payments
 ### Fixes
+- fix "out of eve" handling (use fs.readline instead of stdin)
 ### Deprecations
 
 ## Version 1.4.0

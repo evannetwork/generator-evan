@@ -5,7 +5,7 @@
     "@evan.network/dbcp": "^1.4.2",
     "deep-extend": "^0.6.0",
     "eth-lightwallet": "git+https://github.com/ConsenSys/eth-lightwallet.git#251eda97f705dbfae5ef099479aa19160028ae80",
-    "ipfs-api": "^17.5.0",
+    "ipfs-api": "^26.1.2",
     "prottle": "^1.0.3",
     "web3": "1.0.0-beta.27",
     "web3-bzz": "1.0.0-beta.27",

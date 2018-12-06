@@ -42,10 +42,16 @@ gulp.task('init-profiles', async () => {
   console.log(runtimeConfig)
   console.log(runtimeConfig.web3Provider)
   web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider));
-  dfs = new Ipfs({ remoteNode: new IpfsApi(runtimeConfig.ipfs), });
 
   await buildKeyConfig(web3, runtimeConfig);
   await checkBalances(web3, runtimeConfig);
+
+  dfs = new Ipfs({
+    dfsConfig:runtimeConfig.ipfs,
+    web3: web3,
+    accountId: runtimeConfig.accounts[0],
+    privateKey: runtimeConfig.accountMap[runtimeConfig.accounts[0]]
+  })
   runtimes = await createRuntimes(web3, dfs, runtimeConfig);
   return evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
