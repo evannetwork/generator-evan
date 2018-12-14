@@ -15,6 +15,11 @@
 */
 
 const { promisify } = require('util');
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 const prottle = require('prottle');
 delete global._bitcore;   // -.-
@@ -67,24 +72,20 @@ module.exports = {
     // check balances
     let notEnoughBalance;
     const accounts = Object.keys(runtimeConfig.accountMap);
-    const tasks = accounts.map((account) => {
-      return async () => {
-        const balance = parseInt(await web3.eth.getBalance(account), 10);
-        if (balance < runtimeConfig.minBalance) {
-          notEnoughBalance = true;
-          console.log(`account ${account} does not have enough funds (${web3.utils.fromWei(balance.toString())} EVE)`)
-          console.log('Get funds at https://gitter.im/evannetwork/faucet and then press a key.')
-          const fs = require("fs")
-          const fd = fs.openSync("/dev/stdin", "rs")
-          fs.readSync(fd, new Buffer(1), 0, 1)
-          fs.closeSync(fd)
-          const balance2 = parseInt(await web3.eth.getBalance(account), 10);
-          if(balance2 < runtimeConfig.minBalance) console.warn(`${account} still has insufficient funds.`)
-          else notEnoughBalance = false
-        }
-      };
-    });
-    await prottle(prottleMaxRequests, tasks);
+    for(let account of accounts) {
+      const balance = parseInt(await web3.eth.getBalance(account), 10);
+      if (balance < runtimeConfig.minBalance) {
+        notEnoughBalance = true;
+        console.log(`account ${account} does not have enough funds (${web3.utils.fromWei(balance.toString())} EVE)`)
+        await promisify(rl.question).bind(rl)('Get funds at https://gitter.im/evannetwork/faucet and then press a key.');
+        const balance2 = parseInt(await web3.eth.getBalance(account), 10);
+        if(balance2 < runtimeConfig.minBalance) {
+          console.warn(`${account} still has insufficient funds.`)
+        } else {
+          notEnoughBalance = false;
+        } 
+      }
+    }
     if (notEnoughBalance) {
       throw new Error(`at least one of the accounts does not have enough balance, make sure, accounts have at least ${web3.utils.fromWei(runtimeConfig.minBalance.toString())} EVE`);
     }
@@ -264,7 +265,7 @@ module.exports = {
         if (joinSchema === 0 || joinSchema === 2 || (joinSchema === 3 && runtimes[accountId])) {
           // join as new member
           console.log(`joining with account "${accountId}"`);
-          await runtimes[accountId].executeContractTransaction(bcContract, 'join', { from: accountId, });
+          await runtimes[accountId].executor.executeContractTransaction(bcContract, 'join', { from: accountId, });
         }
         // if join schema is AddOnly or Handshake, if JoinOrAdd and no member runtime
         if (joinSchema === 1 || joinSchema === 2 || (joinSchema === 3 && !runtimes[accountId])) {
@@ -304,5 +305,5 @@ module.exports = {
     }
     console.groupEnd('inviteToContracts');
   },
-  accountAndKey
+  accountAndKey,
 };

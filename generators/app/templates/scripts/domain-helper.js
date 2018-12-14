@@ -15,7 +15,7 @@ const getRuntime = async (mnemonic) => {
   // setup dependencies
   const web3 = new Web3();
   web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider));
-  const dfs = new Ipfs({ remoteNode: new IpfsApi(runtimeConfig.ipfs), });
+
 
   // insert mnemonic if unknown
   if (!runtimeConfig.mnemonics[mnemonic]) {
@@ -27,6 +27,14 @@ const getRuntime = async (mnemonic) => {
   // keep only relevant accountId
   const { accountId } = accountAndKey(mnemonic, runtimeConfig);
   runtimeConfig.accountMap = { [accountId]: runtimeConfig.accountMap[accountId] };
+
+  const dfs = new Ipfs({
+    dfsConfig:runtimeConfig.ipfs,
+    web3: web3,
+    accountId: accountId,
+    privateKey: runtimeConfig.accountMap[accountId]
+  })
+
   return createDefaultRuntime(web3, dfs, runtimeConfig) 
 };
 
