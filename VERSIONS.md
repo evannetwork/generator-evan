@@ -2,13 +2,16 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+## Version 1.5.0
+### Features
 - add ipfs identification header to enable future ipfs payments
 - use web3 1.0.0-beta.37
 
 ### Fixes
 - fix "out of eve" handling (use fs.readline instead of stdin)
-
-### Deprecations
 
 ## Version 1.4.0
 ### Features
