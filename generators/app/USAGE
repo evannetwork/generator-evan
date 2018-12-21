@@ -1,5 +1,6 @@
 Description:
-    Creates a basic evan.network project structure
+    Creates a basic evan.network project structure.
+    See https://github.com/evannetwork/generator-evan/tree/develop for details.
 
 Example:
     yo evan
@@ -15,8 +16,10 @@ Example:
 
 Sub commands:
     yo evan:dapps : Will create a new dapp within the dapps folder.
+    yo evan:profiles : Will create config scripts where you can setup your accounts and their relationships.
     yo evan:contract : Will create a new contract sample within the contracts folder.
     yo evan:edge-server : Will create a new edge-serve within the edge-server folder.
     yo evan:smart-agent : Will create a new smart-agent within the edge-server folder.
+    yo evan:registar : Will add a deployment script for a custom registrar.
 
 Run the subcommands with --help for more informations.
