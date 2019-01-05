@@ -7,6 +7,7 @@
     "eth-lightwallet": "git+https://github.com/ConsenSys/eth-lightwallet.git#251eda97f705dbfae5ef099479aa19160028ae80",
     "ipfs-api": "^26.1.2",
     "prottle": "^1.0.3",
+    "update-notifier": "^2.5.0",
     "web3": "1.0.0-beta.37",
     "yeoman-generator": "^1.1.1"
   },

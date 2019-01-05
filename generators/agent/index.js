@@ -27,6 +27,14 @@
 
 const Generator = require('yeoman-generator');
 const Web3 = require('web3-utils')
+const updateNotifier = require('update-notifier');
+const pkg = require('../../package.json');
+// Checks for available update and returns an instance
+const notifier = updateNotifier({pkg, updateCheckInterval: 0});
+
+// Notify using the built-in convenience method
+notifier.notify({defer:false});
+
 
 const sha3 = Web3.soliditySha3
 function sha9(a, b) { return sha3.apply(sha3, [sha3(a), sha3(b)].sort()) }
@@ -49,7 +57,7 @@ module.exports = class extends Generator {
     catch (e) { if (e.code !== "MODULE_NOT_FOUND") throw e; }
 
     created = this.fs.readJSON(this.destinationPath('./scripts/config/createdProfiles.json'))
-    
+
     this.answers = await this.prompt([
       {
         type    : 'input',
@@ -107,7 +115,7 @@ module.exports = class extends Generator {
                   profileKey: external[k].profileKey,
                 },
               })
-          
+
           if(created)
             for(let k in created)
               accounts.push({
@@ -126,10 +134,11 @@ module.exports = class extends Generator {
     ])
 
     this.answers['Name'] = this.answers.name[0].toUpperCase() + this.answers.name.substr(1)
+    this.answers['NameWithOutSpecials'] = this.answers.name[0].toUpperCase() + this.answers.name.substr(1)
     this.answers['fullname'] = 'smart-agent-' + this.answers.name
 
     this.answers.account = this.answers._accounts.length ? this.answers._accounts[0].id : ''
-    
+
     this.answers.keys = { }
     this.answers.accounts = { }
 
@@ -178,10 +187,10 @@ module.exports = class extends Generator {
     renameOrDelete('initializers/', 'init.js', this.answers.name+'.js')
     renameOrDelete('actions/', 'actions.js', this.answers.name+'-actions.js')
     renameOrDelete('bin/', 'cmd.js', this.answers.name+'-cmd.js')
-    
+
     console.log(`
       Created '${this.answers.fullname}'.
-      
+
       Run 'gulp link-agents' to link it into edge-server.
       Run 'gulp test-agents' to start edge-server with all linked smart agents.
       Run 'gulp smart-agent' to create deployment packages for all project smart-agents and configurations in build/

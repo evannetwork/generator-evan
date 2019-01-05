@@ -32,7 +32,16 @@ const { createBusinessCenter } = require(`./templates/scripts/bc-helper.js`);
 const registrarDomainSuffix = '.fifs.registrar.test.evan';
 const registrarDomainSuffixWithoutEvan = '.fifs.registrar.test';
 const registrarDomainLengh = registrarDomainSuffix.split('.').length;
+const updateNotifier = require('update-notifier');
+const pkg = require('../../package.json');
+// Checks for available update and returns an instance
+const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 
+// Notify using the built-in convenience method
+notifier.notify({defer:false});
+
+// `notifier.update` contains some useful info about the update
+console.log(notifier.update);
 module.exports = class extends Generator {
   /**
    * Ask the user for project information.
@@ -179,7 +188,7 @@ module.exports = class extends Generator {
       {
         globOptions: {
           dot: true
-        } 
+        }
       }
     );
   }

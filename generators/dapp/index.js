@@ -30,7 +30,13 @@ const Generator = require('yeoman-generator');
 const path = require('path');
 const extend = require('deep-extend');
 const digitaltwinHandling = require('./digitaltwin');
+const updateNotifier = require('update-notifier');
+const pkg = require('../../package.json');
+// Checks for available update and returns an instance
+const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 
+// Notify using the built-in convenience method
+notifier.notify({defer:false});
 /**
  * Copy files from a path under the templates directory into the specific dapp folder
  *
@@ -196,7 +202,7 @@ module.exports = class extends Generator {
       this.answers.standalone = false;
     }
 
-    // append projectName into the answers object to handle it within the 
+    // append projectName into the answers object to handle it within the
     this.answers.projectName = projectName;
     this.answers.framework = framework;
   }

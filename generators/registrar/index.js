@@ -26,7 +26,13 @@
 */
 
 const Generator = require('yeoman-generator');
+const updateNotifier = require('update-notifier');
+const pkg = require('../../package.json');
+// Checks for available update and returns an instance
+const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 
+// Notify using the built-in convenience method
+notifier.notify({defer:false});
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts)

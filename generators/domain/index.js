@@ -31,7 +31,13 @@ const { claimDomain } = require(`${process.cwd()}/scripts/domain-helper`);
 
 const registrarDomainSuffix = '.fifs.registrar.test.evan';
 const registrarDomainLengh = registrarDomainSuffix.split('.').length;
+const updateNotifier = require('update-notifier');
+const pkg = require('../../package.json');
+// Checks for available update and returns an instance
+const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 
+// Notify using the built-in convenience method
+notifier.notify({defer:false});
 // const scriptsFolder = `${process.cwd()}/scripts`;
 // const { runtimeConfig } = require(`${scriptsFolder}/config/deployment`);
 // const { createDefaultRuntime, Ipfs } = require('@evan.network/api-blockchain-core')
@@ -94,7 +100,7 @@ module.exports = class extends Generator {
     // web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider))
     // const dfs = new Ipfs({ remoteNode: new IpfsApi(runtimeConfig.ipfs), })
 
-    // return createDefaultRuntime(web3, dfs, runtimeConfig) 
+    // return createDefaultRuntime(web3, dfs, runtimeConfig)
     // console.dir(runtimeConfig)
     // await buildKeyConfig(web3, runtimeConfig)
     // console.dir(runtimeConfig)
