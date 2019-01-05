@@ -7,8 +7,8 @@ exports['default'] = {
   encryptionKeys: {
     <%- keys %>
   },
-  
-  smartAgentFaucet: (api) => {
+
+  smartAgent<%= NameWithoutSpecials %>: (api) => {
     return {
       disabled: false,
       name: '<%= name %>',

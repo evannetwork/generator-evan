@@ -4,10 +4,10 @@ const { Initializer, api } = require('actionhero')
 const { Profile, KeyProvider, Ipld, ContractState, DataContract, Description, Sharing } = require('@evan.network/api-blockchain-core')
 
 // configuration shortcut
-const cfg = api.config.smartAgent<%= Name %>
+const cfg = api.config.smartAgent<%= NameWithoutSpecials %>
 
 
-module.exports = class SmartAgent<%= Name %> extends Initializer {
+module.exports = class SmartAgent<%= NameWithoutSpecials %> extends Initializer {
   constructor() {
     super()
     this.name = '<%= name %>'
@@ -20,7 +20,7 @@ module.exports = class SmartAgent<%= Name %> extends Initializer {
     if (cfg.disabled) return
 
     // objects and values used outside initializer
-    api.smartAgent<%= Name %> = {
+    api.smartAgent<%= NameWithoutSpecials %> = {
       /*
       exampleFunction: async (status) => {
       },
@@ -28,13 +28,13 @@ module.exports = class SmartAgent<%= Name %> extends Initializer {
     }
 
     // specialize from blockchain smart agent library
-    class SmartAgent<%= Name %> extends api.smartAgents.SmartAgent {
+    class SmartAgent<%= NameWithoutSpecials %> extends api.smartAgents.SmartAgent {
       async initialize () { await super.initialize() }
     }
 
     // start the initialization code
-    this.smartAgent<%= Name %> = new SmartAgent<%= Name %>(cfg)
-    await this.smartAgent<%= Name %>.initialize()
+    this.smartAgent<%= NameWithoutSpecials %> = new SmartAgent<%= NameWithoutSpecials %>(cfg)
+    await this.smartAgent<%= NameWithoutSpecials %>.initialize()
 
   }
 

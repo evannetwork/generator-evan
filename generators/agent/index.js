@@ -134,7 +134,7 @@ module.exports = class extends Generator {
     ])
 
     this.answers['Name'] = this.answers.name[0].toUpperCase() + this.answers.name.substr(1)
-    this.answers['NameWithOutSpecials'] = this.answers.name[0].toUpperCase() + this.answers.name.substr(1)
+    this.answers['NameWithoutSpecials'] = this.answers.name.replace(/[^a-zA-Z]/g, "");
     this.answers['fullname'] = 'smart-agent-' + this.answers.name
 
     this.answers.account = this.answers._accounts.length ? this.answers._accounts[0].id : ''
@@ -192,8 +192,7 @@ module.exports = class extends Generator {
       Created '${this.answers.fullname}'.
 
       Run 'gulp link-agents' to link it into edge-server.
-      Run 'gulp test-agents' to start edge-server with all linked smart agents.
-      Run 'gulp smart-agent' to create deployment packages for all project smart-agents and configurations in build/
+      Run 'npm start' to start edge-server.
     `);
   }
   /**

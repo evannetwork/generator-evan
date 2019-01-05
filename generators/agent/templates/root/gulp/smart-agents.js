@@ -50,47 +50,4 @@ gulp.task('link-agents', () => {
         })
       }
     })
-})
-
-gulp.task('test-agents', () => {
-  const cmd = `
-npm start;
-`
-  return spawn(cmd, [], { stdio: 'inherit', shell: true });
-})
-
-function agentFilesCommands(M, A) {
-  const suffix = M === A ? '' : '-'+M
-  const cfg = A + '.js'
-  const m = M + '.js'
-  const S = A+'/'
-  const E = 'node_modules/@evan.network/edge-server-seed'
-  const plugin = `'${A}': { path: __dirname + '/../node_modules/${A}' },`
-  const match = '// EDGE-SERVER SMART-AGENT-PLUGIN'
-
-  return [
-    'tmp=`mktemp -d`','dst=$PWD/build/'+ A + suffix + '.tgz','mkdir -p $tmp/'+A+'/config',
-    'mkdir -p $tmp/'+E+'/config $tmp/'+E+'/node_modules $tmp/contracts',
-    'cp build/contracts/compiled.json build/contracts/compiled.js $tmp/contracts',
-    'cp -R '+S+'initializers '+S+'actions $tmp/'+A,
-    'cp '+S+'config/' + m + ' $tmp/'+S+'config/'+cfg,
-    //"sed -e 's|"+match+"|"+plugin+"|' scripts/plugins.js > $tmp/"+E+'/config/plugins.js',
-    'cp '+S+'config/' + m + ' $tmp/'+E+'/config/'+cfg,
-    'ln -s ../../'+A+' $tmp/'+E+'/node_modules/'+A,
-    'cd $tmp',
-    'tar czf $dst *',
-    'cd -',
-    'rm -r $tmp'
-  ]
-}
-
-// when MACHINE_CONFIG is set, it uses this instead of a generic config
-gulp.task('smart-agent', () => {
-  gulp.src('smart-agent-*/config/*.js', { read: false })
-    .on('data', d => {
-      const p  = path.parse(d.history[0])
-      const agent_name = p.dir.match('(smart-agent-.*)/config')[1]
-      const cmd = agentFilesCommands(p.name, agent_name)
-      spawn(cmd.join(';'), [], { stdio: 'inherit', shell: true });
-    })
-})
+});

@@ -1,6 +1,6 @@
 const {api, CLI} = require('actionhero')
 
-module.exports = class <%= Name %>Command extends CLI {
+module.exports = class <%= NameWithoutSpecials %>Command extends CLI {
   constructor () {
     super()
     this.name = '<%= name %>'
@@ -19,7 +19,7 @@ module.exports = class <%= Name %>Command extends CLI {
   }
 
   async run ({params}) {
-    // use same 
+    // use same
     let keys = await api.redis.clients.client.keys(params.prefix)
 
   }

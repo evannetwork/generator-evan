@@ -3,7 +3,7 @@ const { Action, api } = require('actionhero')
 
 const rxEtherAccount = /^0x[\da-fA-F]{40}/
 
-class SmartAgent<%= Name %> extends Action {
+class SmartAgent<%= NameWithoutSpecials %> extends Action {
   constructor() {
     super()
     this.name = 'smart-agents/<%= name %>/<%= name %>'
@@ -24,18 +24,18 @@ class SmartAgent<%= Name %> extends Action {
 
   async run({ params, response }) {
     try {
-      
-      var srcId = await api.eth.web3.eth.accounts.recover(api.config.smartAgent<%= Name %>.sign_message,
+
+      var srcId = await api.eth.web3.eth.accounts.recover(api.config.smartAgent<%= NameWithoutSpecials %>.sign_message,
                                                           params.srcSignature);
       if(srcId !== params.srcId) throw new Error("No verified Account.")
-      
+
       /*
         do stuff
-        api.smartAgent<%= Name %>.exampleFunction('some value')
+        api.smartAgent<%= NameWithoutSpecials %>.exampleFunction('some value')
       */
-      
+
       response.status = 'success'
-      
+
     } catch (ex) {
       api.log(ex)
       response.status = 'error'
@@ -45,5 +45,5 @@ class SmartAgent<%= Name %> extends Action {
 }
 
 module.exports = {
-  SmartAgent<%= Name %>
+  SmartAgent<%= NameWithoutSpecials %>
 }
