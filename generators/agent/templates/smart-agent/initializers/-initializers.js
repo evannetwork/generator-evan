@@ -1,10 +1,12 @@
 'use strict'
-var request = require('request')
-const { Initializer, api } = require('actionhero')
-const { Profile, KeyProvider, Ipld, ContractState, DataContract, Description, Sharing } = require('@evan.network/api-blockchain-core')
+
+const {
+  api,
+  Initializer,
+} = require('actionhero')
 
 // configuration shortcut
-const cfg = api.config.smartAgent<%= NameWithoutSpecials %>
+const config = api.config.smartAgent<%= NameWithoutSpecials %>
 
 
 module.exports = class SmartAgent<%= NameWithoutSpecials %> extends Initializer {
@@ -17,27 +19,22 @@ module.exports = class SmartAgent<%= NameWithoutSpecials %> extends Initializer 
   }
 
   async initialize() {
-    if (cfg.disabled) return
-
-    // objects and values used outside initializer
-    api.smartAgent<%= NameWithoutSpecials %> = {
-      /*
-      exampleFunction: async (status) => {
-      },
-      */
+    if (config.disabled) {
+      return
     }
 
     // specialize from blockchain smart agent library
     class SmartAgent<%= NameWithoutSpecials %> extends api.smartAgents.SmartAgent {
-      async initialize () { await super.initialize() }
+      async initialize () {
+        await super.initialize()
+      }
     }
 
     // start the initialization code
-    this.smartAgent<%= NameWithoutSpecials %> = new SmartAgent<%= NameWithoutSpecials %>(cfg)
-    await this.smartAgent<%= NameWithoutSpecials %>.initialize()
+    const smartAgent<%= NameWithoutSpecials %> = new SmartAgent<%= NameWithoutSpecials %>(config)
+    await smartAgent<%= NameWithoutSpecials %>.initialize()
 
+    // objects and values used outside initializer
+    api.smartAgent<%= NameWithoutSpecials %> = smartAgent
   }
-
-  async start() { }
-  async stop() { api.log('Stopped Listening.', 'debug', this.name) }
 }
