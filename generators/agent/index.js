@@ -183,10 +183,10 @@ module.exports = class extends Generator {
         this.fs.delete(this.destinationPath(this.answers.fullname + '/'+ key))
     }
 
-    renameOrDelete('config/', 'smart-agent-.js', this.answers.fullname+'.js')
-    renameOrDelete('initializers/', 'init.js', this.answers.name+'.js')
-    renameOrDelete('actions/', 'actions.js', this.answers.name+'-actions.js')
-    renameOrDelete('bin/', 'cmd.js', this.answers.name+'-cmd.js')
+    renameOrDelete('config/', '-config.js', `${this.answers.name}-config.js`)
+    renameOrDelete('initializers/', '-initializers.js', `${this.answers.name}-initializers.js`)
+    renameOrDelete('actions/', '-actions.js', `${this.answers.name}-actions.js`)
+    renameOrDelete('bin/', '-cmd.js', `${this.answers.name}-cmd.js`)
 
     console.log(`
       Created '${this.answers.fullname}'.
