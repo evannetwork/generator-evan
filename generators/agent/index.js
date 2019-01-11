@@ -33,7 +33,7 @@ const pkg = require('../../package.json');
 const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 
 // Notify using the built-in convenience method
-notifier.notify({defer:false});
+notifier.notify({ defer:false });
 
 
 const sha3 = Web3.soliditySha3
@@ -53,8 +53,13 @@ module.exports = class extends Generator {
     var created
     const accounts =  [] //{ name: 'none', value: '', checked: true} ]
 
-    try { external = require(this.destinationPath('./scripts/config/externalAccounts.js')) }
-    catch (e) { if (e.code !== "MODULE_NOT_FOUND") throw e; }
+    try {
+      external = require(this.destinationPath('./scripts/config/externalAccounts.js'))
+    } catch (e) {
+      if (e.code !== "MODULE_NOT_FOUND") {
+        throw e;
+      }
+    }
 
     created = this.fs.readJSON(this.destinationPath('./scripts/config/createdProfiles.json'))
 
@@ -105,8 +110,8 @@ module.exports = class extends Generator {
         message : 'Add accounts to smart agent configuration:',
         choices : (answers) => {
 
-          if(external)
-            for(let k in external)
+          if(external) {
+            for(let k in external) {
               accounts.push({
                 name: [k, external[k].id, external[k].alias].join(', '),
                 value: {
@@ -115,9 +120,11 @@ module.exports = class extends Generator {
                   profileKey: external[k].profileKey,
                 },
               })
+            }
+          }
 
-          if(created)
-            for(let k in created)
+          if(created) {
+            for(let k in created) {
               accounts.push({
                 name: [k, created[k].id, created[k].alias].join(', '),
                 value: {
@@ -126,6 +133,8 @@ module.exports = class extends Generator {
                   profileKey: created[k].profileKey,
                 },
               })
+            }
+          }
 
           return accounts
         },
@@ -158,8 +167,8 @@ module.exports = class extends Generator {
     const pkg = this.fs.readJSON('./package.json')
     if(!pkg.devDependencies['@evan.network/edge-server-seed']) {
       pkg.devDependencies['@evan.network/edge-server-seed'] = '^1.0.0'
-      pkg.scripts['start'] = "cd node_modules/@evan.network/edge-server-seed; npm start"
-      pkg.scripts['debug'] = "cd node_modules/@evan.network/edge-server-seed; npm debug"
+      pkg.scripts['start'] = "cd node_modules/@evan.network/edge-server-seed && npm start"
+      pkg.scripts['debug'] = "cd node_modules/@evan.network/edge-server-seed && npm run debug"
       this.fs.writeJSON( './package.json', pkg, null, 2)
 
       console.log(`
@@ -176,17 +185,19 @@ module.exports = class extends Generator {
     await this._copyTemplate('smart-agent', this.answers.fullname);
 
     const renameOrDelete = (key,src,dst) => {
-      if(this.answers.components.indexOf(key) >= 0)
+      if(this.answers.components.indexOf(key) >= 0) {
         this.fs.move(this.destinationPath(this.answers.fullname + '/' + key + src),
                      this.destinationPath(this.answers.fullname + '/' + key + dst))
-      else
+      }
+      else {
         this.fs.delete(this.destinationPath(this.answers.fullname + '/'+ key))
+      }
     }
 
-    renameOrDelete('config/', '-config.js', `${this.answers.name}-config.js`)
-    renameOrDelete('initializers/', '-initializers.js', `${this.answers.name}-initializers.js`)
     renameOrDelete('actions/', '-actions.js', `${this.answers.name}-actions.js`)
     renameOrDelete('bin/', '-cmd.js', `${this.answers.name}-cmd.js`)
+    renameOrDelete('config/', '-config.js', `${this.answers.name}-config.js`)
+    renameOrDelete('initializers/', '-initializers.js', `${this.answers.name}-initializers.js`)
 
     console.log(`
       Created '${this.answers.fullname}'.
