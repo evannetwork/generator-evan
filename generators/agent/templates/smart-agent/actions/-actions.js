@@ -11,23 +11,25 @@ class SmartAgent<%= NameWithoutSpecials %> extends Action {
     this.inputs = {
       srcId: {
         required: true,
-        validator: this.accountValidator
+        validator: this.accountValidator,
       },
     }
     this.outputExample = { }
   }
 
   accountValidator (param) {
-    if (!param.match(rxEtherAccount))
+    if (!param.match(rxEtherAccount)) {
       throw new Error('not a valid account address')
+    }
   }
 
   async run({ params, response }) {
     try {
-
-      var srcId = await api.eth.web3.eth.accounts.recover(api.config.smartAgent<%= NameWithoutSpecials %>.sign_message,
-                                                          params.srcSignature);
-      if(srcId !== params.srcId) throw new Error("No verified Account.")
+      // a signed message can be given to validate account
+      // for signing messags see https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#sign
+      // var srcId = await api.eth.web3.eth.accounts.recover(
+      //   api.config.smartAgent<%= NameWithoutSpecials %>.sign_message, params.srcSignature);
+      // if(srcId !== params.srcId) throw new Error("No verified Account.")
 
       /*
         do stuff
