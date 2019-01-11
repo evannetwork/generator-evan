@@ -143,7 +143,8 @@ module.exports = class extends Generator {
     ])
 
     this.answers['Name'] = this.answers.name[0].toUpperCase() + this.answers.name.substr(1)
-    this.answers['NameWithoutSpecials'] = this.answers.name.replace(/[^a-zA-Z]/g, "");
+    const sanitized = this.answers.name.replace(/[^a-zA-Z]/g, '')
+    this.answers['NameWithoutSpecials'] = sanitized[0].toUpperCase() + sanitized.substr(1)
     this.answers['fullname'] = 'smart-agent-' + this.answers.name
 
     this.answers.account = this.answers._accounts.length ? this.answers._accounts[0].id : ''
