@@ -53,7 +53,7 @@ module.exports = class extends Generator {
     var created
     const accounts =  [] //{ name: 'none', value: '', checked: true} ]
 
-    try { external = require(this.destinationPath('./scripts/config/externalProfiles.js')) }
+    try { external = require(this.destinationPath('./scripts/config/externalAccounts.js')) }
     catch (e) { if (e.code !== "MODULE_NOT_FOUND") throw e; }
 
     created = this.fs.readJSON(this.destinationPath('./scripts/config/createdProfiles.json'))
