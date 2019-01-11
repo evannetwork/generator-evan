@@ -9,7 +9,7 @@ const {
 const config = api.config.smartAgent<%= NameWithoutSpecials %>
 
 
-module.exports = class SmartAgent<%= NameWithoutSpecials %> extends Initializer {
+module.exports = class SmartAgent<%= NameWithoutSpecials %>Initializer extends Initializer {
   constructor() {
     super()
     this.name = '<%= name %>'
