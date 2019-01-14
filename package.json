@@ -1,8 +1,8 @@
 {
   "author": "evan GmbH",
   "dependencies": {
-    "@evan.network/api-blockchain-core": "^1.7.0",
-    "@evan.network/dbcp": "^1.5.0",
+    "@evan.network/api-blockchain-core": "1.6.1",
+    "@evan.network/dbcp": "1.4.4",
     "deep-extend": "^0.6.0",
     "eth-lightwallet": "git+https://github.com/ConsenSys/eth-lightwallet.git#251eda97f705dbfae5ef099479aa19160028ae80",
     "ipfs-api": "^26.1.2",
