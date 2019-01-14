@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- code cleanup for smart-agents templates
+
 ### Deprecations
 
 ## Version 1.5.0
