@@ -35,6 +35,6 @@ module.exports = class SmartAgent<%= NameWithoutSpecials %>Initializer extends I
     await smartAgent<%= NameWithoutSpecials %>.initialize()
 
     // objects and values used outside initializer
-    api.smartAgent<%= NameWithoutSpecials %> = smartAgent
+    api.smartAgent<%= NameWithoutSpecials %> = smartAgent<%= NameWithoutSpecials %>
   }
 }
