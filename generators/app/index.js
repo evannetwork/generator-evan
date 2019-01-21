@@ -179,7 +179,7 @@ module.exports = class extends Generator {
    */
   async writing() {
     await this.fs.copyTpl(
-      this.templatePath('**'),
+      this.templatePath('**/{.[^.],}*'),
       this.destinationPath(`${ this.destinationRoot() }`),
       this.answers,
       {
