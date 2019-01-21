@@ -5,9 +5,17 @@
 ### Fixes
 ### Deprecations
 
+
+## Version 1.6.1
+### Fixes
+- replace all spaces in project name with dashes
+- fix smart agent instance api assignment
+
+
 ## Version 1.6.0
 ### Fixes
 - code cleanup for smart-agentsa templates
+
 
 ## Version 1.5.0
 ### Features
@@ -16,6 +24,7 @@
 
 ### Fixes
 - fix "out of eve" handling (use fs.readline instead of stdin)
+
 
 ## Version 1.4.0
 ### Features
@@ -28,6 +37,7 @@
 
 ### Deprecations
 - remove light DApp design (is included by `@evan.network/ui-angular-sass` custom themes now)
+
 
 ## Version 1.3.1
 ### Features
