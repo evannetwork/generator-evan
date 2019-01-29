@@ -25,6 +25,7 @@
   https://evan.network/license/
 */
 
+const { promisify } = require('util')
 const Generator = require('yeoman-generator');
 const Web3 = require('web3-utils')
 const updateNotifier = require('update-notifier');
@@ -166,19 +167,15 @@ module.exports = class extends Generator {
    */
   async writing() {
     const pkg = this.fs.readJSON('./package.json')
-    if(!pkg.devDependencies['@evan.network/edge-server-seed']) {
-      pkg.devDependencies['@evan.network/edge-server-seed'] = '^1.0.0'
+    if(!pkg.dependencies['@evan.network/edge-server-seed']) {
+      pkg.dependencies['@evan.network/edge-server-seed'] = '^1.0.0'
       pkg.scripts['start'] = "cd node_modules/@evan.network/edge-server-seed && npm start"
       pkg.scripts['debug'] = "cd node_modules/@evan.network/edge-server-seed && npm run debug"
-      this.fs.writeJSON( './package.json', pkg, null, 2)
+      this.fs.writeJSON('./package.json', pkg, null, 2)
 
       console.log(`
       Added developer dependency for edge-server-seed, running 'npm i' to install.
       `)
-
-      const util = require('util');
-      const exec = util.promisify(require('child_process').execSync);
-      exec('npm i', { stdio: 'inherit'});
 
       this._copyTemplate('root','');
     }
@@ -200,6 +197,13 @@ module.exports = class extends Generator {
     renameOrDelete('config/', '-config.js', `${this.answers.name}-config.js`)
     renameOrDelete('initializers/', '-initializers.js', `${this.answers.name}-initializers.js`)
 
+  }
+
+  install() {
+    this.npmInstall();
+  }
+
+  end() {
     console.log(`
       Created '${this.answers.fullname}'.
 
@@ -207,6 +211,7 @@ module.exports = class extends Generator {
       Run 'npm start' to start edge-server.
     `);
   }
+
   /**
    * Copy files from a path under the templates directory into the specific dapp folder
    */

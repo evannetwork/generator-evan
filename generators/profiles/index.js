@@ -65,7 +65,7 @@ module.exports = class extends Generator {
    */
   _copyTemplateIntoDApps() {
     this.fs.copyTpl(
-      this.templatePath('**'),
+      this.templatePath('**/{.[^.],}*'),
       this.destinationPath(`${ this.destinationRoot() }/`),
       this.answers,
       {
