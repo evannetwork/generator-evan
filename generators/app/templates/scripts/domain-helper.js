@@ -14,9 +14,16 @@ const claimDomain = async (domain, mnemonic) => {
 const getRuntime = async (mnemonic) => {
   // setup dependencies
   const web3 = new Web3();
-  web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider));
-
-
+  const websocketProvider = new web3.providers.WebsocketProvider(
+    runtimeConfig.web3Provider,
+    {
+      clientConfig: {
+        keepalive: true,
+        keepaliveInterval:5000
+      }
+    }
+  );
+  web3.setProvider(websocketProvider);
   // insert mnemonic if unknown
   if (!runtimeConfig.mnemonics[mnemonic]) {
     runtimeConfig.mnemonics[mnemonic] = 'no data interaction, therefore no password';
@@ -35,7 +42,7 @@ const getRuntime = async (mnemonic) => {
     privateKey: runtimeConfig.accountMap[accountId]
   })
 
-  return createDefaultRuntime(web3, dfs, runtimeConfig) 
+  return createDefaultRuntime(web3, dfs, runtimeConfig)
 };
 
 module.exports = {

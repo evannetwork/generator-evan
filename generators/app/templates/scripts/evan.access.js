@@ -1,12 +1,12 @@
 /*
   Copyright (c) 2018-present evan GmbH.
- 
+
   Licensed under the Apache License, Version 2.0 (the 'License');
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
       http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an 'AS IS' BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ const defaultDFS = {host: 'ipfs.evan.network', port: '443', protocol: 'https'}
 
 let accessProfiles = {}
 let createProfiles = {}
-let createdProfiles = {} 
+let createdProfiles = {}
 
 // the account sources to add
 try{ accessProfiles = require('./config/externalAccounts.js') }
@@ -50,7 +50,7 @@ function sha9(a, b) { return sha3.apply(sha3, [sha3(a), sha3(b)].sort()) }
 /*
 function example_gulp_plugin() {
   const transformStream = new Transform({objectMode: true})
-  
+
   transformStream._transform = async (file, encoding, callback) => {
   }
   return transformStream;
@@ -68,7 +68,7 @@ function findAccount(key, runtimeConfig) {
   especially public repositories.
   This is not just a security problem, it would also prevent developers to have own accounts configured.
   For this reason account data configuration is by default separated into own files in the config/ directory:
-  
+
   externalAccounts.js  - precreated profiles that are used in development and deployment tasks
   managedAccounts.js   - profiles that are automatically created if they don't exist already
   createdProfiles.js   - the profiles that have already been created - generated when profiles are created
@@ -96,7 +96,7 @@ function getAccountConfig(evanConfig = {}, accountConfig = {}, createConfig = {}
   }
 
   Object.assign(config, evanConfig)
-  
+
   function mapAccount(a, c) {
     if(!c.id || !c.privateKey || !c.profileKey) return console.log('skipped loading account ', a)
 
@@ -109,7 +109,7 @@ function getAccountConfig(evanConfig = {}, accountConfig = {}, createConfig = {}
   Object.assign(accessProfiles, accountConfig)
   Object.assign(createProfiles, createConfig)
 
-  
+
   for(const a in accessProfiles)
     mapAccount(a, accessProfiles[a])
 
@@ -122,7 +122,7 @@ function getAccountConfig(evanConfig = {}, accountConfig = {}, createConfig = {}
       console.log('Already created, loading ', alias)
     }
   }
- 
+
   let create = {}
   for(const a in createProfiles) {
     const c = createProfiles[a]
@@ -167,7 +167,7 @@ async function cacheProfiles(config) {
     for(let cp in createdProfiles) if(cp.id === a) { addToCache = false; break }
 
     if (addToCache) {
-      
+
       console.log('caching ', config.aliases[mn],'/',a)
       createRTCache[config.aliases[mn]] = {
         id: a,
@@ -180,7 +180,7 @@ async function cacheProfiles(config) {
       }
     }
   }
-  
+
   if(Object.keys(createRTCache).length) {
     Object.assign(createdProfiles, createRTCache)
 
@@ -199,13 +199,22 @@ async function init(cfg = {}) {
   if (bcc) return bcc
   cfg = Object.assign(options, cfg)
   cfg = getAccountConfig(cfg)
-  
+
   // important!
   cfg.keyConfig[sha3('mailboxKeyExchange')] =
     '346c22768f84f3050f5c94cec98349b3c5cbfa0b7315304e13647a4918ffff22'     // accX <--> mailbox edge key
 
   const web3 = new Web3()
-  web3.setProvider(new web3.providers.WebsocketProvider(cfg.web3Provider))
+  const websocketProvider = new web3.providers.WebsocketProvider(
+    runtimeConfig.web3Provider,
+    {
+      clientConfig: {
+        keepalive: true,
+        keepaliveInterval:5000
+      }
+    }
+  );
+  web3.setProvider(websocketProvider);
   const dfs = new Ipfs({
     dfsConfig:cfg.ipfs,
     web3: web3,
@@ -242,7 +251,7 @@ function upload(files) {
     const pfiles = await Promise.all(files.map(f => pfy(fs.readFile)(f)))
 
     const args = []
-    for(let i in files) 
+    for(let i in files)
       args.push({ path: files[i], content: pfiles[i] })
 
     await ei
@@ -261,7 +270,7 @@ function download() {
   return async () => {
     //const ei = await init()
     //const cfg = getAcccountConfig(options)
-    
+
     //close()
   }
 }
