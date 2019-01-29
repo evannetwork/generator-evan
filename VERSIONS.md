@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- adjust reconnecting issues with keepalive ping
+
 ### Deprecations
 
 
@@ -41,7 +43,7 @@
 
 ## Version 1.3.1
 ### Features
-- digital twin DApp: add created contract to favorites 
+- digital twin DApp: add created contract to favorites
 
 ### Fixes
 - fix deployment path when app is generated
@@ -90,7 +92,7 @@
 - add custom dapp stylings
 
 ### Fixes
-- add web3 dependencies in the right version 
+- add web3 dependencies in the right version
 - typos
 
 ### Deprecations
