@@ -4,6 +4,8 @@
 ### Features
 ### Fixes
 - adjust reconnecting issues with keepalive ping
+- include hidden files when copying from templates
+- fix run order of `package.json` update and `npm install`
 
 ### Deprecations
 
