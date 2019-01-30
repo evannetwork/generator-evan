@@ -3,12 +3,13 @@
 ## Next Version
 ### Features
 ### Fixes
+### Deprecations
+
+## Version 1.6.2
+### Fixes
 - adjust reconnecting issues with keepalive ping
 - include hidden files when copying from templates
 - fix run order of `package.json` update and `npm install`
-
-### Deprecations
-
 
 ## Version 1.6.1
 ### Fixes
