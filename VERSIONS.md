@@ -2,6 +2,8 @@
 
 ## Next Version
 ### Features
+- add support for `angular dapps` and the new `angular-gulp` jobs
+
 ### Fixes
 ### Deprecations
 
