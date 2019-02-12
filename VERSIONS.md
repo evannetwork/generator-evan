@@ -2,10 +2,12 @@
 
 ## Next Version
 ### Features
-- add support for `angular dapps` and the new `angular-gulp` jobs
-
 ### Fixes
 ### Deprecations
+
+## Version 1.7.0
+### Features
+- add support for `angular dapps` and the new `angular-gulp` jobs
 
 ## Version 1.6.2
 ### Fixes
