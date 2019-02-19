@@ -68,7 +68,7 @@ export class <%= cleanName %>Service implements OnDestroy {
    * default banner image that is used initally for digital twin creation
    */
   public defaultBannerImg: string =
-    'https://ipfs.evan.network/ipfs/QmTYC9f9aiWn2Hx5j2fTDqg6EzZXNiJpK5UBwNQUgLfF1x/banner.svg';
+    'https://ipfs.test.evan.network/ipfs/QmTYC9f9aiWn2Hx5j2fTDqg6EzZXNiJpK5UBwNQUgLfF1x/banner.svg';
 
   /**
    * Create a singleton service instance. 

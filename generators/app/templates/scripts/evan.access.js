@@ -28,7 +28,7 @@ const pfy = require('util').promisify
 const  options = require('./config/deployment.js').options
 
 const defaultWeb3 = 'wss://testcore.evan.network/ws'
-const defaultDFS = {host: 'ipfs.evan.network', port: '443', protocol: 'https'}
+const defaultDFS = {host: 'ipfs.test.evan.network', port: '443', protocol: 'https'}
 
 let accessProfiles = {}
 let createProfiles = {}
