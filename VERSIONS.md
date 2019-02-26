@@ -3,6 +3,9 @@
 ## Next Version
 ### Features
 ### Fixes
+- use latest library versions
+- fix angular dapp template default style class names
+
 ### Deprecations
 
 ## Version 1.7.0
