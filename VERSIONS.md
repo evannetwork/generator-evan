@@ -5,6 +5,7 @@
 ### Fixes
 - use latest library versions
 - fix angular dapp template default style class names
+- use correct `api-blockchain-core` imports
 
 ### Deprecations
 
