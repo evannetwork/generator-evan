@@ -199,7 +199,7 @@ export async function startDApp(container, dbcpName, ensAddress) {
   const ionicAppEl = createIonicAppElement(container, dbcpName);
   
   // Add project class name to the ion-app / .evan-dapp element for generalized styling
-  // ionicAppEl.className += ' .<%= dbcpName %>-style';
+  // ionicAppEl.className += ' <%= dbcpName %>-style';
 
   await startAngularApplication(<%= cleanName %>Module, getRoutes(ensAddress));
 

@@ -5,9 +5,6 @@ const {
   Initializer,
 } = require('actionhero')
 
-// configuration shortcut
-const config = api.config.smartAgent<%= NameWithoutSpecials %>
-
 
 module.exports = class SmartAgent<%= NameWithoutSpecials %>Initializer extends Initializer {
   constructor() {
@@ -19,7 +16,7 @@ module.exports = class SmartAgent<%= NameWithoutSpecials %>Initializer extends I
   }
 
   async initialize() {
-    if (config.disabled) {
+    if (api.config.smartAgent<%= NameWithoutSpecials %>.disabled) {
       return
     }
 
@@ -31,7 +28,7 @@ module.exports = class SmartAgent<%= NameWithoutSpecials %>Initializer extends I
     }
 
     // start the initialization code
-    const smartAgent<%= NameWithoutSpecials %> = new SmartAgent<%= NameWithoutSpecials %>(config)
+    const smartAgent<%= NameWithoutSpecials %> = new SmartAgent<%= NameWithoutSpecials %>(api.config.smartAgent<%= NameWithoutSpecials %>)
     await smartAgent<%= NameWithoutSpecials %>.initialize()
 
     // objects and values used outside initializer
