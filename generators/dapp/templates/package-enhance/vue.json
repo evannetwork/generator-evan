@@ -1,7 +1,7 @@
 {
   "devDependencies": {
-    "@evan.network/api-blockchain-core": "^1.7.0",
-    "@evan.network/ui-dapp-browser": "^1.7.0",
+    "@evan.network/api-blockchain-core": "^2.1.0",
+    "@evan.network/ui-dapp-browser": "^2.1.0",
     "axios": "^0.18.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.0.0",

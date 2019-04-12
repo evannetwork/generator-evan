@@ -1,35 +1,39 @@
 /*
-  Copyright (c) 2018-present evan GmbH.
+  Copyright (C) 2018-present evan GmbH.
  
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
  
-      http://www.apache.org/licenses/LICENSE-2.0
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details.
  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+ 
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+ 
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
-
+ 
 const externalAccounts = require('./externalAccounts');
 const managedAccounts = require('./managedAccounts');
-
-
-/*
- The configuration data needed to interact with evan.network during development,
- i.e. for creating and interacting with contracts, for uploading files to the dfs,
- to create profiles etc.
  
-*/
 const bcConfig = {
   nameResolver: {
     ensAddress: process.env.ENS_ADDRESS || '0x937bbC1d3874961CA38726E9cD07317ba81eD2e1',
     ensResolver: process.env.ENS_RESOLVER || '0xDC18774FA2E472D26aB91deCC4CDd20D9E82047e',
     labels: {
-      businessCenterRoot: process.env.BC_ROOT || '<%= bcDomain %>' || 'testbc.evan',
+      businessCenterRoot: process.env.BC_ROOT || 'testbc.evan',
       ensRoot: process.env.ENS_ROOT || 'evan',
       factory: 'factory',
       admin: 'admin',
@@ -46,17 +50,20 @@ const bcConfig = {
       profile: process.env.ENS_PROFILES || ['profile', 'ensRoot'],
       profileFactory: ['profile', 'factory', 'ensRoot'],
       mailbox: process.env.ENS_MAILBOX || ['mailbox', 'ensRoot'],
-      bcDomain: '<%= bcDomain %>',
-      dappsDomain: '<%= dappsDomain %>',
-      joinSchema: '<%= joinSchema %>',
     },
   },
-  alwaysAutoGasLimit: 1.1
+  smartAgents: {
+    onboarding: {
+      accountId: '0x063fB42cCe4CA5448D69b4418cb89E663E71A139',
+    },
+  },
+  alwaysAutoGasLimit: 1.1,
+  ensRootOwner: '0x4a6723fC5a926FA150bAeAf04bfD673B056Ba83D',
 }
-
-const runtimeConfig = {
-  // web3Provider: 'wss://testcore.evan.network/ws',                       // default value
-  // ipfs: {host: 'ipfs.test.evan.network', port: '443', protocol: 'https'},    // default value
+ 
+let runtimeConfig = {
+  web3Provider: 'wss://testcore.evan.network/ws',                              // default value
+  ipfs: { host: 'ipfs.test.evan.network', port: '443', protocol: 'https' },    // default value
   minBalance: 1000000000000000000,
   bookmarkDefinitions: {
     // bookmarks as ENS domain and DBCP for bookmark
@@ -110,22 +117,23 @@ const runtimeConfig = {
     // domainParentOwnerKey: process.env.ENS_OWNER_KEY,
   },
 }
-
-// circular dependency between this and evan.access.js
-// this is just to pass along the flat options to init when evan.access is included,
-// and still enable the prexisting scripts that include deployment.js to have the accounts filled in and cached
-
-module.exports = {
-  bcConfig,
-  options: runtimeConfig
-}
-
-try {
-  const evan = require('../evan.access.js')
-
-  module.exports['runtimeConfig'] = evan.getAccountConfig(runtimeConfig, externalAccounts, managedAccounts)
-} catch(e) {
-  // silent
-}
-
-
+ 
+const dappConfigSwitches = {
+  // deployment specific custom configurations
+  url: {
+    coreSmartAgent: 'https://agents.test.evan.network',
+    paymentSmartAgent: 'https://payments.test.evan.network',
+  },
+  accounts: {
+    faucetAccount: '0x4a6723fC5a926FA150bAeAf04bfD673B056Ba83D',
+    paymentAgentAccount: '0xAF176885bD81D5f6C76eeD23fadb1eb0e5Fe1b1F',
+    paymentChannelManagerAccount: '0x0A0D9dddEba35Ca0D235A4086086AC704bbc8C2b',
+  },
+  gasPrice: 20000000000,
+  mainnetTexts: false
+};
+ 
+const evan = require('../evan.access.js')
+runtimeConfig = evan.getAccountConfig(runtimeConfig, externalAccounts, managedAccounts)
+ 
+module.exports = { bcConfig, runtimeConfig, dappConfigSwitches };

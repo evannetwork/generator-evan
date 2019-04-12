@@ -6,6 +6,11 @@
 ### Deprecations
 
 
+## Version 1.8.0
+### Fixes
+- use correct dapp deployment configuration template for the latest `@evan.network/ui-dapp-browser` version
+
+
 ## Version 1.7.1
 ### Fixes
 - use latest library versions
