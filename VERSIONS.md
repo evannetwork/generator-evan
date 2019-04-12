@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- use correct dapp deployment configuration template for the latest `@evan.network/ui-dapp-browser` version
+
 ### Deprecations
 
 
