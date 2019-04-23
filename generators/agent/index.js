@@ -144,8 +144,7 @@ module.exports = class extends Generator {
     ])
 
     this.answers['Name'] = this.answers.name[0].toUpperCase() + this.answers.name.substr(1)
-    const sanitized = this.answers.name.replace(/[^a-zA-Z]/g, '')
-    this.answers['NameWithoutSpecials'] = sanitized[0].toUpperCase() + sanitized.substr(1)
+    this.answers['NameWithoutSpecials'] = this._toCamelCase(this.answers['Name'])
     this.answers['fullname'] = 'smart-agent-' + this.answers.name
 
     this.answers.account = this.answers._accounts.length ? this.answers._accounts[0].id : ''
@@ -192,10 +191,10 @@ module.exports = class extends Generator {
       }
     }
 
-    renameOrDelete('actions/', '-actions.js', `${this.answers.name}-actions.js`)
-    renameOrDelete('bin/', '-cmd.js', `${this.answers.name}-cmd.js`)
-    renameOrDelete('config/', '-config.js', `${this.answers.name}-config.js`)
-    renameOrDelete('initializers/', '-initializers.js', `${this.answers.name}-initializers.js`)
+    renameOrDelete('actions/', '-actions.js', `${this.answers.fullname}-actions.js`)
+    renameOrDelete('bin/', '-cmd.js', `${this.answers.fullname}-cmd.js`)
+    renameOrDelete('config/', '-config.js', `${this.answers.fullname}-config.js`)
+    renameOrDelete('initializers/', '-initializers.js', `${this.answers.fullname}-initializers.js`)
 
   }
 
@@ -216,6 +215,16 @@ module.exports = class extends Generator {
    * Copy files from a path under the templates directory into the specific dapp folder
    */
   _copyTemplate(src, dst) {
+    this.fs.copyTpl(
+      this.templatePath(`${src}/.*`),
+      this.destinationPath(dst),
+      this.answers,
+      {
+        globOptions: {
+          dot: true
+        }
+      }
+    );
     return this.fs.copyTpl(
       this.templatePath(src),
       this.destinationPath(dst),
@@ -226,5 +235,12 @@ module.exports = class extends Generator {
         }
       }
     );
+  }
+
+  _toCamelCase(str) {
+    return str.replace(/^([A-Z])|[\s-_](\w)/g, function(match, p1, p2, offset) {
+      if (p2) return p2.toUpperCase();
+      return p1.toUpperCase();
+    });
   }
 };

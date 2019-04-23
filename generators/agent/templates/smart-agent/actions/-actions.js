@@ -6,10 +6,10 @@ const rxEtherAccount = /^0x[\da-fA-F]{40}/
 class SmartAgent<%= NameWithoutSpecials %> extends Action {
   constructor() {
     super()
-    this.name = 'smart-agents/<%= name %>/<%= name %>'
+    this.name = 'smart-agents/<%= name %>/status/get'
     this.description = '<%= Name %> action.'
     this.inputs = {
-      srcId: {
+      accountId: {
         required: true,
         validator: this.accountValidator,
       },
@@ -36,7 +36,7 @@ class SmartAgent<%= NameWithoutSpecials %> extends Action {
         api.smartAgent<%= NameWithoutSpecials %>.exampleFunction('some value')
       */
 
-      response.status = 'success'
+      response.status = `successful status call from accountId: ${params.accountId}`
 
     } catch (ex) {
       api.log(ex)
