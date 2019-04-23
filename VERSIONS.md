@@ -3,21 +3,32 @@
 ## Next Version
 ### Features
 ### Fixes
+### Deprecations
+
+
+## Version 1.8.0
+### Fixes
+- use correct dapp deployment configuration template for the latest `@evan.network/ui-dapp-browser` version
+
+
+## Version 1.7.1
+### Fixes
 - use latest library versions
 - fix angular dapp template default style class names
 - use correct `api-blockchain-core` imports
 
-### Deprecations
 
 ## Version 1.7.0
 ### Features
 - add support for `angular dapps` and the new `angular-gulp` jobs
+
 
 ## Version 1.6.2
 ### Fixes
 - adjust reconnecting issues with keepalive ping
 - include hidden files when copying from templates
 - fix run order of `package.json` update and `npm install`
+
 
 ## Version 1.6.1
 ### Fixes
@@ -60,6 +71,7 @@
 - fix deployment path when app is generated
 - add missing package.json depdency for DApp's
 
+
 ## Version 1.3.0
 ### Features
 - `yo evan` does not generates a new folder
@@ -71,11 +83,13 @@
 ### Fixes
 - fix empty undefined answer values `dappsDomain`, `deploymentAccountId`, `deploymentPrivateKey` when generating root structure without custom ens dapps domain
 
+
 ## Version 1.2.1
 ### Features
 ### Fixes
 - fix correct version of blockchain-core
 ### Deprecations
+
 
 ## Version 1.2.0
 ### Features
@@ -86,6 +100,7 @@
 ### Deprecations
 - remove account config from `deployment.js` and only use  `externalAccounts.js` and `managedAccounts.js` for this purpose
 
+
 ## Version 1.1.0
 ### Features
 - better generators for dapps
@@ -93,6 +108,7 @@
 - generator for registrar generation
 - generator for automatic profile generation
 - generator for contract creation
+
 
 ## Version 1.0.1
 ### Features
@@ -106,11 +122,8 @@
 - add web3 dependencies in the right version
 - typos
 
-### Deprecations
 
 ## Next Version
 ### Features
-
 ### Fixes
-
 ### Deprecations
