@@ -1,12 +1,12 @@
 /*
   Copyright (c) 2018-present evan GmbH.
- 
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
       http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -119,7 +119,7 @@ export class DetailComponent extends AsyncComponent {
         // check if currently anything is saving?
         this.saving = this.queueService.getQueueEntry(this.<%= cleanName %>ServiceInstance.queueId,
           true).data.length > 0;
-        
+
         // load the members and all the roles of the contract and check, if the current logged in user
         // is in the owner role
         const members = await this.bcc.rightsAndRoles.getMembers(this.contractAddress);
@@ -181,7 +181,7 @@ export class DetailComponent extends AsyncComponent {
         formData: formDataToSave
       }
     );
-    
+
     this.saving = true;
     this.ref.detectChanges();
   }

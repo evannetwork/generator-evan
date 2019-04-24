@@ -4,15 +4,15 @@ const { Action, api } = require('actionhero')
 const rxEtherAccount = /^0x[\da-fA-F]{40}/
 
 class SmartAgent<%= NameWithoutSpecials %> extends Action {
-  constructor() {
+  constructor () {
     super()
     this.name = 'smart-agents/<%= name %>/status/get'
-    this.description = '<%= Name %> action.'
+    this.description = '<%= Name %> status action.'
     this.inputs = {
       accountId: {
         required: true,
-        validator: this.accountValidator,
-      },
+        validator: this.accountValidator
+      }
     }
     this.outputExample = { }
   }
@@ -23,7 +23,7 @@ class SmartAgent<%= NameWithoutSpecials %> extends Action {
     }
   }
 
-  async run({ params, response }) {
+  async run ({ params, response }) {
     try {
       // a signed message can be given to validate account
       // for signing messags see https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#sign
@@ -37,7 +37,6 @@ class SmartAgent<%= NameWithoutSpecials %> extends Action {
       */
 
       response.status = `successful status call from accountId: ${params.accountId}`
-
     } catch (ex) {
       api.log(ex)
       response.status = 'error'

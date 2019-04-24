@@ -2,12 +2,11 @@
 
 const {
   api,
-  Initializer,
+  Initializer
 } = require('actionhero')
 
-
 module.exports = class SmartAgent<%= NameWithoutSpecials %>Initializer extends Initializer {
-  constructor() {
+  constructor () {
     super()
     this.name = '<%= name %>'
     this.loadPriority = 4100
@@ -15,7 +14,7 @@ module.exports = class SmartAgent<%= NameWithoutSpecials %>Initializer extends I
     this.stopPriority = 4100
   }
 
-  async initialize() {
+  async initialize () {
     if (api.config.smartAgent<%= NameWithoutSpecials %>.disabled) {
       return
     }

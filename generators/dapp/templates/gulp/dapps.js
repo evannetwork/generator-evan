@@ -1,17 +1,28 @@
 /*
-  Copyright (c) 2018-present evan GmbH.
+  Copyright (C) 2018-present evan GmbH.
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
 
-      http://www.apache.org/licenses/LICENSE-2.0
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details.
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 const { lstatSync, readdirSync } = require('fs');
@@ -19,29 +30,7 @@ const gulp = require('gulp');
 const path = require('path');
 const del = require('del');
 const exec = require('child_process').exec;
-
-const scriptsFolder = process.cwd();
-const isDirectory = source => lstatSync(source).isDirectory()
-const getDirectories = source =>
-  readdirSync(source).map(name => path.join(source, name)).filter(isDirectory)
-
-/**
- * Executes and console command
- *
- * @param      {string}       command  command to execute
- * @return     {Promise<any}  resolved when command is finished
- */
-async function runExec(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, { }, async (err, stdout, stderr) => {
-      if (err || stderr) {
-        reject({ stdout, stderr });
-      } else {
-        resolve({ stdout, stderr });
-      }
-    });
-  });
-}
+const { runExec, scriptsFolder, isDirectory, getDirectories, nodeEnv } = require('./lib');
 
 const dappDirs = getDirectories(path.resolve('../dapps'));
 let longestDAppName = 0;
@@ -75,7 +64,7 @@ const serves = { };
 dappDirs.forEach(dappDir => {
   const dappName = dappDir.split('/').pop();
 
-  serves[dappName] = { };
+  serves[dappName] = { duration: 0, lastDuration: 0 };
 });
 
 /**
@@ -84,7 +73,7 @@ dappDirs.forEach(dappDir => {
 const logServing = () => {
   console.clear();
 
-  console.log('Watching DApps');
+  console.log(`Watching DApps: ${ nodeEnv }`);
   console.log('--------------\n');
 
   for (let dappDir of dappDirs) {
@@ -92,17 +81,18 @@ const logServing = () => {
     const logDAppName = getFilledDAppName(dappName);
 
     // load the status of the dapp
+    const timeLog = `(${ serves[dappName].duration }s / ${ serves[dappName].lastDuration }s)`;
     if (serves[dappName].rebuild) {
-      console.log(`  ${ logDAppName }:     rebuilding`);
+      console.log(`  ${ logDAppName }:     rebuilding ${ timeLog }`);
     } else if (serves[dappName].loading) {
-      console.log(`  ${ logDAppName }:   building`);
+      console.log(`  ${ logDAppName }:   building ${ timeLog }`);
     } else {
-      console.log(`  ${ logDAppName }: watching`);
+      console.log(`  ${ logDAppName }: watching ${ timeLog }`);
     }
 
     if (serves[dappName].error) {
       console.log();
-      console.log(serves[dappName].error);
+      console.error(serves[dappName].error);
     }
   }
 
@@ -123,15 +113,28 @@ const buildDApp = async (dappDir) => {
     serves[dappName].error = '';
     logServing();
 
+    // track the build time
+    const startTime = Date.now();
+    const timeCounter = setInterval(() => {
+      serves[dappName].duration = Math.round((Date.now() - startTime) / 1000);
+      logServing();
+    }, 1000);
+
     try {
       // navigate to the dapp dir and run the build command
       process.chdir(dappDir);
-      await runExec('npm run build');
+
+      await runExec('npm run build', dappDir);
+
+      // clear timer and calculate time
+      serves[dappName].lastDuration = Math.round((Date.now() - startTime) / 1000);
 
       delete serves[dappName].error;
     } catch (ex) {
-      serves[dappName].error = ex.stderr;
+      serves[dappName].error = ex;
     }
+
+    clearInterval(timeCounter);
 
     // reset loading, rebuild if nessecary
     serves[dappName].loading = false;

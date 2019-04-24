@@ -62,7 +62,7 @@ module.exports = class extends Generator {
       }
     }
 
-    created = this.fs.readJSON(this.destinationPath('./scripts/config/createdProfiles.json'))
+    created = require(this.destinationPath('./scripts/config/managedAccounts.js'))
 
     this.answers = await this.prompt([
       {
@@ -114,7 +114,7 @@ module.exports = class extends Generator {
           if(external) {
             for(let k in external) {
               accounts.push({
-                name: [k, external[k].id, external[k].alias].join(', '),
+                name: [external[k].alias, external[k].id].join(', '),
                 value: {
                   id: external[k].id,
                   privateKey: external[k].privateKey,
@@ -127,7 +127,7 @@ module.exports = class extends Generator {
           if(created) {
             for(let k in created) {
               accounts.push({
-                name: [k, created[k].id, created[k].alias].join(', '),
+                name: [created[k].alias, created[k].id].join(', '),
                 value: {
                   id: created[k].id,
                   privateKey: created[k].privateKey,
@@ -157,8 +157,8 @@ module.exports = class extends Generator {
       this.answers.keys[sha3(a.id)] = a.profileKey
       this.answers.keys[sha9(a.id,a.id)] = a.profileKey
     }
-    this.answers.accounts = JSON.stringify(this.answers.accounts,null,2).slice(1,-1)
-    this.answers.keys = JSON.stringify(this.answers.keys,null,2).slice(1,-1)
+    this.answers.accountKeys = Object.keys(this.answers.accounts)
+    this.answers.keysKeys = Object.keys(this.answers.keys)
   }
 
   /**
@@ -181,6 +181,17 @@ module.exports = class extends Generator {
 
     await this._copyTemplate('smart-agent', this.answers.fullname);
 
+    await this.fs.copyTpl(
+      this.templatePath(`smart-agent/.*`),
+      this.destinationPath(this.answers.fullname),
+      this.answers,
+      {
+        globOptions: {
+          dot: true
+        }
+      }
+    );
+
     const renameOrDelete = (key,src,dst) => {
       if(this.answers.components.indexOf(key) >= 0) {
         this.fs.move(this.destinationPath(this.answers.fullname + '/' + key + src),
@@ -199,6 +210,7 @@ module.exports = class extends Generator {
   }
 
   install() {
+    this.npmInstall([], {}, null, { cwd: this.destinationPath(this.answers.fullname) });
     this.npmInstall();
   }
 
@@ -215,16 +227,6 @@ module.exports = class extends Generator {
    * Copy files from a path under the templates directory into the specific dapp folder
    */
   _copyTemplate(src, dst) {
-    this.fs.copyTpl(
-      this.templatePath(`${src}/.*`),
-      this.destinationPath(dst),
-      this.answers,
-      {
-        globOptions: {
-          dot: true
-        }
-      }
-    );
     return this.fs.copyTpl(
       this.templatePath(src),
       this.destinationPath(dst),

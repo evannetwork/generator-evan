@@ -3,8 +3,8 @@
     "author": "evan GmbH",
     "dapp": {
       "dependencies": {
-        "angular-core": "^1.0.0",
-        "angular-libs": "^1.0.0"
+        "angular-core": "^2.1.0",
+        "angular-libs": "^2.1.0"
       },
       "entrypoint": "<%= dbcpName %>.js",
       "files": [

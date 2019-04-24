@@ -114,7 +114,7 @@ module.exports = class extends Generator {
     try {
       const deploymentConfig = require(`${ this.destinationRoot() }/scripts/config/deployment.js`);
       this.answers.dbcpName = projectName;
-
+      console.dir(deploymentConfig.bcConfig.nameResolver.domains)
       if (deploymentConfig.bcConfig.nameResolver.domains.dappsDomain) {
         this.answers.dbcpName = `${ projectName }.${ deploymentConfig.bcConfig.nameResolver.domains.dappsDomain }`;
       }
@@ -184,9 +184,9 @@ module.exports = class extends Generator {
             message : 'Which type of DApp you want to create?',
             choices: [
               {
-                name: 'Hello World DApp (Login, DataContract creation, DataContract detail)',
+                name: 'Hello World DApp',
                 value: 'hello-world'
-              },
+              }
             ]
           }
         ])).type;
@@ -214,6 +214,7 @@ module.exports = class extends Generator {
     copyTemplateIntoDApps.call(this, `${ this.answers.framework }/root`);
     copyTemplateIntoDApps.call(this, `${ this.answers.framework }/${ this.answers.type }`);
     copyTemplateIntoDApps.call(this, 'gulp', `${ this.destinationRoot() }/gulp`);
+    copyTemplateIntoDApps.call(this, 'vue-build', `${ this.destinationRoot() }/vue`);
 
     // load the current package json and enhance it with the new scripts and dependencies
     const rootPackageJSON = require(`${ this.destinationRoot() }/package.json`);
@@ -233,5 +234,9 @@ module.exports = class extends Generator {
       After you started your local dev server, visit localhost:3000/dev.html.
       You can now open your DApp by adding it to your favorites using the following name ${ this.answers.dbcpName }.
     `);
+  }
+
+  install() {
+    this.npmInstall();
   }
 };
