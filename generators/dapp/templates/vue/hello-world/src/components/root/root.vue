@@ -25,7 +25,31 @@
   https://evan.network/license/
 */
 
-module.exports = require('../../vue/webpack.config')(
-  require('./dbcp.json').public.name,
-  require('path').resolve(__dirname, './dist'),
-);
+<template>
+  <div class="evan theme-evan">
+    <evan-dapp-wrapper>
+      <template v-slot:content>
+        Hello World!
+<!--         <transition name="fade" mode="out-in">
+          <router-view></router-view>
+        </transition> -->
+        <evan-dapp-wrapper-level-2>
+          <template v-slot:content>
+            <div class="w300">
+              dapp wrapper-sidebar-level-2
+            </div>
+          </template>
+        </evan-dapp-wrapper-level-2>
+      </template>
+    </evan-dapp-wrapper>
+  </div>
+</template>
+
+<script lang="ts">
+  import RootComponent from './root.ts';
+  export default RootComponent;
+</script>
+
+<style lang="scss" scoped>
+  @import './root';
+</style>

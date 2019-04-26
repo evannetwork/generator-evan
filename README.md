@@ -125,10 +125,15 @@ When the contracts have been compiled, the resulting `compiles.json` and `compil
 
 
 ## Generate profiles
-To add support for configuring profiles within your project, run:
+To add support for configuring profiles and create profiles within your project, run:
 ```
 yo evan:profiles
 ```
+
+First you will be asked if you want to generate new profiles for your project. If you choose "Yes" you will be asked to enter an alias for the new profile. Then you can insert a custom password for the profile or when you leave the input empty an automatic generated password will be used. Then the profile will be automatically created with the inserted values. When the process finishes you will get an information that the profile was successfully created and the informations (like mnemonic, password, alias and accountid) are inserted into the file `./scripts/config/managedAccounts.js`.
+
+If you choose "No" then only the needed files to manage/create/maintain profiles will be copied to your project.
+
 
 To create/ensure your configured profiles run
 ```
@@ -346,6 +351,39 @@ const runtimeConfig = {
 
 ## Generate smart-agent
 
+When you want a smart-agent component in your project you can use the following command:
+
+```bash
+yo evan:agent
+```
+
+A smart-agent is a small REST API server which gives you the ability to create a API with litte effort. The smart-agent is based on [actionhero.js](https://www.actionherojs.com/) if you want to get further information about it.
+
+When generating a smart agent you must fill out some informations about the agent:
+
+1. Name of the agent: your smart-agent will be prefixed with "smart-agent-". Give your smart agent a name (lowercase, dash separated) what he is supposed to do, like "digital-twin-validation"
+2. Description of the agent: Describe the agents tasks in a few words.
+3. Choose which functionalities you will need in your agent:
+You have 4 different options to check (with the space bar) when you want to use them:
+  1. config
+  A configuration for your agent is always needed
+  2. initializers
+  Initializers in the smart-agent are places to save common code which other parts of your application will use. Here is where you might connect to your database or define middlewares or do some blockchain work like event listeners,
+  3. actions/web requests
+  Actions are the basic units of work. All connection types from all servers can use actions. This means that you only need to write an action once, and both HTTP clients and websocket clients can consume it. Within actions you can call your initializer defined functions for example.
+  4. commands/command line tools
+  Command line tools can be executed via the command line (u don't say... ;-)). This cli commands can also call your initalizer functions and do some work only once, when the command is executed
+4. Add accounts to smart agent
+  In this option you can select which accounts should be added to your smart agent (your smart agent also has an identity on evan.network) which you defined in the `./scripts/config/managedAccounts.js` or the `./scripts/config/externalAccounts.js`
+
+After filling out all questions the needed files are copied to your project in the root directory with the name of your smart agent. Also the needed npm installs for the smart agent will be executed after the generation to be instant ready to develop
+
+### Linking / starting smart agent
+
+Because you can have multiple smart agents in your project, you must link them to the actionhero installed in your node_modules folder. To do so run the command "npx gulp link-agents" in your root project folder. After linking the smart agent you can run the server with the command "npm start".
+
+Then the smart agent starts and you can develop your logic as actions/initializers and so on.
+
 
 ## Generate dapp
 
@@ -366,7 +404,7 @@ of several templates for a fast development start.
   4. Digital Twin = Create, view and change data of your own digital twin. The yeoman script will generate a customized formular for you, that allows to enter several metadata.
 
 2. VueJS
-  1. Hello World = DApp that handles basic login and contract creation.
+  1. Hello World = DApp based on VueJS.
 
 After you created your DApp, you can now build your DApps by running:
 

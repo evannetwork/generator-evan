@@ -25,7 +25,11 @@
   https://evan.network/license/
 */
 
-module.exports = require('../../vue/webpack.config')(
-  require('./dbcp.json').public.name,
-  require('path').resolve(__dirname, './dist'),
-);
+/* tslint:disable */
+export default {
+  "_sample": {
+    "routes": {
+    }
+  }
+}
+/* tslint:enable */;

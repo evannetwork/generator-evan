@@ -1,45 +1,58 @@
-import Vue from "vue";
-import {
-  getDomainName,
-  lightwallet,
-  utils,
-} from 'dapp-browser';
+/*
+  Copyright (C) 2018-present evan GmbH.
 
-import Main from "./components/main.vue";
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
 
-import {
-  basePath,
-  initializeRouting,
-  router,
-} from './routing';
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details.
 
-export let finishedLogin;
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
 
-export function startDApp(container: any, dbcpName: any) {
-  if (container === document.body) {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-  }
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
 
-  lightwallet.setPasswordFunction(async () => {
-    // bind login function so we can resolve the initial promise, when login is done
-    const loginPromise = new Promise(resolve => finishedLogin = (password: string) => {
-      router.push({ path: `${ basePath }` });
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
+*/
 
-      resolve(password);
-    });
+import Vue from 'vue';
+import { initializeVue } from '@evan.network/ui-vue-core';
 
-    // navigate the user to the login page
-    router.push({ path: `${ basePath }/login` });
+import Main from './components/root/root.vue';
+import translations from './i18n/translations';
+import routes from './routes';
+import components from './components/registry';
 
-    return loginPromise;
-  });
-
-  initializeRouting(dbcpName);
-
-  let v = new Vue({
-    el: container,
-    router,
-    render: h => h(Main),
+/**
+ * StartDapp function that is called by the ui-dapp-browser, including an container and the current
+ * dbcp. So startup, it's evan time!
+ *
+ * @param      {any}     container    container element
+ * @param      {string}  dbcpName     dbcp name of the dapp
+ * @param      {any}     dappEnsOrContract  original ens / contract address that were loaded
+ * @param      {string}  dappBaseUrl  origin of the dapp
+ */
+export async function startDApp(container: any, dbcpName: any, dappEnsOrContract: any, dappBaseUrl: any) {
+  await initializeVue({
+    components,
+    container,
+    dappBaseUrl,
+    dappEnsOrContract,
+    dbcpName,
+    RootComponent: Main,
+    routes,
+    state: { },
+    translations: translations,
+    Vue: Vue,
   });
 }

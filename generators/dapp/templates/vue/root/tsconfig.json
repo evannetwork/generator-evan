@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
+    "declaration": true,
     "experimentalDecorators": true,
     "lib": [
       "es2015",
@@ -10,26 +11,18 @@
     "moduleResolution": "node",
     "noImplicitAny": false,
     "outDir": "./built/",
-    "paths": {
-      "bcc": [
-        "../../../node_modules/@evan.network/api-blockchain-core/dist/index.js"
-      ],
-      "dapp-browser": [
-        "../../../node_modules/@evan.network/ui-dapp-browser/runtime/build/main"
-      ],
-      "smart-contracts": [
-        "../../../node_modules/@evan.network/smart-contracts-core/contracts/compiled.js"
-      ]
-    },
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
+    "strict": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
     "target": "es5"
   },
   "exclude": [
     "../../../node_modules/@evan.network"
   ],
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "../../vue/ts-shim.d.ts"
   ]
 }

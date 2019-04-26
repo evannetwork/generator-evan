@@ -15,4 +15,6 @@ module.exports = {
     contacts: ['test', '0xAa44fb6F6f6Aef3F11AF0b8829469885eb15E4cc'],
   },
   */
+
+  /*####YEOMAN_SEPARATOR####*/
 }

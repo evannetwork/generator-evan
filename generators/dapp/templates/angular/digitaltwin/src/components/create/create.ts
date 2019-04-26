@@ -1,12 +1,12 @@
 /*
   Copyright (c) 2018-present evan GmbH.
- 
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
       http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -124,7 +124,7 @@ export class CreateComponent extends AsyncComponent {
       this.formData = await this.<%= cleanName %>ServiceInstance.loadDigitalTwinData(this.contractAddress);
     } else {
       this.formData.dtGeneral.bannerImg = [{
-        blobURI: this.<%= cleanName %>ServiceInstance.defaultBannerImg,
+        blobURI: this._DomSanitizer.bypassSecurityTrustUrl(this.<%= cleanName %>ServiceInstance.defaultBannerImg),
         disableEncryption: true
       }];
     }
@@ -159,7 +159,7 @@ export class CreateComponent extends AsyncComponent {
   async _ngOnDestroy() {
     this.queueWatcher();
   }
-  
+
   /**
    * Starts the creation of a new contract
    */
@@ -205,7 +205,7 @@ export class CreateComponent extends AsyncComponent {
   async takeSnapshot(array: Array<any>, overwriteFirst: boolean) {
     try {
       const picture = await this.pictureService.takeSnapshot();
-      
+
       if (overwriteFirst) {
         array[0] = picture;
       } else {

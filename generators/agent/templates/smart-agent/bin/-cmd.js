@@ -1,4 +1,4 @@
-const {api, CLI} = require('actionhero')
+const { api, CLI } = require('actionhero')
 
 module.exports = class <%= NameWithoutSpecials %>Command extends CLI {
   constructor () {
@@ -18,9 +18,9 @@ module.exports = class <%= NameWithoutSpecials %>Command extends CLI {
     }
   }
 
-  async run ({params}) {
+  async run ({ params }) {
     // use same
     let keys = await api.redis.clients.client.keys(params.prefix)
-
+    return keys
   }
 }
