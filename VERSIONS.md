@@ -5,6 +5,10 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.9.1
+### Fixes
+- update dependency versions
+
 
 ## Version 1.9.0
 ### Features

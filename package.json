@@ -1,7 +1,7 @@
 {
   "author": "evan GmbH",
   "dependencies": {
-    "@evan.network/api-blockchain-core": "^2.1.0",
+    "@evan.network/api-blockchain-core": "^2.2.0",
     "@evan.network/dbcp": "^1.5.3",
     "deep-extend": "^0.6.0",
     "eth-lightwallet": "git+https://github.com/ConsenSys/eth-lightwallet.git#251eda97f705dbfae5ef099479aa19160028ae80",
@@ -31,5 +31,5 @@
     "url": "git@github.com:evannetwork/generator-evan.git"
   },
   "scripts": {},
-  "version": "1.9.0"
+  "version": "1.9.1"
 }
