@@ -6,6 +6,16 @@
 ### Deprecations
 
 
+## Version 1.9.0
+### Features
+- add eslint config
+- camelcase class names
+- add profile creation
+- add vue example
+- sanitize agent
+- add smart agent docu
+
+
 ## Version 1.8.0
 ### Fixes
 - use correct dapp deployment configuration template for the latest `@evan.network/ui-dapp-browser` version
