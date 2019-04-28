@@ -28,7 +28,6 @@
 const Generator = require('yeoman-generator');
 const updateNotifier = require('update-notifier');
 const pkg = require('../../package.json');
-const spinner = require('cli-spinners').dots;
 // Checks for available update and returns an instance
 const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 
