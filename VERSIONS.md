@@ -3,8 +3,11 @@
 ## Next Version
 ### Features
 ### Fixes
-- remove unused dependency
 ### Deprecations
+
+## Version 1.9.2
+### Fixes
+- remove unused dependency
 
 ## Version 1.9.1
 ### Fixes
