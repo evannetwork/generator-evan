@@ -3,6 +3,11 @@
 ## Next Version
 ### Features
 ### Fixes
+- fix ipfs constructor for different profiles
+- fix profile scripts for keyexchange and so on
+- fix datakey generation
+- add eth-lightwallet
+
 ### Deprecations
 
 ## Version 1.9.2
