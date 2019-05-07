@@ -50,7 +50,7 @@ gulp.task('init-profiles', async () => {
     accountId: runtimeConfig.accounts[0],
     privateKey: runtimeConfig.accountMap[runtimeConfig.accounts[0]]
   })
-  runtimes = await createRuntimes(web3, dfs, runtimeConfig);
+  runtimes = await createRuntimes(web3, runtimeConfig);
   return evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
