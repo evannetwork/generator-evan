@@ -5,9 +5,19 @@
 ### Fixes
 ### Deprecations
 
+
+## Version 1.9.3
+### Fixes
+- fix ipfs constructor for different profiles
+- fix profile scripts for keyexchange and so on
+- fix datakey generation
+- add eth-lightwallet
+
+
 ## Version 1.9.2
 ### Fixes
 - remove unused dependency
+
 
 ## Version 1.9.1
 ### Fixes

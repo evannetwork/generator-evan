@@ -245,7 +245,6 @@ module.exports = class extends Generator {
       // re-enable pinning
       profile.ipld.ipfs.disablePin = false;
 
-
       var apiURL = 'https://agents.test.evan.network/api/smart-agents/faucet/handout?apiVersion=1';
       const pk = '0x' + pKey;
       const signature = runtime.web3.eth.accounts.sign('Gimme Gimme Gimme!', pk).signature

@@ -129,7 +129,7 @@ function getAccountConfig(evanConfig = {}, accountConfig = {}, createConfig = {}
     const cc = createdProfiles[a]
 
     if(cc) mapAccount(a,cc)
-    else if(!c.mnemonic || !c.password || !c.alias) console.log('skipped creating account ', a)
+    if(!c.mnemonic || !c.password || !c.alias) console.log('skipped creating account ', a)
     else {
       config.ensureProfiles = true
       // set up profile creation fields in config
