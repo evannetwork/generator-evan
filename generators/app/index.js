@@ -62,7 +62,7 @@ module.exports = class extends Generator {
       {
         type    : 'confirm',
         name    : 'ensClaim',
-        message : 'Should a sub ENS address on the evan.network be claimed for you? (mnemonic required)',
+        message : 'Should a sub ENS address on the evan.network be claimed for you? (mnemonic required) (default yes)',
         default : true
       }
     ]);
@@ -114,8 +114,8 @@ module.exports = class extends Generator {
         {
           type    : 'confirm',
           name    : 'createBC',
-          message : 'Should a business center be created at the given address?',
-          default : true
+          message : 'Should a business center be created at the given address? (default no)',
+          default : false
         }
       ])).createBC;
 

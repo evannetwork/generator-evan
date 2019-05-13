@@ -5,6 +5,7 @@
 ### Fixes
 - fix replacement of dashes with spaces when generating an agent
 - fix dataKey generation with keccack256 instead of soliditySha3
+- set default "false" to businesscenter creation
 ### Deprecations
 
 
