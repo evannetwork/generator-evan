@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- fix replacement of dashes with spaces when generating an agent
+- fix dataKey generation with keccack256 instead of soliditySha3
 ### Deprecations
 
 

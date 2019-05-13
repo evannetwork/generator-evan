@@ -69,13 +69,13 @@ module.exports = class extends Generator {
         type    : 'input',
         name    : 'name',
         message : 'Name the agent: smart-agent-*',
-        default : this.appname,     // Default to current folder name
+        default : this.appname.replace(/\s+/g, '-'),     // Default to current folder name
       },
       {
         type    : 'input',
         name    : 'description',
         message : 'What does the agent do? Describe it.',
-        default : this.appname,     // Default to current folder name
+        default : this.appname.replace(/\s+/g, '-'),     // Default to current folder name
       },
       {
         type    : 'checkbox',
