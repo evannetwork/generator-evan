@@ -6,5 +6,5 @@ For more details about how to program DApps have a look here:
 
 - [DApp Tutorials](https://evannetwork.github.io/dapps/basics)
 - [Custom Theming](https://ipfs.test.evan.network/ipns/QmReXE5YkiXviaHNG1ASfY6fFhEoiDKuSkgY4hxgZD9Gm8/angular-sass/index.html)
-- [API Reference UI](https://ipfs.test.evan.network/ipns/QmReXE5YkiXviaHNG1ASfY6fFhEoiDKuSkgY4hxgZD9Gm8)
-- [API Reference blockchain-core / DBCP](https://ipfs.test.evan.network/ipns/QmYmsPTdPPDLig6gKB1wu1De4KJtTqAXFLF1498umYs4M6)
+- [API Reference UI](https://ui-docs.readthedocs.io)
+- [API Reference blockchain-core / DBCP](https://api-blockchain-core.readthedocs.io)

@@ -25,6 +25,10 @@
   https://evan.network/license/
 */
 
+// Fix Error: More than one instance of bitcore-lib found. Please make sure to require bitcore-lib
+// and check that submodules do not also include their own bitcore-lib dependency.
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){} });
+
 const Generator = require('yeoman-generator');
 const path = require('path');
 const { claimDomain, getRuntime } = require(`./templates/scripts/domain-helper.js`);
@@ -62,7 +66,7 @@ module.exports = class extends Generator {
       {
         type    : 'confirm',
         name    : 'ensClaim',
-        message : 'Should a sub ENS address on the evan.network be claimed for you? (mnemonic required)',
+        message : 'Should a sub ENS address on the evan.network be claimed for you? (mnemonic required) (default yes)',
         default : true
       }
     ]);
@@ -114,8 +118,8 @@ module.exports = class extends Generator {
         {
           type    : 'confirm',
           name    : 'createBC',
-          message : 'Should a business center be created at the given address?',
-          default : true
+          message : 'Should a business center be created at the given address? (default no)',
+          default : false
         }
       ])).createBC;
 

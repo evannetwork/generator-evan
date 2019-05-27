@@ -126,11 +126,13 @@ module.exports = class extends Generator {
         web3
       });
 
-      const sha9Account = web3.utils.soliditySha3.apply(web3.utils.soliditySha3,
-[web3.utils.soliditySha3(accountId), web3.utils.soliditySha3(accountId)].sort());
+      const sha9Account = web3.utils.soliditySha3.apply(
+        web3.utils.soliditySha3,
+        [web3.utils.soliditySha3(accountId), web3.utils.soliditySha3(accountId)].sort()
+      );
       const sha3Account = web3.utils.soliditySha3(accountId)
       const dataKey = web3.utils
-        .soliditySha3(accountId + newProfile.password)
+        .keccak256(accountId + newProfile.password)
         .replace(/0x/g, '');
       const runtimeConfig = {
         accountMap: {

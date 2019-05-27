@@ -6,8 +6,8 @@
   },
   "description": "<%= description %>",
   "devDependencies": {
-    "@evan.network/api-blockchain-core": "^2.1.0",
-    "@evan.network/smart-contracts-core": "^2.1.0",
+    "@evan.network/api-blockchain-core": "^2.3.0",
+    "@evan.network/smart-contracts-core": "^2.1.1",
     "eth-lightwallet": "^3.0.1",
     "readline": "1.3.0"
   },
