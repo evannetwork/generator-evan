@@ -25,6 +25,10 @@
   https://evan.network/license/
 */
 
+// Fix Error: More than one instance of bitcore-lib found. Please make sure to require bitcore-lib
+// and check that submodules do not also include their own bitcore-lib dependency.
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){} });
+
 const Generator = require('yeoman-generator');
 const path = require('path');
 const { claimDomain, getRuntime } = require(`./templates/scripts/domain-helper.js`);

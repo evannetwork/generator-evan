@@ -30,6 +30,5 @@
     "type": "git",
     "url": "git@github.com:evannetwork/generator-evan.git"
   },
-  "scripts": {},
-  "version": "1.9.3"
+  "version": "1.9.4"
 }

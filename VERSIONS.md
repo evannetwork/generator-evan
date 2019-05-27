@@ -3,10 +3,15 @@
 ## Next Version
 ### Features
 ### Fixes
+### Deprecations
+
+
+## Version 1.9.4
+### Fixes
 - fix replacement of dashes with spaces when generating an agent
 - fix dataKey generation with keccack256 instead of soliditySha3
 - set default "false" to businesscenter creation
-### Deprecations
+- fix `More than one instance of bitcore-lib found`
 
 
 ## Version 1.9.3
