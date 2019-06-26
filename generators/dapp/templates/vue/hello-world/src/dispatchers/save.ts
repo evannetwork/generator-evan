@@ -25,17 +25,27 @@
   https://evan.network/license/
 */
 
-// import evan libs
-import { ComponentRegistrationInterface } from '@evan.network/ui-vue-core';
+import * as bcc from '@evan.network/api-blockchain-core';
+import * as dappBrowser from '@evan.network/ui-dapp-browser';
+import { Dispatcher, DispatcherInstance } from '@evan.network/ui';
+import { EvanComponent, EvanForm, EvanFormControl } from '@evan.network/ui-vue-core';
 
-import HelloWorldComponent from './helloworld/helloworld.vue';
 
-// export them all, so other applications can access them
-export { }
+const dispatcher = new Dispatcher(
+  `<%= dbcpName %>.${ dappBrowser.getDomainName() }`,
+  'saveDispatcher',
+  40 * 1000,
+  '_sample.dispatcher.save'
+);
 
-// map them to element names, so they can be used within templates
-const componentRegistration: Array<ComponentRegistrationInterface> = [
-  { name: 'hello-world',    component: HelloWorldComponent },
-];
+dispatcher
+  .step(async (instance: DispatcherInstance, data: any) => {
+    const runtime = instance.runtime;
 
-export default componentRegistration;
+    // ensure latest addressbook is loaded
+    await runtime.profile.loadForAccount(runtime.profile.treeLabels.contracts);
+    await runtime.profile.addProfileKey(data.accountId, 'alias', data.alias);
+    await runtime.profile.storeForAccount(runtime.profile.treeLabels.addressBook);
+  });
+
+export default dispatcher;

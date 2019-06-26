@@ -25,17 +25,8 @@
   https://evan.network/license/
 */
 
-// import evan libs
-import { ComponentRegistrationInterface } from '@evan.network/ui-vue-core';
+import saveDispatcher from './save';
 
-import HelloWorldComponent from './helloworld/helloworld.vue';
-
-// export them all, so other applications can access them
-export { }
-
-// map them to element names, so they can be used within templates
-const componentRegistration: Array<ComponentRegistrationInterface> = [
-  { name: 'hello-world',    component: HelloWorldComponent },
-];
-
-export default componentRegistration;
+export {
+  saveDispatcher,
+}

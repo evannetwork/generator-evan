@@ -29,17 +29,22 @@
   <div class="evan theme-evan">
     <evan-dapp-wrapper>
       <template v-slot:content>
-        Hello World!
-<!--         <transition name="fade" mode="out-in">
-          <router-view></router-view>
-        </transition> -->
+        <evan-breadcrumbs
+          :i18nScope="'_sample.breadcrumbs'"
+          :enableReload="true">
+        </evan-breadcrumbs>
+
         <evan-dapp-wrapper-level-2>
           <template v-slot:content>
             <div class="w300">
-              dapp wrapper-sidebar-level-2
+              {{ '_sample.sidebarcontent' | translate}}
             </div>
           </template>
         </evan-dapp-wrapper-level-2>
+
+        <transition name="fade" mode="out-in">
+          <router-view></router-view>
+        </transition>
       </template>
     </evan-dapp-wrapper>
   </div>
