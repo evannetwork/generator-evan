@@ -55,6 +55,3 @@
   export default RootComponent;
 </script>
 
-<style lang="scss" scoped>
-  @import './root';
-</style>

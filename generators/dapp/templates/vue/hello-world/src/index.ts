@@ -28,10 +28,14 @@
 import Vue from 'vue';
 import { initializeVue } from '@evan.network/ui-vue-core';
 
-import Main from './components/root/root.vue';
-import translations from './i18n/translations';
-import routes from './routes';
 import components from './components/registry';
+import RootComponent from './components/root/root.vue';
+import routes from './routes';
+import translations from './i18n/translations';
+
+export * from './components/registry';
+export * from './dispatchers/registry';
+export { translations }
 
 /**
  * StartDapp function that is called by the ui-dapp-browser, including an container and the current
@@ -49,10 +53,10 @@ export async function startDApp(container: any, dbcpName: any, dappEnsOrContract
     dappBaseUrl,
     dappEnsOrContract,
     dbcpName,
-    RootComponent: Main,
+    RootComponent,
     routes,
     state: { },
-    translations: translations,
-    Vue: Vue,
+    translations,
+    Vue,
   });
 }

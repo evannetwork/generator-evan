@@ -39,7 +39,7 @@ export default {
     },
     "content": "Herzlichen Glückwunsch {alias}, Sie haben erfolreich Ihre Vue Beispielanwendung erstellt.",
     "dispatcher": {
-      "save": "Alias speichern..."
+      "save": "Alias speichern"
     },
     "header": "Vue Beispiel",
     "header2": "Datenbereich",

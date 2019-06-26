@@ -121,11 +121,12 @@ export default class DispatcherSampleComponent extends mixins(EvanComponent) {
     } else {
       // if saving was finished, reload the data
       if (this.saving) {
+        delete runtime.profile.trees[runtime.profile.treeLabels.addressBook];
         await runtime.profile.loadForAccount(runtime.profile.treeLabels.addressBook);
         const addressBook = await runtime.profile.getAddressBook();
         this.aliasForm.alias.value = addressBook.profile[runtime.activeAccount].alias;
 
-        (<any>this.$refs.saveFinishedModal).showModal();
+        (<any>this.$refs.saveFinishedModal).show();
       }
 
       this.saving = false;

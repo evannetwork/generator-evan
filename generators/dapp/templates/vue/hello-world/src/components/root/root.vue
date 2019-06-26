@@ -27,16 +27,21 @@
 
 <template>
   <div class="evan theme-evan">
-    <evan-dapp-wrapper>
-      <template v-slot:content>
+    <evan-dapp-wrapper :routes="[ ]">
+      <template slot="content">
         <evan-breadcrumbs
           :i18nScope="'_sample.breadcrumbs'"
           :enableReload="true">
         </evan-breadcrumbs>
 
+        <evan-nav-tabs class="flex-shrink-0"
+          :tabs="tabs"
+          ref="navTabs">
+        </evan-nav-tabs>
+
         <evan-dapp-wrapper-level-2>
           <template v-slot:content>
-            <div class="w300">
+            <div class="w300 p-3">
               {{ '_sample.sidebarcontent' | translate}}
             </div>
           </template>

@@ -44,7 +44,7 @@ dispatcher
 
     // ensure latest addressbook is loaded
     await runtime.profile.loadForAccount(runtime.profile.treeLabels.contracts);
-    await runtime.profile.addProfileKey(data.accountId, 'alias', data.alias);
+    await runtime.profile.addProfileKey(runtime.activeAccount, 'alias', data.alias);
     await runtime.profile.storeForAccount(runtime.profile.treeLabels.addressBook);
   });
 
