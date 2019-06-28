@@ -2,6 +2,8 @@
 
 ## Next Version
 ### Features
+- add advanced vue hello world generator
+
 ### Fixes
 ### Deprecations
 
