@@ -8,7 +8,7 @@
       "entrypoint": "<%= dbcpName %>.js",
       "files": [
         "<%= dbcpName %>.js",
-        "index.css"
+        "<%= dbcpName %>.css"
       ],
       "primaryColor": "<%= color %>",
       "secondaryColor": "#f9f9ff",

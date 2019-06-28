@@ -2,8 +2,15 @@
 
 ## Next Version
 ### Features
+
 ### Fixes
+
 ### Deprecations
+
+
+## Version 1.10.0
+### Features
+- add advanced vue hello world generator
 
 
 ## Version 1.9.4
