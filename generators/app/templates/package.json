@@ -2,7 +2,7 @@
   "dependencies": {
     "gulp": "3.9.1",
     "typescript": "2.9.1",
-    "web3": "1.0.0-beta.37"
+    "web3": "1.0.0-beta.55"
   },
   "description": "<%= description %>",
   "devDependencies": {
