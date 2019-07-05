@@ -96,15 +96,6 @@ module.exports = class extends Generator {
     ]);
     await claimDomain(answers.domain, answers.mnemonic);
 
-    // const web3 = new Web3()
-    // web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider))
-    // const dfs = new Ipfs({ remoteNode: new IpfsApi(runtimeConfig.ipfs), })
-
-    // return createDefaultRuntime(web3, dfs, runtimeConfig)
-    // console.dir(runtimeConfig)
-    // await buildKeyConfig(web3, runtimeConfig)
-    // console.dir(runtimeConfig)
-    // runtime = await createRuntime(runtimeConfig)
     process.exit();
     this._copyTemplateIntoDApps();
   }

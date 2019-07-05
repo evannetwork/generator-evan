@@ -37,8 +37,8 @@ gulp.task('init', async () => {
       'Provider those by setting them as environment keys "ENS_OWNER" and "ENS_OWNER_KEY"');
   }
 
-  web3 = new Web3();
-  web3.setProvider(new web3.providers.WebsocketProvider(runtimeConfig.web3Provider));
+  const provider = new Web3.providers.WebsocketProvider(runtimeConfig.web3Provider);
+  web3 = new Web3(provider, null, { transactionConfirmationBlocks: 1 }); 
 
   const ensOwnerRuntimeConfig = JSON.parse(JSON.stringify(runtimeConfig))
   ensOwnerRuntimeConfig.accountMap = {};
