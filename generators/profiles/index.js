@@ -108,13 +108,9 @@ module.exports = class extends Generator {
       vault.generateNewAddress(pwDerivedKey, 1);
 
 
-
-      const web3Provider = 'wss://testcore.evan.network/ws';
-      const wsp = new Web3.providers.WebsocketProvider(
-            web3Provider, { clientConfig: { keepalive: true, keepaliveInterval: 5000 } });
-      const web3 = new Web3(wsp, { transactionConfirmationBlocks: 1 });
-
-
+      const provider = new Web3.providers.WebsocketProvider(
+        web3Provider, { clientConfig: { keepalive: true, keepaliveInterval: 5000 } });
+      const web3 = new Web3(provider, null, { transactionConfirmationBlocks: 1 });
       const accountId = web3.utils.toChecksumAddress(vault.getAddresses()[0]);
       const pKey = vault.exportPrivateKey(accountId.toLowerCase(), pwDerivedKey);
 
