@@ -27,7 +27,7 @@
 
 const { promisify } = require('util')
 const Generator = require('yeoman-generator');
-const Web3 = require('web3-utils')
+const Web3Utils = require('web3-utils')
 const updateNotifier = require('update-notifier');
 const pkg = require('../../package.json');
 // Checks for available update and returns an instance
@@ -37,7 +37,7 @@ const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 notifier.notify({ defer:false });
 
 
-const sha3 = Web3.soliditySha3
+const sha3 = Web3Utils.soliditySha3
 function sha9(a, b) { return sha3.apply(sha3, [sha3(a), sha3(b)].sort()) }
 
 module.exports = class extends Generator {
