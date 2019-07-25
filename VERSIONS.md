@@ -4,6 +4,7 @@
 ### Features
 
 ### Fixes
+- fix `soliditySha3` calls by using static access path of `Web3`
 
 ### Deprecations
 
