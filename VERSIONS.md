@@ -4,9 +4,13 @@
 ### Features
 
 ### Fixes
-- fix `soliditySha3` calls by using static access path of `Web3`
 
 ### Deprecations
+
+
+## Version 1.11.1
+### Fixes
+- fix `soliditySha3` calls by using static access path of `Web3`
 
 
 ## Version 1.11.0
