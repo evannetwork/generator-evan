@@ -8,6 +8,11 @@
 ### Deprecations
 
 
+## Version 1.11.1
+### Fixes
+- fix `soliditySha3` calls by using static access path of `Web3`
+
+
 ## Version 1.11.0
 ### Fixes
 - update for `web3` version `1.0.0-beta.55` support
