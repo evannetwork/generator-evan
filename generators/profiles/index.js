@@ -34,6 +34,7 @@ const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 // Notify using the built-in convenience method
 notifier.notify({defer:false});
 
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: false });
 const keystore = require('eth-lightwallet/lib/keystore');
 const { createDefaultRuntime, Ipfs } = require(`@evan.network/api-blockchain-core`);
 const Web3 = require('web3');
@@ -109,7 +110,9 @@ module.exports = class extends Generator {
 
 
       const provider = new Web3.providers.WebsocketProvider(
-        web3Provider, { clientConfig: { keepalive: true, keepaliveInterval: 5000 } });
+        'wss://testcore.evan.network/ws',
+        { clientConfig: { keepalive: true, keepaliveInterval: 5000 } },
+      );
       const web3 = new Web3(provider, null, { transactionConfirmationBlocks: 1 });
       const accountId = web3.utils.toChecksumAddress(vault.getAddresses()[0]);
       const pKey = vault.exportPrivateKey(accountId.toLowerCase(), pwDerivedKey);
@@ -122,11 +125,11 @@ module.exports = class extends Generator {
         web3
       });
 
-      const sha9Account = Web3.utils.soliditySha3.apply(
-        Web3.utils.soliditySha3,
-        [Web3.utils.soliditySha3(accountId), Web3.utils.soliditySha3(accountId)].sort()
+      const sha9Account = web3.utils.soliditySha3.apply(
+        web3.utils.soliditySha3,
+        [web3.utils.soliditySha3(accountId), web3.utils.soliditySha3(accountId)].sort()
       );
-      const sha3Account = Web3.utils.soliditySha3(accountId)
+      const sha3Account = web3.utils.soliditySha3(accountId)
       const dataKey = web3.utils
         .keccak256(accountId + newProfile.password)
         .replace(/0x/g, '');

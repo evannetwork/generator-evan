@@ -44,7 +44,11 @@ catch(e) { if (e.code !== "MODULE_NOT_FOUND") throw e }
 try{ createdProfiles = require('./config/createdProfiles.json') }
 catch(e) { if (e.code !== "MODULE_NOT_FOUND") throw e }
 
-const sha3 = Web3.utils.soliditySha3
+const hashProvider = new Web3.providers.WebsocketProvider(
+  defaultWeb3, { clientConfig: { keepalive: true, keepaliveInterval: 5000 } });
+const hashWeb3 = new Web3(hashProvider, null, { transactionConfirmationBlocks: 1 });
+
+const sha3 = hashWeb3.utils.soliditySha3
 function sha9(a, b) { return sha3.apply(sha3, [sha3(a), sha3(b)].sort()) }
 
 /*
