@@ -1,9 +1,9 @@
 {
   "devDependencies": {
     "@evan.network/api-blockchain-core": "^2.8.4",
-    "@evan.network/ui": "^1.8.0",
-    "@evan.network/ui-dapp-browser": "^2.3.0",
-    "@evan.network/ui-vue-core": "^1.4.0",
+    "@evan.network/ui": "^1.7.1",
+    "@evan.network/ui-dapp-browser": "^2.4.0",
+    "@evan.network/ui-vue-core": "^1.5.0",
     "axios": "^0.18.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.0.0",
