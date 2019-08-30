@@ -2,6 +2,7 @@
 
 ## Next Version
 ### Features
+- add `evanAuth` middleware (commented out by default) to action in agent
 
 ### Fixes
 
