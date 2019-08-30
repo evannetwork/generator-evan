@@ -114,7 +114,6 @@ module.exports = class extends Generator {
     try {
       const deploymentConfig = require(`${ this.destinationRoot() }/scripts/config/deployment.js`);
       this.answers.dbcpName = projectName;
-      console.dir(deploymentConfig.bcConfig.nameResolver.domains)
       if (deploymentConfig.bcConfig.nameResolver.domains.dappsDomain) {
         this.answers.dbcpName = `${ projectName }.${ deploymentConfig.bcConfig.nameResolver.domains.dappsDomain }`;
       }
@@ -132,6 +131,9 @@ module.exports = class extends Generator {
       this.answers.cleanName = this.answers.dbcpName.replace(/\.|\-/g, '');
     } catch(e) {
       // silent
+      this.answers.bcDomain = '';
+      this.answers.joinSchema = '';
+      this.answers.factoryPath = `testdatacontract`;
       this.answers.dbcpName = projectName;
       this.answers.cleanName = this.answers.dbcpName.replace(/\.|\-/g, '');
     }
