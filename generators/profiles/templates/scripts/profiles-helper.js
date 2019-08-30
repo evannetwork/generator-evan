@@ -24,6 +24,7 @@ const rl = readline.createInterface({
 
 const prottle = require('prottle');
 Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){} });
+const keystore = require('eth-lightwallet/lib/keystore');
 
 const {
   createDefaultRuntime,
