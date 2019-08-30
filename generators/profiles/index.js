@@ -187,7 +187,7 @@ module.exports = class extends Generator {
       You can also add the "create-profiles" or any subtask tasks from "./gulp/create-profiles.js" to your gulp tasks.
     `);
 
-    // close web3 connection to allow generator to exit d
+    // close web3 connection to allow generator to exit
     runtime.web3.currentProvider.connection.close();
   }
   /**
