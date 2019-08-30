@@ -218,7 +218,7 @@ module.exports = class extends Generator {
     console.log(`
       Created '${this.answers.fullname}'.
 
-      Run 'gulp link-agents' to link it into edge-server.
+      Run 'npx gulp link-agents' to link it into edge-server.
       Run 'npm start' to start edge-server.
     `);
   }
