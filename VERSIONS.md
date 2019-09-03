@@ -4,10 +4,13 @@
 ### Features
 
 ### Fixes
-- fix generator staying open after finishing
-- fix variable handling in key config building
 
 ### Deprecations
+
+## Version 1.11.2
+### Fixes
+- fix generator staying open after finishing
+- fix variable handling in key config building
 
 
 ## Version 1.11.1
