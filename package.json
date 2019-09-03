@@ -8,9 +8,9 @@
     "ipfs-api": "^26.1.2",
     "prottle": "^1.0.3",
     "request": "^2.88.0",
-    "update-notifier": "^2.5.0",
-    "web3": "1.0.0-beta.55",
-    "yeoman-generator": "^1.1.1"
+    "update-notifier": "^3.0.1",
+    "web3": "2.0.0-alpha",
+    "yeoman-generator": "^4.0.1"
   },
   "description": "blockchain interaction core library",
   "devDependencies": {},
@@ -30,5 +30,5 @@
     "type": "git",
     "url": "git@github.com:evannetwork/generator-evan.git"
   },
-  "version": "1.11.1"
+  "version": "1.11.2"
 }

@@ -63,8 +63,8 @@ module.exports = {
       const dataKey = web3.utils.sha3(accountId + runtimeConfig.mnemonics[mnemonic]).substr(2);
       runtimeConfig.accounts.push(accountId);
       runtimeConfig.accountMap[accountId] = pKey;
-      runtimeConfig.keyConfig[Web3.utils.soliditySha3(accountId)] = dataKey;
-      runtimeConfig.keyConfig[Web3.utils.soliditySha3(Web3.utils.soliditySha3(accountId), Web3.utils.soliditySha3(accountId))] = dataKey;
+      runtimeConfig.keyConfig[web3.utils.soliditySha3(accountId)] = dataKey;
+      runtimeConfig.keyConfig[web3.utils.soliditySha3(web3.utils.soliditySha3(accountId), web3.utils.soliditySha3(accountId))] = dataKey;
       runtimeConfig.mnemonic2account[mnemonic] = accountId;
     }
     console.groupEnd('buildKeyConfig');

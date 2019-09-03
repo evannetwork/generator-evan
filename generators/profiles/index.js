@@ -34,12 +34,15 @@ const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 // Notify using the built-in convenience method
 notifier.notify({defer:false});
 
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: false });
 const keystore = require('eth-lightwallet/lib/keystore');
 const { createDefaultRuntime, Ipfs } = require(`@evan.network/api-blockchain-core`);
 const Web3 = require('web3');
 const { promisify } = require('util');
 const request = require('request');
 const fs = require('fs');
+
+let runtime;
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -51,7 +54,6 @@ module.exports = class extends Generator {
    * @return     {Promise}  resolved when done
    */
   async prompting() {
-
     let done = false;
 
     while(!done) {
@@ -109,7 +111,9 @@ module.exports = class extends Generator {
 
 
       const provider = new Web3.providers.WebsocketProvider(
-        web3Provider, { clientConfig: { keepalive: true, keepaliveInterval: 5000 } });
+        'wss://testcore.evan.network/ws',
+        { clientConfig: { keepalive: true, keepaliveInterval: 5000 } },
+      );
       const web3 = new Web3(provider, null, { transactionConfirmationBlocks: 1 });
       const accountId = web3.utils.toChecksumAddress(vault.getAddresses()[0]);
       const pKey = vault.exportPrivateKey(accountId.toLowerCase(), pwDerivedKey);
@@ -122,11 +126,11 @@ module.exports = class extends Generator {
         web3
       });
 
-      const sha9Account = Web3.utils.soliditySha3.apply(
-        Web3.utils.soliditySha3,
-        [Web3.utils.soliditySha3(accountId), Web3.utils.soliditySha3(accountId)].sort()
+      const sha9Account = web3.utils.soliditySha3.apply(
+        web3.utils.soliditySha3,
+        [web3.utils.soliditySha3(accountId), web3.utils.soliditySha3(accountId)].sort()
       );
-      const sha3Account = Web3.utils.soliditySha3(accountId)
+      const sha3Account = web3.utils.soliditySha3(accountId)
       const dataKey = web3.utils
         .keccak256(accountId + newProfile.password)
         .replace(/0x/g, '');
@@ -139,7 +143,7 @@ module.exports = class extends Generator {
           [sha3Account]: dataKey
         }
       };
-      const runtime = await createDefaultRuntime(web3, ipfs, runtimeConfig);
+      runtime = await createDefaultRuntime(web3, ipfs, runtimeConfig);
 
       await this._createOfflineProfile(runtime, newProfile.alias, accountId, pKey)
 
@@ -182,6 +186,9 @@ module.exports = class extends Generator {
 
       You can also add the "create-profiles" or any subtask tasks from "./gulp/create-profiles.js" to your gulp tasks.
     `);
+
+    // close web3 connection to allow generator to exit
+    runtime.web3.currentProvider.connection.close();
   }
   /**
    * Copy files from a path under the templates directory into the specific dapp folder
