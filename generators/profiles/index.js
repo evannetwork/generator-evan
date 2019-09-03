@@ -42,6 +42,8 @@ const { promisify } = require('util');
 const request = require('request');
 const fs = require('fs');
 
+let runtime;
+
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts)
@@ -52,7 +54,6 @@ module.exports = class extends Generator {
    * @return     {Promise}  resolved when done
    */
   async prompting() {
-
     let done = false;
 
     while(!done) {
@@ -142,7 +143,7 @@ module.exports = class extends Generator {
           [sha3Account]: dataKey
         }
       };
-      const runtime = await createDefaultRuntime(web3, ipfs, runtimeConfig);
+      runtime = await createDefaultRuntime(web3, ipfs, runtimeConfig);
 
       await this._createOfflineProfile(runtime, newProfile.alias, accountId, pKey)
 
@@ -185,6 +186,9 @@ module.exports = class extends Generator {
 
       You can also add the "create-profiles" or any subtask tasks from "./gulp/create-profiles.js" to your gulp tasks.
     `);
+
+    // close web3 connection to allow generator to exit
+    runtime.web3.currentProvider.connection.close();
   }
   /**
    * Copy files from a path under the templates directory into the specific dapp folder

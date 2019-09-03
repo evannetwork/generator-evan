@@ -38,16 +38,6 @@ const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 
 // Notify using the built-in convenience method
 notifier.notify({defer:false});
-// const scriptsFolder = `${process.cwd()}/scripts`;
-// const { runtimeConfig } = require(`${scriptsFolder}/config/deployment`);
-// const { createDefaultRuntime, Ipfs } = require('@evan.network/api-blockchain-core')
-// const IpfsApi = require('ipfs-api')
-// const Web3 = require('web3')
-
-// const { buildKeyConfig } = require(`${scriptsFolder}/profile-helper`)
-// const createRuntime = require(`${scriptsFolder}/createRuntime`);
-
-// let runtime
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -94,24 +84,12 @@ module.exports = class extends Generator {
         transformer: (input) => `${input}${registrarDomainSuffix}`,
       },
     ]);
+    console.log('calling claimDomain');
     await claimDomain(answers.domain, answers.mnemonic);
-
-    process.exit();
-    this._copyTemplateIntoDApps();
   }
-  /**
-   * Copy files from a path under the templates directory into the specific dapp folder
-   */
-  _copyTemplateIntoDApps() {
-    this.fs.copyTpl(
-      this.templatePath('**/{.[^.],}*'),
-      this.destinationPath(`${ this.destinationRoot() }/`),
-      this.answers,
-      {
-        globOptions: {
-          dot: true
-        }
-      }
-    );
+
+  async end() {
+    // explicitely exit, as some streams may keep yeoman node alive
+    process.exit();
   }
 };

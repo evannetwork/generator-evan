@@ -4,6 +4,8 @@
 ### Features
 
 ### Fixes
+- fix generator staying open after finishing
+- fix variable handling in key config building
 
 ### Deprecations
 
