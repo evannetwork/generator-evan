@@ -15,6 +15,7 @@ class SmartAgent<%= NameWithoutSpecials %> extends Action {
       }
     }
     this.outputExample = { }
+    // this.middleware = ['ensureEvanAuth']
   }
 
   accountValidator (param) {
@@ -25,18 +26,12 @@ class SmartAgent<%= NameWithoutSpecials %> extends Action {
 
   async run ({ params, response }) {
     try {
-      // a signed message can be given to validate account
-      // for signing messags see https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#sign
-      // var srcId = await api.eth.web3.eth.accounts.recover(
-      //   api.config.smartAgent<%= NameWithoutSpecials %>.sign_message, params.srcSignature);
-      // if(srcId !== params.srcId) throw new Error("No verified Account.")
+      // if required, authenticated user / accountId can be retrieved from connection
+      // this requires the "ensureEvanAuth" middleware to be enabled (see above)
+      // const accountId = connection.evanAuth.EvanAuth
 
-      /*
-        do stuff
-        api.smartAgent<%= NameWithoutSpecials %>.exampleFunction('some value')
-      */
-
-      response.status = `successful status call from accountId: ${params.accountId}`
+      response.result = `successful status call from accountId: ${params.accountId}`
+      response.status = 'success'
     } catch (ex) {
       api.log(ex)
       response.status = 'error'

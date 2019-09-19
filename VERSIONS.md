@@ -7,6 +7,12 @@
 
 ### Deprecations
 
+
+## Version 1.12.0
+### Features
+- add `evanAuth` middleware (commented out by default) to action in agent
+
+
 ## Version 1.11.2
 ### Fixes
 - fix generator staying open after finishing
