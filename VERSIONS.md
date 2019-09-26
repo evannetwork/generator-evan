@@ -4,6 +4,7 @@
 ### Features
 
 ### Fixes
+- remove license headers from templates
 
 ### Deprecations
 
