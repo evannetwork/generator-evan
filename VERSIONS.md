@@ -8,6 +8,11 @@
 ### Deprecations
 
 
+## Version 1.12.1
+### Fixes
+- remove license headers from templates
+
+
 ## Version 1.12.0
 ### Features
 - add `evanAuth` middleware (commented out by default) to action in agent
