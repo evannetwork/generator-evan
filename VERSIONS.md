@@ -4,9 +4,13 @@
 ### Features
 
 ### Fixes
-- remove license headers from templates
 
 ### Deprecations
+
+
+## Version 1.12.1
+### Fixes
+- remove license headers from templates
 
 
 ## Version 1.12.0
