@@ -4,10 +4,14 @@
 ### Features
 
 ### Fixes
-- fix web3 closing too early when watching for new blocks
-- fix compile contracts issue
 
 ### Deprecations
+
+
+## Version 1.12.2
+### Fixes
+- fix web3 closing too early when watching for new blocks
+- fix compile contracts issue
 
 
 ## Version 1.12.1
