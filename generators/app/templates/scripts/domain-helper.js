@@ -9,7 +9,11 @@ const { runtimeConfig } = require('./config/deployment');
 const claimDomain = async (domain, mnemonic) => {
   const runtime = await getRuntime(mnemonic);
   await runtime.nameResolver.claimAddress(domain, runtime.activeAccount);
-  runtime.web3.currentProvider.connection.close();
+  // close the connection after 10 seconds to wait for block handlers closing
+  setTimeout(() => {
+    runtime.web3.currentProvider.connection.close();
+  }, 10000)
+
 };
 
 const getRuntime = async (mnemonic) => {
