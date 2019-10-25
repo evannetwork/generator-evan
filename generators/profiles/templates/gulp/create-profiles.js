@@ -38,29 +38,29 @@ gulp.task('init-profiles', async () => {
   return evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-gulp.task('ensure-profiles', ['init-profiles'], async () => {
+gulp.task('ensure-profiles', gulp.series(['init-profiles']), async () => {
   await ensureProfiles(runtimes, runtimeConfig);
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-gulp.task('exchange-keys', ['init-profiles', 'ensure-profiles'], async () => {
+gulp.task('exchange-keys', gulp.series(['init-profiles', 'ensure-profiles']), async () => {
   await exchangeKeys(runtimes, runtimeConfig);
 })
 
-gulp.task('add-bookmarks', ['init-profiles', 'ensure-profiles'], async () => {
+gulp.task('add-bookmarks', gulp.series(['init-profiles', 'ensure-profiles']), async () => {
   await addBookmarks(runtimes, runtimeConfig);
 })
 
-gulp.task('add-to-business-centers', ['init-profiles'], async () => {
+gulp.task('add-to-business-centers', gulp.series(['init-profiles']), async () => {
   await addToBusinessCenters(runtimes, runtimeConfig);
 })
 
-gulp.task('invite-to-contracts', ['init-profiles'], async () => {
+gulp.task('invite-to-contracts', gulp.series(['init-profiles']), async () => {
   await inviteToContracts(runtimes, runtimeConfig);
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-gulp.task('create-profiles', ['init-profiles'], async () => {
+gulp.task('create-profiles', gulp.series(['init-profiles']), async () => {
   await ensureProfiles(runtimes, runtimeConfig);
   await exchangeKeys(runtimes, runtimeConfig);
   await addBookmarks(runtimes, runtimeConfig);
@@ -69,5 +69,4 @@ gulp.task('create-profiles', ['init-profiles'], async () => {
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-
-gulp.task('default', ['create-profiles'])
+gulp.task('default', gulp.series(['create-profiles']))
