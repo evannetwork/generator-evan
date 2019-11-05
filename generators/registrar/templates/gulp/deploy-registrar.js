@@ -37,9 +37,9 @@ gulp.task('init', async () => {
   runtime = await createDefaultRuntime(web3, dfs, ensOwnerRuntimeConfig);
 })
 
-gulp.task('deploy-registrar', ['init'], async () => {
+gulp.task('deploy-registrar', gulp.series(['init']), async () => {
   await deployRegistrar(runtime, runtimeConfig);
 })
 
 
-gulp.task('default', ['deploy-registrar']);
+gulp.task('default', gulp.series(['deploy-registrar']));

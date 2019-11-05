@@ -146,4 +146,4 @@ gulp.task('dapps-build', async function () {
   }
 });
 
-gulp.task('default', [ 'dapps-build' ]);
+gulp.task('default', gulp.series([ 'dapps-build' ]));
