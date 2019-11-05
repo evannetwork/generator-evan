@@ -4,9 +4,13 @@
 ### Features
 
 ### Fixes
-- update gulp build scripts to be compatible with nodejs 12
 
 ### Deprecations
+
+
+## Version 1.12.3
+### Fixes
+- update gulp build scripts to be compatible with nodejs 12
 
 
 ## Version 1.12.2
