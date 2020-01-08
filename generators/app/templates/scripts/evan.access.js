@@ -1,49 +1,31 @@
-let bcc = null  // only initialize it if needed, since it takes a while
-let busy = 0
-const Transform = require('stream').Transform
-const IpfsApi = require('ipfs-api')
-const BCC = require('@evan.network/api-blockchain-core')
-const { Ipfs, createDefaultRuntime, PropertyType, ModificationType } = BCC
-const { soliditySha3: sha3 } = require('web3-utils')
-const path = require('path')
-const fs = require('fs')
-const pfy = require('util').promisify
+let bcc = null; // only initialize it if needed, since it takes a while
+let busy = 0;
+const { Ipfs, createDefaultRuntime } = require('@evan.network/api-blockchain-core');
+const { soliditySha3: sha3 } = require('web3-utils');
+const fs = require('fs');
+const promisify = require('util').promisify;
 
-const  options = require('./config/deployment.js').options
+const  options = require('./config/deployment.js').options;
 
-const defaultWeb3 = 'wss://testcore.evan.network/ws'
-const defaultDFS = {host: 'ipfs.test.evan.network', port: '443', protocol: 'https'}
+const defaultWeb3 = 'wss://testcore.evan.network/ws';
+const defaultDFS = {host: 'ipfs.test.evan.network', port: '443', protocol: 'https'};
 
-let accessProfiles = {}
-let createProfiles = {}
-let createdProfiles = {}
+let accessProfiles = {};
+let managedProfiles = {};
+let createdProfiles = {};
 
 // the account sources to add
 try{ accessProfiles = require('./config/externalAccounts.js') }
 catch(e) { if (e.code !== "MODULE_NOT_FOUND") throw e }
-try{ createProfiles = require('./config/managedProfiles.js') }
+try{ managedProfiles = require('./config/managedProfiles.js') }
 catch(e) { if (e.code !== "MODULE_NOT_FOUND") throw e }
 
 // createdProfiles can change doring execution, and is written back then
 try{ createdProfiles = require('./config/createdProfiles.json') }
 catch(e) { if (e.code !== "MODULE_NOT_FOUND") throw e }
 
-function sha9(a, b) { return sha3.apply(sha3, [sha3(a), sha3(b)].sort()) }
-
-/*
-function example_gulp_plugin() {
-  const transformStream = new Transform({objectMode: true})
-
-  transformStream._transform = async (file, encoding, callback) => {
-  }
-  return transformStream;
-}
-*/
-
-function findAccount(key, runtimeConfig) {
-  if(key.startsWith('0x')) return key
-  if(runtimeConfig.accountMap[key]) return runtimeConfig.accountMap[key]
-  return undefined
+function sha9(a, b) { 
+  return sha3.apply(sha3, [sha3(a), sha3(b)].sort());
 }
 
 /*
@@ -65,7 +47,6 @@ function findAccount(key, runtimeConfig) {
                actual account fields are filled in from account config files and accountCfg
   accountCfg - you can provide accessProfiles via argument that will be merged with what is read from the file
 */
-
 function getAccountConfig(evanConfig = {}, accountConfig = {}, createConfig = {} ) {
 
   // default runtime config
@@ -80,58 +61,62 @@ function getAccountConfig(evanConfig = {}, accountConfig = {}, createConfig = {}
 
   Object.assign(config, evanConfig)
 
-  function mapAccount(a, c) {
-    if(!c.id || !c.privateKey || !c.profileKey) return console.log('skipped loading account ', a)
+  function mapAccount(profileName, profile) {
+    if(!profile.id || !profile.privateKey || !profile.profileKey) {
+      return console.log('Skipped loading account ', profileName)
+    }
 
-    config.accounts.push(c.id)
-    config.accountMap[c.id] = c.privateKey
-    config.keyConfig[sha3(c.id)] = c.profileKey
-    config.keyConfig[sha9(c.id, c.id)] = c.profileKey
+    config.accounts.push(profile.id)
+    config.accountMap[profile.id] = profile.privateKey
+    config.keyConfig[sha3(profile.id)] = profile.profileKey
+    config.keyConfig[sha9(profile.id, profile.id)] = profile.profileKey
   }
 
   Object.assign(accessProfiles, accountConfig)
-  Object.assign(createProfiles, createConfig)
+  Object.assign(managedProfiles, createConfig)
 
 
-  for(const a in accessProfiles)
-    mapAccount(a, accessProfiles[a])
+  for(const profile in accessProfiles) {
+    mapAccount(profile, accessProfiles[profile])
+  }
 
   // first fetch the accounts to create from the original runtime config
-  for(let mn in config.aliases) {
-    const alias = config.aliases[mn]
-    const cc = createdProfiles.accounts[alias]
-    if(cc) {
-      mapAccount(a,cc)
-      console.log('Already created, loading ', alias)
+  for(let aliasName in config.aliases) {
+    const alias = config.aliases[aliasName];
+    const account = createdProfiles.accounts[alias];
+    if(account) {
+      mapAccount(alias, account);
+      console.log('Already created, loading ', alias);
     }
   }
 
-  let create = {}
-  for(const a in createProfiles) {
-    const c = createProfiles[a]
-    const cc = createdProfiles[a]
+  for(const profileName in managedProfiles) {
+    const managedProfile = managedProfiles[profileName];
+    const createdProfile = createdProfiles[profileName];
 
-    if(cc) mapAccount(a,cc)
-    if(!c.mnemonic || !c.password || !c.alias) console.log('skipped creating account ', a)
+    if(createdProfile) {
+      mapAccount(profileName, createdProfile);
+    }
+
+    if(!managedProfile.mnemonic || !managedProfile.password || !managedProfile.alias) {
+      console.log('skipped creating account ', profileName);
+    }
     else {
-      config.ensureProfiles = true
-      // set up profile creation fields in config
-      create[a] = c
-
-      config.mnemonics[c.mnemonic] = c.password
-      config.aliases[c.mnemonic] = c.alias
-      if(c.contacts && c.contacts.length) {
-        const key = c.id || c.mnemonic
-        config.contactConfig[key] = []
-        for(let contactName of c.contacts) {
-          const contact = accessProfiles[contactName] || createProfiles[contactName]
-          config.contactConfig[key].push(contact.id || contact.mnemonic)
+      config.ensureProfiles = true;
+      config.mnemonics[managedProfile.mnemonic] = managedProfile.password;
+      config.aliases[managedProfile.mnemonic] = managedProfile.alias;
+      if(managedProfile.contacts && managedProfile.contacts.length) {
+        const key = managedProfile.id || managedProfile.mnemonic;
+        config.contactConfig[key] = [];
+        for(let contactName of managedProfile.contacts) {
+          const contact = accessProfiles[contactName] || managedProfiles[contactName];
+          config.contactConfig[key].push(contact.id || contact.mnemonic);
         }
       }
     }
   }
 
-  config.activeAccount = config.activeAccount || config.accounts[0]
+  config.activeAccount = config.activeAccount || config.accounts[0];
 
   return config
 }
@@ -143,22 +128,27 @@ async function cacheProfiles(config) {
 
   const createRTCache = {}
   for(let mn in config.mnemonic2account) {
-    const a = config.mnemonic2account[mn]
+    const accountId = config.mnemonic2account[mn]
 
     let addToCache = true
 
-    for(let cp in createdProfiles) if(cp.id === a) { addToCache = false; break }
+    for(let profile in createdProfiles) {
+      if(profile.id === accountId) { 
+        addToCache = false; 
+        break;
+      } 
+    }
 
     if (addToCache) {
 
-      console.log('caching ', config.aliases[mn],'/',a)
+      console.log('caching ', config.aliases[mn],'/',accountId)
       createRTCache[config.aliases[mn]] = {
-        id: a,
+        id: accountId,
         alias: config.aliases[mn],
         mnemonic: mn,
         password: config.mnemonics[mn],
-        privateKey: config.accountMap[a],
-        profileKey: config.keyConfig[sha3(a)],
+        privateKey: config.accountMap[accountId],
+        profileKey: config.keyConfig[sha3(accountId)],
         contacts: [],
       }
     }
@@ -167,25 +157,26 @@ async function cacheProfiles(config) {
   if(Object.keys(createRTCache).length) {
     Object.assign(createdProfiles, createRTCache)
 
-    return pfy(fs.writeFile)( __dirname + '/config/createdProfiles.json', JSON.stringify(createdProfiles,null,2))
+    return promisify(fs.writeFile)( __dirname + '/config/createdProfiles.json', JSON.stringify(createdProfiles,null,2))
   }
 }
 
 
 // this just loads existing accounts, cached or preconfigured
 // if you want to create profiles, don't use this, it never loads the profile-helpers
-
 async function init(cfg = {}) {
   // if we really want to support mulitple different blockchain cores with different cfg at the same time,
   // we need a real stack to manage this
-  ++busy
-  if (bcc) return bcc
-  cfg = Object.assign(options, cfg)
-  cfg = getAccountConfig(cfg)
+  busy += 1
+  if (bcc) {
+    return bcc
+  }
+  cfg = Object.assign(options, cfg);
+  cfg = getAccountConfig(cfg);
 
   // important!
   cfg.keyConfig[sha3('mailboxKeyExchange')] =
-    '346c22768f84f3050f5c94cec98349b3c5cbfa0b7315304e13647a4918ffff22'     // accX <--> mailbox edge key
+    '346c22768f84f3050f5c94cec98349b3c5cbfa0b7315304e13647a4918ffff22';     // accX <--> mailbox edge key
 
   const provider = new Web3.providers.WebsocketProvider(
     runtimeConfig.web3Provider, { clientConfig: { keepalive: true, keepaliveInterval: 5000 } });
@@ -196,58 +187,50 @@ async function init(cfg = {}) {
     accountId:
     cfg.accounts[0],
     privateKey:cfg.accountMap[cfg.accounts[0]]
-  })
+  });
 
   return createDefaultRuntime(web3, dfs, cfg)
     .then(v => {
       v.accounts = cfg.accounts
       bcc = v;
       console.log('Connected to evan.network as ', v.accounts[0]);
-      return v})
-    .catch(e => { throw e })
+      return v
+    })
 }
 
 function close() {
-  if( --busy && !bcc) return
-  bcc.web3.currentProvider.connection.close()
-  bcc.dfs.stop().then(() => process.exit(0))
+  busy -= 1;
+  if( busy && !bcc) {
+    return;
+  }
+  bcc.web3.currentProvider.connection.close();
+  bcc.dfs.stop().then(() => process.exit(0));
 }
 
 function upload(files) {
-  const live = 'live/'
+  const live = 'live/';
   files = Array.isArray(files) ? files : [files]
   return  async () => {
-    const ei = init()
-    // TODO: check file dates to only upload if new
-    //const ifiles = await Promise.all(files.map( v => pfy(fs.stat)(v) ))
-    //const lfiles = await Promise.all(files.map( v => pfy(fs.stat)(live+v) ))
-
-    //const ffiles
-    const pfiles = await Promise.all(files.map(f => pfy(fs.readFile)(f)))
+    const fileContents = await Promise.all(files.map(f => promisify(fs.readFile)(f)))
 
     const args = []
-    for(let i in files)
-      args.push({ path: files[i], content: pfiles[i] })
+    for(let i in files) {
+      args.push({ path: files[i], content: fileContents[i] })
+    }
 
-    await ei
+    await init()
     const hashes = await bcc.dfs.addMultiple(args)
     const map = {}
-    for(let i in hashes) map[files[i]] = hashes[i]
-    await Promise.all(hashes.map((v,i) => pfy(fs.appendFile)(live + files[i], Ipfs.bytes32ToIpfsHash(hashes[i])+'\n', 'utf-8')))
+    for(let i in hashes) {
+      map[files[i]] = hashes[i]
+    }
+    await Promise.all(
+      hashes.map((v,i) => promisify(fs.appendFile)(live + files[i], Ipfs.bytes32ToIpfsHash(hashes[i])+'\n', 'utf-8'))
+    )
     close()
 
     return map
   }
 }
 
-function download() {
-
-  return async () => {
-    //const ei = await init()
-    //const cfg = getAcccountConfig(options)
-
-    //close()
-  }
-}
-
-module.exports = { bcc, init, close, upload, download, getAccountConfig, cacheProfiles }
+module.exports = { bcc, init, close, upload, getAccountConfig, cacheProfiles }
