@@ -1,11 +1,10 @@
-const { runtimeConfig, bcConfig } = require('./config/deployment');
+const { bcConfig } = require('./config/deployment');
 const { Logger, } = require('@evan.network/dbcp');
 
 const createBusinessCenter = async function(runtime, accountId, ensDomain, joinSchema = 0, oldBusinessCenterContractId, bcOwner) {
   const log = (new Logger()).logFunction;
 
   log('retrieving admin factory');
-  var getOptions = () => ({from: accountId, gas: 4000000});
   const adminFactoryContractAddress = await runtime.nameResolver.getAddress(runtime.nameResolver.getDomainName(bcConfig.nameResolver.domains.adminFactory));
 
   const adminFactory = runtime.contractLoader.loadContract('BusinessCenterFactory', adminFactoryContractAddress);

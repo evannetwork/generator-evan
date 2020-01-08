@@ -1,7 +1,5 @@
 const { createDefaultRuntime, Ipfs } = require('@evan.network/api-blockchain-core');
-const IpfsApi = require('ipfs-api');
 const Web3 = require('web3');
-
 const { accountAndKey, buildKeyConfig } = require('./profiles-helper');
 const { runtimeConfig } = require('./config/deployment');
 
