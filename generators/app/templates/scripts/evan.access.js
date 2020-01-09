@@ -156,8 +156,7 @@ async function cacheProfiles(config) {
 
   if(Object.keys(createRTCache).length) {
     Object.assign(createdProfiles, createRTCache)
-
-    return promisify(fs.writeFile)( __dirname + '/config/createdProfiles.json', JSON.stringify(createdProfiles,null,2))
+    return promisify(fs.writeFile)( __dirname + '/config/createdProfiles.json', JSON.stringify(createdProfiles, null, 2))
   }
 }
 

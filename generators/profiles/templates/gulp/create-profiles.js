@@ -21,7 +21,7 @@ let web3;
 let dfs;
 let runtimes;
 
-gulp.task('init-profiles', async () => {
+gulp.task('init-profiles', gulp.series(async () => {
   const provider = new Web3.providers.WebsocketProvider(runtimeConfig.web3Provider);
   web3 = new Web3(provider, null, { transactionConfirmationBlocks: 1 });
 
@@ -36,7 +36,7 @@ gulp.task('init-profiles', async () => {
   })
   runtimes = await createRuntimes(web3, runtimeConfig);
   return evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
-})
+}))
 
 gulp.task('ensure-profiles', gulp.series(['init-profiles']), async () => {
   await ensureProfiles(runtimes, runtimeConfig);
@@ -66,7 +66,7 @@ gulp.task('create-profiles', gulp.series(['init-profiles']), async () => {
   await addBookmarks(runtimes, runtimeConfig);
   await addToBusinessCenters(runtimes, runtimeConfig);
   await inviteToContracts(runtimes, runtimeConfig);
-  await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
+  evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
 gulp.task('default', gulp.series(['create-profiles']))

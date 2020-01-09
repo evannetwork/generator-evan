@@ -1,5 +1,4 @@
 const { promisify } = require('util');
-const Web3 = require('web3');
 const readline = require('readline');
 const rl = readline.createInterface({
   input: process.stdin,
@@ -7,14 +6,16 @@ const rl = readline.createInterface({
 });
 
 const prottle = require('prottle');
-Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){} });
+// Fix Error: More than one instance of bitcore-lib found. Please make sure to require bitcore-lib
+// and check that submodules do not also include their own bitcore-lib dependency.
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: true });
 const keystore = require('eth-lightwallet/lib/keystore');
 
 const {
   createDefaultRuntime,
   Profile,
+  Ipfs
 } = require('@evan.network/api-blockchain-core');
-
 
 const prottleMaxRequests = 10;
 
@@ -23,7 +24,17 @@ function accountAndKey(key, cfg) {
           { accountId: key, lookup: key  } : { accountId: cfg.mnemonic2account[key], lookup: key });
 }
 
- async function address(key, rt) { return key ? (key.startsWith('0x')) ? key : rt.nameResolver.getAddress(key) : null }
+async function address(key, rt) { 
+  if (!key) {
+    return null;
+  }
+
+  if (key.startsWith('0x')) {
+    return key;
+  } else {
+    return rt.nameResolver.getAddress(key) 
+  }
+}
 
 module.exports = {
   buildKeyConfig: async (web3, runtimeConfig) =>  {
@@ -42,7 +53,7 @@ module.exports = {
       vault.generateNewAddress(pwDerivedKey, 1);
       const accountId = web3.utils.toChecksumAddress(vault.getAddresses()[0]);
       const pKey = vault.exportPrivateKey(accountId.toLowerCase(), pwDerivedKey);
-      const dataKey = web3.utils.sha3(runtimeConfig.mnemonics[mnemonic]).substr(2);
+      const dataKey = web3.utils.sha3(accountId + runtimeConfig.mnemonics[mnemonic]).substr(2);
       runtimeConfig.accounts.push(accountId);
       runtimeConfig.accountMap[accountId] = pKey;
       runtimeConfig.keyConfig[web3.utils.soliditySha3(accountId)] = dataKey;
@@ -102,7 +113,6 @@ module.exports = {
       return async () => {
         console.log(`checking profile for ${account}`);
         if (! await accountRuntime.profile.exists()) {
-        // if (true) {
           console.log(`creating profile for ${account}`);
           const keys = await accountRuntime.keyExchange.getDiffieHellmanKeys();
           await accountRuntime.profile.createProfile(keys);
@@ -141,7 +151,6 @@ module.exports = {
               accountAndKey(split[0], runtimeConfig).accountId);
             console.log(`checking key exchange from ${accountId} with user ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
-            // if (false) {
               console.log(`key found from ${accountId} with user ${targetAccount}`);
             } else {
               console.log(`exchanging keys from ${accountId} with user ${targetAccount}`);
@@ -165,7 +174,6 @@ module.exports = {
             const targetAccount = split[split.length - 1];
             console.log(`checking key exchange from ${accountId} with account ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
-            // if (false) {
               console.log(`key found from ${accountId} with account ${targetAccount}`);
             } else {
               const agentProfile = new Profile({

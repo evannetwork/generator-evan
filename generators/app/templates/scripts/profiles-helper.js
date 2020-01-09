@@ -6,9 +6,8 @@ const rl = readline.createInterface({
 });
 
 const prottle = require('prottle');
-delete global._bitcore;   // -.-
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: true });
 const keystore = require('eth-lightwallet/lib/keystore');
-delete global._bitcore;   // -.-
 
 const {
   createDefaultRuntime,
