@@ -1,5 +1,4 @@
-const gulp = require('gulp')
-const IpfsApi = require('ipfs-api');
+const {series, task} = require('gulp')
 const Web3 = require('web3');
 const { Ipfs, } = require('@evan.network/api-blockchain-core');
 
@@ -18,10 +17,9 @@ const runtimeConfig = require('../scripts/config/deployment.js').runtimeConfig;
 const evan = require('../scripts/evan.access.js');
 
 let web3;
-let dfs;
 let runtimes;
 
-gulp.task('init-profiles', async () => {
+task('init-profiles', async () => {
   const provider = new Web3.providers.WebsocketProvider(runtimeConfig.web3Provider);
   web3 = new Web3(provider, null, { transactionConfirmationBlocks: 1 });
 
@@ -38,35 +36,52 @@ gulp.task('init-profiles', async () => {
   return evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
 
-gulp.task('ensure-profiles', gulp.series(['init-profiles']), async () => {
+task('ensure-profiles', series(['init-profiles']), async () => {
   await ensureProfiles(runtimes, runtimeConfig);
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
 })
+const ensureProfilesSeries = 
 
-gulp.task('exchange-keys', gulp.series(['init-profiles', 'ensure-profiles']), async () => {
+async function exchangeKeysTask() {
   await exchangeKeys(runtimes, runtimeConfig);
-})
+}
+const exchangeKeysSeries = series(initProfilesTask, ensureProfilesTask, exchangeKeysTask);
+exchangeKeysSeries.displayName = 'exchange-keys';
 
-gulp.task('add-bookmarks', gulp.series(['init-profiles', 'ensure-profiles']), async () => {
+async function addBookmarksTask() {
   await addBookmarks(runtimes, runtimeConfig);
-})
+}
+const addBookmarksSeries = series(initProfilesTask, ensureProfilesTask, addBookmarksTask)
+addBookmarksSeries.displayName = 'add-bookmarks';
 
-gulp.task('add-to-business-centers', gulp.series(['init-profiles']), async () => {
-  await addToBusinessCenters(runtimes, runtimeConfig);
-})
+async function addToBusinessCentersTask(){
+  addToBusinessCenters(runtimes, runtimeConfig);
+}
+const addToBusinessCentersSeries = series(initProfilesTask, addToBusinessCentersTask);
+addToBusinessCentersSeries.displayName = 'add-to-business-centers';
 
-gulp.task('invite-to-contracts', gulp.series(['init-profiles']), async () => {
+async function inviteToContractsTask(done) {
   await inviteToContracts(runtimes, runtimeConfig);
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
-})
+}
+const inviteToContractsSeries = series(initProfilesTask, inviteToContractsTask);
+inviteToContractsSeries.displayName = 'invite-to-contracts';
 
-gulp.task('create-profiles', gulp.series(['init-profiles']), async () => {
+async function createProfilesTask() {
   await ensureProfiles(runtimes, runtimeConfig);
   await exchangeKeys(runtimes, runtimeConfig);
   await addBookmarks(runtimes, runtimeConfig);
   await addToBusinessCenters(runtimes, runtimeConfig);
   await inviteToContracts(runtimes, runtimeConfig);
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
-})
+}
+const createProfilesSeries = series(initProfilesTask, createProfilesTask);
+createProfiles.displayName = 'create-profiles'
 
-gulp.task('default', gulp.series(['create-profiles']))
+
+exports.createProfilesSeries = createProfilesSeries;
+exports.inviteToContractsSeries = inviteToContractsSeries;
+exports.addToBusinessCentersSeries = addToBusinessCentersSeries;
+exports.addBookmarksSeries = addBookmarksSeries;
+exports.exchangeKeysSeries = exchangeKeysSeries;
+exports.default = createProfiles;
