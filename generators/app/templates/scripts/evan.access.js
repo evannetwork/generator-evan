@@ -190,7 +190,7 @@ async function init(cfg = {}) {
 
   return createDefaultRuntime(web3, dfs, cfg)
     .then(v => {
-      v.accounts = cfg.accounts
+      v.accounts = cfg.accounts;
       bcc = v;
       console.log('Connected to evan.network as ', v.accounts[0]);
       return v
