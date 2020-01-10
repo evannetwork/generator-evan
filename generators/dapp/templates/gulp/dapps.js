@@ -123,7 +123,7 @@ const buildDApp = async (dappDir) => {
 }
 
 // Run Express, auto rebuild and restart on src changes
-gulp.task('dapps-serve', gulp.series( async () => {
+gulp.task('dapps-serve', gulp.series(async () => {
   dappDirs.forEach(dappDir =>
     gulp.watch(`${dappDir}/src/**/*`, (event) => buildDApp(dappDir))
   );
