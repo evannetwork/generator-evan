@@ -221,7 +221,7 @@ function upload(files) {
     const hashes = await bcc.dfs.addMultiple(args)
     const map = {}
     for(let i in hashes) {
-      map[files[i]] = hashes[i]
+      map[files[i]] = hashes[i];
     }
     await Promise.all(
       hashes.map((v,i) => promisify(fs.appendFile)(live + files[i], Ipfs.bytes32ToIpfsHash(hashes[i])+'\n', 'utf-8'))
