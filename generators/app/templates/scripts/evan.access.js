@@ -232,4 +232,4 @@ function upload(files) {
   }
 }
 
-module.exports = { bcc, init, close, upload, getAccountConfig, cacheProfiles }
+module.exports = { bcc, init, close, upload, getAccountConfig, cacheProfiles };
