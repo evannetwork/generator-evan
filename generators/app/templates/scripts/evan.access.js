@@ -208,7 +208,7 @@ function close() {
 
 function upload(files) {
   const live = 'live/';
-  files = Array.isArray(files) ? files : [files]
+  files = Array.isArray(files) ? files : [files];
   return  async () => {
     const fileContents = await Promise.all(files.map(f => promisify(fs.readFile)(f)))
 
