@@ -214,7 +214,7 @@ function upload(files) {
 
     const args = []
     for(let i in files) {
-      args.push({ path: files[i], content: fileContents[i] })
+      args.push({ path: files[i], content: fileContents[i] });
     }
 
     await init()
