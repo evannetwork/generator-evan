@@ -166,7 +166,7 @@ async function cacheProfiles(config) {
 async function init(cfg = {}) {
   // if we really want to support mulitple different blockchain cores with different cfg at the same time,
   // we need a real stack to manage this
-  busy += 1
+  busy += 1;
   if (bcc) {
     return bcc
   }
