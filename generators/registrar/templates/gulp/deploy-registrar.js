@@ -1,5 +1,4 @@
 const gulp = require('gulp')
-const IpfsApi = require('ipfs-api');
 const Web3 = require('web3');
 const { createDefaultRuntime, Ipfs, } = require('@evan.network/api-blockchain-core');
 
@@ -14,7 +13,7 @@ let web3;
 let dfs;
 let runtime;
 
-gulp.task('init', async () => {
+gulp.task('init', gulp.series(async () => {
   if (!runtimeConfig.registrar.domainParentOwner ||
       !runtimeConfig.registrar.domainParentOwnerKey) {
     throw new Error('Missing ens parent domain owner setup. ' +
@@ -35,7 +34,7 @@ gulp.task('init', async () => {
     privateKey: runtimeConfig.registrar.domainParentOwnerKey
   })
   runtime = await createDefaultRuntime(web3, dfs, ensOwnerRuntimeConfig);
-})
+}))
 
 gulp.task('deploy-registrar', gulp.series(['init']), async () => {
   await deployRegistrar(runtime, runtimeConfig);

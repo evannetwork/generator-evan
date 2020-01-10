@@ -13,8 +13,9 @@ const getAgents = source => fs.readdirSync(source).map(name => path.join(source,
       .filter(isAgent).map(f => path.basename(f))
 
 const agents = getAgents('../../..')
-for(let a of agents)
+for(let a of agents) {
   plugins[a] = { path: pluginPrefix + a }
+}
 
 exports['default'] = {
   plugins: (api) => {
