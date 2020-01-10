@@ -168,7 +168,7 @@ async function init(cfg = {}) {
   // we need a real stack to manage this
   busy += 1;
   if (bcc) {
-    return bcc
+    return bcc;
   }
   cfg = Object.assign(options, cfg);
   cfg = getAccountConfig(cfg);
