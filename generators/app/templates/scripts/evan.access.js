@@ -217,7 +217,7 @@ function upload(files) {
       args.push({ path: files[i], content: fileContents[i] });
     }
 
-    await init()
+    await init();
     const hashes = await bcc.dfs.addMultiple(args)
     const map = {}
     for(let i in hashes) {
