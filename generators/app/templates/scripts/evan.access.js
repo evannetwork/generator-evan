@@ -226,7 +226,7 @@ function upload(files) {
     await Promise.all(
       hashes.map((v,i) => promisify(fs.appendFile)(live + files[i], Ipfs.bytes32ToIpfsHash(hashes[i])+'\n', 'utf-8'))
     )
-    close()
+    close();
 
     return map
   }
