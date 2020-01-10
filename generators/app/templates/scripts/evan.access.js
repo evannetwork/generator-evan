@@ -199,7 +199,7 @@ async function init(cfg = {}) {
 
 function close() {
   busy -= 1;
-  if( busy && !bcc) {
+  if(busy && !bcc) {
     return;
   }
   bcc.web3.currentProvider.connection.close();
