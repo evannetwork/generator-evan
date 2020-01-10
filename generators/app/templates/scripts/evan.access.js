@@ -228,7 +228,7 @@ function upload(files) {
     )
     close();
 
-    return map
+    return map;
   }
 }
 
