@@ -73,6 +73,7 @@ async function createProfilesTask() {
   await inviteToContracts(runtimes, runtimeConfig);
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
   await evan.cacheProfiles(runtimeConfig); // so we can avoid checking on the network later
+
   web3.currentProvider.disconnect(1000);
   setTimeout(() => {console.log('Task finished successfully. Please press CTRL-C.')});
 }
