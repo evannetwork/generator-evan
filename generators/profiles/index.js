@@ -7,7 +7,7 @@ const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 // Notify using the built-in convenience method
 notifier.notify({defer:false});
 
-Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: false });
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: true });
 const keystore = require('eth-lightwallet/lib/keystore');
 const { createDefaultRuntime, Ipfs } = require(`@evan.network/api-blockchain-core`);
 const Web3 = require('web3');

@@ -16,6 +16,7 @@ const {
 const runtimeConfig = require('../scripts/config/deployment.js').runtimeConfig;
 const evan = require('../scripts/evan.access.js');
 
+
 let web3;
 let runtimes;
 
@@ -26,15 +27,10 @@ task('init-profiles', async () => {
   await buildKeyConfig(web3, runtimeConfig);
   await checkBalances(web3, runtimeConfig);
 
-  dfs = new Ipfs({
-    dfsConfig:runtimeConfig.ipfs,
-    web3: web3,
-    accountId: runtimeConfig.accounts[0],
-    privateKey: runtimeConfig.accountMap[runtimeConfig.accounts[0]]
-  })
   runtimes = await createRuntimes(web3, runtimeConfig);
+ 
   return evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
-})
+}]))
 
 task('ensure-profiles', series(['init-profiles']), async () => {
   await ensureProfiles(runtimes, runtimeConfig);
@@ -74,6 +70,9 @@ async function createProfilesTask() {
   await addToBusinessCenters(runtimes, runtimeConfig);
   await inviteToContracts(runtimes, runtimeConfig);
   await evan.cacheProfiles(runtimeConfig);   // so we can avoid checking on the network later
+
+  web3.currentProvider.disconnect(1000);
+  setTimeout(() => {console.log('Task finished successfully. Please press CTRL-C.')});
 }
 const createProfilesSeries = series(initProfilesTask, createProfilesTask);
 createProfiles.displayName = 'create-profiles'

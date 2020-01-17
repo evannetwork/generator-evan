@@ -156,8 +156,7 @@ async function cacheProfiles(config) {
 
   if(Object.keys(createRTCache).length) {
     Object.assign(createdProfiles, createRTCache)
-
-    return promisify(fs.writeFile)( __dirname + '/config/createdProfiles.json', JSON.stringify(createdProfiles,null,2))
+    return promisify(fs.writeFile)( __dirname + '/config/createdProfiles.json', JSON.stringify(createdProfiles, null, 2))
   }
 }
 
@@ -167,9 +166,9 @@ async function cacheProfiles(config) {
 async function init(cfg = {}) {
   // if we really want to support mulitple different blockchain cores with different cfg at the same time,
   // we need a real stack to manage this
-  busy += 1
+  busy += 1;
   if (bcc) {
-    return bcc
+    return bcc;
   }
   cfg = Object.assign(options, cfg);
   cfg = getAccountConfig(cfg);
@@ -191,7 +190,7 @@ async function init(cfg = {}) {
 
   return createDefaultRuntime(web3, dfs, cfg)
     .then(v => {
-      v.accounts = cfg.accounts
+      v.accounts = cfg.accounts;
       bcc = v;
       console.log('Connected to evan.network as ', v.accounts[0]);
       return v
@@ -200,7 +199,7 @@ async function init(cfg = {}) {
 
 function close() {
   busy -= 1;
-  if( busy && !bcc) {
+  if(busy && !bcc) {
     return;
   }
   bcc.web3.currentProvider.connection.close();
@@ -209,28 +208,28 @@ function close() {
 
 function upload(files) {
   const live = 'live/';
-  files = Array.isArray(files) ? files : [files]
+  files = Array.isArray(files) ? files : [files];
   return  async () => {
-    const fileContents = await Promise.all(files.map(f => promisify(fs.readFile)(f)))
+    const fileContents = await Promise.all(files.map(f => promisify(fs.readFile)(f)));
 
     const args = []
     for(let i in files) {
-      args.push({ path: files[i], content: fileContents[i] })
+      args.push({ path: files[i], content: fileContents[i] });
     }
 
-    await init()
-    const hashes = await bcc.dfs.addMultiple(args)
-    const map = {}
+    await init();
+    const hashes = await bcc.dfs.addMultiple(args);
+    const map = {};
     for(let i in hashes) {
-      map[files[i]] = hashes[i]
+      map[files[i]] = hashes[i];
     }
     await Promise.all(
       hashes.map((v,i) => promisify(fs.appendFile)(live + files[i], Ipfs.bytes32ToIpfsHash(hashes[i])+'\n', 'utf-8'))
     )
-    close()
+    close();
 
-    return map
+    return map;
   }
 }
 
-module.exports = { bcc, init, close, upload, getAccountConfig, cacheProfiles }
+module.exports = { bcc, init, close, upload, getAccountConfig, cacheProfiles };

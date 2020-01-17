@@ -1,9 +1,6 @@
-const { lstatSync, readdirSync } = require('fs');
 const gulp = require('gulp');
 const path = require('path');
-const del = require('del');
-const exec = require('child_process').exec;
-const { runExec, scriptsFolder, isDirectory, getDirectories, nodeEnv } = require('./lib');
+const { runExec, getDirectories, nodeEnv } = require('./lib');
 
 const dappDirs = getDirectories(path.resolve('../dapps'));
 let longestDAppName = 0;
@@ -126,16 +123,16 @@ const buildDApp = async (dappDir) => {
 }
 
 // Run Express, auto rebuild and restart on src changes
-gulp.task('dapps-serve', () => {
+gulp.task('dapps-serve', gulp.series(async () => {
   dappDirs.forEach(dappDir =>
     gulp.watch(`${dappDir}/src/**/*`, (event) => buildDApp(dappDir))
   );
 
   setTimeout(() => logServing());
-});
+}));
 
 // Run Express, auto rebuild and restart on src changes
-gulp.task('dapps-build', async function () {
+gulp.task('dapps-build', gulp.series(async function () {
   for (let dappDir of dappDirs) {
     try {
       // navigate to the dapp dir and run the build command
@@ -144,6 +141,6 @@ gulp.task('dapps-build', async function () {
       console.error(ex);
     }
   }
-});
+}));
 
 gulp.task('default', gulp.series([ 'dapps-build' ]));
