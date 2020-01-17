@@ -13,6 +13,6 @@ gulp.task('evan-access', gulp.series((cb) => {
     .catch(err => { cb(err) })
 }))
 
-gulp.task('build', gulp.series(() => { if(!fs.existsSync(buildFolder)) fs.mkdirSync(buildFolder) }))
+gulp.task('build', gulp.series((cb) => { if(!fs.existsSync(buildFolder)) fs.mkdirSync(buildFolder); cb(); }))
 gulp.task('compile-contracts', gulp.series(['build']), ch.compile('contracts', '../build/contracts') )
 gulp.task('default', gulp.series(['compile-contracts']))
