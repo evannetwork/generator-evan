@@ -1,6 +1,6 @@
 // Fix Error: More than one instance of bitcore-lib found. Please make sure to require bitcore-lib
 // and check that submodules do not also include their own bitcore-lib dependency.
-Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){} });
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: true });
 
 const Generator = require('yeoman-generator');
 const path = require('path');

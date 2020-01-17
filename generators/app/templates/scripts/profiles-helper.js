@@ -1,19 +1,15 @@
 const { promisify } = require('util');
 const readline = require('readline');
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 
 const prottle = require('prottle');
-delete global._bitcore;   // -.-
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: true });
 const keystore = require('eth-lightwallet/lib/keystore');
-delete global._bitcore;   // -.-
 
 const {
   createDefaultRuntime,
   Profile,
-  Ipfs
+  Ipfs,
+  Onboarding
 } = require('@evan.network/api-blockchain-core');
 
 const prottleMaxRequests = 10;
@@ -70,8 +66,13 @@ module.exports = {
       const balance = parseInt(await web3.eth.getBalance(account), 10);
       if (balance < runtimeConfig.minBalance) {
         notEnoughBalance = true;
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
         console.log(`account ${account} does not have enough funds (${web3.utils.fromWei(balance.toString())} EVE)`)
         await promisify(rl.question).bind(rl)('Get funds at https://gitter.im/evannetwork/faucet and then press a key.');
+        rl.close();
         const balance2 = parseInt(await web3.eth.getBalance(account), 10);
         if(balance2 < runtimeConfig.minBalance) {
           console.warn(`${account} still has insufficient funds.`)
@@ -114,7 +115,12 @@ module.exports = {
         if (! await accountRuntime.profile.exists()) {
           console.log(`creating profile for ${account}`);
           const keys = await accountRuntime.keyExchange.getDiffieHellmanKeys();
-          await accountRuntime.profile.createProfile(keys);
+          await Onboarding.createProfile(accountRuntime, {
+            accountDetails:{
+              profileType: 'user',
+              accountName: account,
+            }
+          });
           const alias = runtimeConfig.aliases[mnemonic] || runtimeConfig.aliases[account];
           if (alias) {
             console.log(`setting alias for ${account}`);
