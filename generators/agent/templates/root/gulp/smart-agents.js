@@ -2,7 +2,7 @@ const gulp = require('gulp')
 const path = require('path')
 const fs = require('fs')
 
-gulp.task('link-agents', gulp.series(async function() {
+function linkAgents(cb) {
   const plugins = path.resolve(process.cwd(),'node_modules/@evan.network/edge-server-seed/config/plugins.js')
   const source_plugins = '../../../../scripts/config/plugins.js'
   try {
@@ -33,4 +33,10 @@ gulp.task('link-agents', gulp.series(async function() {
         }
       })
     });
-}));
+    cb();
+}
+
+linkAgents.displayName = 'link-agents';
+
+exports.linkAgents = linkAgents;
+exports.default = linkAgents;
