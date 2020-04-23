@@ -6,6 +6,7 @@
 ### Fixes
 
 ### Deprecations
+- remove dapp generators
 
 
 ## Version 1.12.3

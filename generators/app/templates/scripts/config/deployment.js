@@ -23,7 +23,6 @@ const bcConfig = {
       profile: process.env.ENS_PROFILES || ['profile', 'ensRoot'],
       profileFactory: ['profile', 'factory', 'ensRoot'],
       mailbox: process.env.ENS_MAILBOX || ['mailbox', 'ensRoot'],
-      dappsDomain: '<%= dappsDomain %>',
     },
   },
   smartAgents: {
@@ -92,22 +91,7 @@ let runtimeConfig = {
   },
 }
 
-const dappConfigSwitches = {
-  // deployment specific custom configurations
-  url: {
-    coreSmartAgent: 'https://agents.test.evan.network',
-    paymentSmartAgent: 'https://payments.test.evan.network',
-  },
-  accounts: {
-    faucetAccount: '0x4a6723fC5a926FA150bAeAf04bfD673B056Ba83D',
-    paymentAgentAccount: '0xAF176885bD81D5f6C76eeD23fadb1eb0e5Fe1b1F',
-    paymentChannelManagerAccount: '0x0A0D9dddEba35Ca0D235A4086086AC704bbc8C2b',
-  },
-  gasPrice: 20000000000,
-  mainnetTexts: false
-};
-
 const evan = require('../evan.access.js')
 runtimeConfig = evan.getAccountConfig(runtimeConfig, externalAccounts, managedAccounts)
 
-module.exports = { bcConfig, runtimeConfig, dappConfigSwitches };
+module.exports = { bcConfig, runtimeConfig, };

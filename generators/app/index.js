@@ -145,8 +145,6 @@ module.exports = class extends Generator {
       this.answers.deploymentPrivateKey = '';
       this.answers.joinSchema = '';
     }
-
-    this.answers.deploymentConfigLocation = path.normalize(`${this.destinationPath()}/scripts/config/deployment.js`).replace(/\\/g, '\\\\');
   }
 
   /**

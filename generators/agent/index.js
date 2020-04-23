@@ -196,9 +196,6 @@ module.exports = class extends Generator {
     `);
   }
 
-  /**
-   * Copy files from a path under the templates directory into the specific dapp folder
-   */
   _copyTemplate(src, dst) {
     return this.fs.copyTpl(
       this.templatePath(src),
