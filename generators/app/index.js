@@ -98,7 +98,6 @@ module.exports = class extends Generator {
 
       const userRuntime = await getRuntime(mnemonic);
       const accountId = userRuntime.activeAccount;
-      this.answers.dappsDomain = `${domain}`.replace(/\.evan$/, '');
       this.answers.deploymentAccountId = accountId;
       this.answers.deploymentPrivateKey = await userRuntime.accountStore.getPrivateKey(accountId);
 
@@ -141,7 +140,6 @@ module.exports = class extends Generator {
       await userRuntime.dfs.stop();
       await userRuntime.web3.currentProvider.connection.close();
     } else {
-      this.answers.dappsDomain = '';
       this.answers.bcDomain = '';
       this.answers.deploymentAccountId = '';
       this.answers.deploymentPrivateKey = '';
