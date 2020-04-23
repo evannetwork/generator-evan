@@ -254,29 +254,6 @@ const runtimeConfig = {
 ```
 
 
-#### add-to-business-centers
-Configured in `./scripts/config/deployment.js`, `runtimeConfig.bookmarkDefinitions`.
-
-Business centers are defined as ENS addresses and a config for invites. The account configured as `owner` (configured as account ID, optional) may be used to invite the accounts configured as `members` - depending on the business centers join schema.
-
-Example configuration:
-```javascript
-const runtimeConfig = {
-  // ...
-  businessCenters: {
-    'sample.evan': {
-      owner: '0x0000000000000000000000000000000000000001',
-      members: [
-        'coconut tree unfold enforce swim wrap ritual brain sting avoid dust awesome',
-        'dress mother round decide ghost slide fire tennis salt injury stadium annual',
-      ],
-    },
-  },
-  // ...
-}
-```
-
-
 #### invite-to-contracts
 Configured in `./scripts/config/deployment.js`, `runtimeConfig.contracts`.
 
