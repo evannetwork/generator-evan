@@ -5,7 +5,6 @@ Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, 
 const Generator = require('yeoman-generator');
 const path = require('path');
 const { claimDomain, getRuntime } = require(`./templates/scripts/domain-helper.js`);
-const { createBusinessCenter } = require(`./templates/scripts/bc-helper.js`);
 const registrarDomainSuffix = '.fifs.registrar.test.evan';
 const registrarDomainLengh = registrarDomainSuffix.split('.').length;
 const updateNotifier = require('update-notifier');
@@ -92,7 +91,6 @@ module.exports = class extends Generator {
       this.answers.deploymentAccountId = accountId;
       this.answers.deploymentPrivateKey = await userRuntime.accountStore.getPrivateKey(accountId);
 
-      await userRuntime.dfs.stop();
       await userRuntime.web3.currentProvider.connection.close();
     } else {
       this.answers.deploymentAccountId = '';

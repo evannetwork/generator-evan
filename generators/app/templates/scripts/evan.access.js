@@ -203,7 +203,6 @@ function close() {
     return;
   }
   bcc.web3.currentProvider.connection.close();
-  bcc.dfs.stop().then(() => process.exit(0));
 }
 
 function upload(files) {

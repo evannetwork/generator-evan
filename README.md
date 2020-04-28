@@ -285,7 +285,7 @@ const runtimeConfig = {
 ## Generate ENS Registrar
 To add a deployment script for a custom registar to your project, run:
 ```
-yo evan:registar
+yo evan:registrar
 ```
 
 To create/ensure your registrar scripts are running
