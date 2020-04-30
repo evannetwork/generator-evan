@@ -78,7 +78,7 @@ async function createProfilesTask() {
   setTimeout(() => {console.log('Task finished successfully. Please press CTRL-C.')});
 }
 const createProfilesSeries = series(initProfilesTask, createProfilesTask);
-createProfiles.displayName = 'create-profiles'
+createProfilesSeries.displayName = 'create-profiles'
 
 
 exports.createProfilesSeries = createProfilesSeries;
@@ -88,4 +88,4 @@ exports.addBookmarksSeries = addBookmarksSeries;
 exports.exchangeKeysSeries = exchangeKeysSeries;
 exports.ensureProfilesSeries = ensureProfilesSeries;
 exports.initProfilesTask = initProfilesTask;
-exports.default = createProfiles;
+exports.default = createProfilesSeries;

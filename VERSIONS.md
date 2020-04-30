@@ -2,10 +2,14 @@
 
 ## Next Version
 ### Features
+- add `useIdentity` support
 
 ### Fixes
+- fix `npx link-agents`
 
 ### Deprecations
+- remove `business center` generator and helper libraries
+- remove `dapp` generator
 
 
 ## Version 1.12.3

@@ -1,7 +1,7 @@
 # generator-evan
 
 The generator-evan is an yeoman generator for evan.network projects. By using the generator you can
-easily create and handle smart-contracts, smart-agents and dapps.
+easily create and handle smart-contracts and smart-agents.
 
 <!-- MarkdownTOC autolink="true" -->
 
@@ -21,8 +21,6 @@ easily create and handle smart-contracts, smart-agents and dapps.
     - [invite-to-contracts](#invite-to-contracts)
 - [Generate ENS Registrar](#generate-ens-registrar)
 - [Generate smart-agent](#generate-smart-agent)
-- [Generate dapp](#generate-dapp)
-  - [DApp custom style](#dapp-custom-style)
 
 <!-- /MarkdownTOC -->
 
@@ -58,8 +56,6 @@ structure:
   - package.json: Development packages installed by npm
   - .gitignore: files that should be ignored by
   - git .npmrc: disabled package.lock.json
-  - lerna.json: management for nested lerna projects (needed for smart-agents, dapps, ...)
-  - config/deployment.js: DBCP deployment configuration, have a look into the readme.md file for more details
 
 
 ### Configuring External Accounts
@@ -258,29 +254,6 @@ const runtimeConfig = {
 ```
 
 
-#### add-to-business-centers
-Configured in `./scripts/config/deployment.js`, `runtimeConfig.bookmarkDefinitions`.
-
-Business centers are defined as ENS addresses and a config for invites. The account configured as `owner` (configured as account ID, optional) may be used to invite the accounts configured as `members` - depending on the business centers join schema.
-
-Example configuration:
-```javascript
-const runtimeConfig = {
-  // ...
-  businessCenters: {
-    'sample.evan': {
-      owner: '0x0000000000000000000000000000000000000001',
-      members: [
-        'coconut tree unfold enforce swim wrap ritual brain sting avoid dust awesome',
-        'dress mother round decide ghost slide fire tennis salt injury stadium annual',
-      ],
-    },
-  },
-  // ...
-}
-```
-
-
 #### invite-to-contracts
 Configured in `./scripts/config/deployment.js`, `runtimeConfig.contracts`.
 
@@ -312,7 +285,7 @@ const runtimeConfig = {
 ## Generate ENS Registrar
 To add a deployment script for a custom registar to your project, run:
 ```
-yo evan:registar
+yo evan:registrar
 ```
 
 To create/ensure your registrar scripts are running
@@ -383,59 +356,3 @@ After filling out all questions the needed files are copied to your project in t
 Because you can have multiple smart agents in your project, you must link them to the actionhero installed in your node_modules folder. To do so run the command "npx gulp link-agents" in your root project folder. After linking the smart agent you can run the server with the command "npm start".
 
 Then the smart agent starts and you can develop your logic as actions/initializers and so on.
-
-
-## Generate dapp
-
-To generate a new dapp for your project, you can use the following command:
-
-```bash
-yo evan:dapp
-```
-
-This sub generator will ask for each data that is needed to specify the basic structure of your
-dapp. Each new dapp will placed within the "dapps" folder of your basi project. You can shoose one
-of several templates for a fast development start.
-
-1. Angular 5
-  1. Single DApp = Mostly used for handling OnePage Apps for a Dashboard or Contract Select View.
-  2. Dashboard DApp = Represents a DApp that handles a Dashboard with left side panel navigation, that can organize and open other DApps.
-  3. DataContract DApp = A single DApp for creating and viewing a DataContract. The DApp includes the basic routing for contract addresses and the logic for creating a new data contract and setting some data.
-  4. Digital Twin = Create, view and change data of your own digital twin. The yeoman script will generate a customized formular for you, that allows to enter several metadata.
-
-2. VueJS
-  1. Hello World = DApp based on VueJS.
-
-After you created your DApp, you can now build your DApps by running:
-
-```bash
-npm run dapps-build
-```
-
-You can now start your local dev server by running:
-
-```bash
-npm run serve
-```
-
-After you started your local dev server, visit localhost:3000/dev.html.
-You can now open your DApp by adding it to your favorites using the dbcp name of your new DApp.
-
-More infos about DApps:
-
-- [DApp Tutorials](https://evannetwork.github.io/dapps/basics)
-- [API Reference UI](https://ipfs.test.evan.network/ipns/QmReXE5YkiXviaHNG1ASfY6fFhEoiDKuSkgY4hxgZD9Gm8)
-- [API Reference blockchain-core / DBCP](https://ipfs.test.evan.network/ipns/QmYmsPTdPPDLig6gKB1wu1De4KJtTqAXFLF1498umYs4M6)
-
-### DApp custom style
-
-The evan.network provides two color themes. The basic dark one, that is activated everywhere, and the light one, that can be activated by adding the **.evan-light** class to your dapps element. If you want to create a custom DApp styling, you can simply use the **@evan.network/ui-angular-sass** theme definitions. How to create custom themes, please have a look at the following documentation: [UI-SASS documentation](https://ipfs.test.evan.network/ipns/QmReXE5YkiXviaHNG1ASfY6fFhEoiDKuSkgY4hxgZD9Gm8/angular-sass/index.html)
-
-After your custom theme is defined, your DApp will include a full custom evan.network design. To enable this design, apply your custom-style class (or the evan-light class) to your dapp entrypoint element (e.g. within the index.ts of your DApp).
-
-```
-  ...
-  // Add project class name to the ion-app / .evan-dapp element for generalized styling
-  ionicAppEl.className += ' .evan-custom-style';
-  ...
-```
