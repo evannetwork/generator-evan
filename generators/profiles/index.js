@@ -7,7 +7,7 @@ const notifier = updateNotifier({pkg, updateCheckInterval: 0});
 // Notify using the built-in convenience method
 notifier.notify({defer:false});
 
-Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: false });
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: true });
 const keystore = require('eth-lightwallet/lib/keystore');
 const { createDefaultRuntime, Ipfs } = require(`@evan.network/api-blockchain-core`);
 const Web3 = require('web3');
@@ -148,7 +148,7 @@ module.exports = class extends Generator {
    * Copy all files from the origin into the destination and replace the placeholders.
    */
   writing() {
-    this._copyTemplateIntoDApps();
+    this._copyTemplate();
 
     console.log(`
       Scripts for managing profiles have been added to your project.
@@ -163,10 +163,7 @@ module.exports = class extends Generator {
     // close web3 connection to allow generator to exit
     runtime.web3.currentProvider.connection.close();
   }
-  /**
-   * Copy files from a path under the templates directory into the specific dapp folder
-   */
-  _copyTemplateIntoDApps() {
+  _copyTemplate() {
     this.fs.copyTpl(
       this.templatePath('**/{.[^.],}*'),
       this.destinationPath(`${ this.destinationRoot() }/`),

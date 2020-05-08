@@ -1,22 +1,16 @@
 const { promisify } = require('util');
-const Web3 = require('web3');
 const readline = require('readline');
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 
 const prottle = require('prottle');
-delete global._bitcore;   // -.-
+Object.defineProperty(global, '_bitcore', { get(){ return undefined }, set(){}, configurable: true });
 const keystore = require('eth-lightwallet/lib/keystore');
-delete global._bitcore;   // -.-
 
 const {
   createDefaultRuntime,
   Profile,
-  Ipfs
+  Ipfs,
+  Onboarding
 } = require('@evan.network/api-blockchain-core');
-
 
 const prottleMaxRequests = 10;
 
@@ -25,7 +19,17 @@ function accountAndKey(key, cfg) {
           { accountId: key, lookup: key  } : { accountId: cfg.mnemonic2account[key], lookup: key });
 }
 
- async function address(key, rt) { return key ? (key.startsWith('0x')) ? key : rt.nameResolver.getAddress(key) : null }
+async function address(key, rt) { 
+  if (!key) {
+    return null;
+  }
+
+  if (key.startsWith('0x')) {
+    return key;
+  } else {
+    return rt.nameResolver.getAddress(key) 
+  }
+}
 
 module.exports = {
   buildKeyConfig: async (web3, runtimeConfig) =>  {
@@ -62,8 +66,13 @@ module.exports = {
       const balance = parseInt(await web3.eth.getBalance(account), 10);
       if (balance < runtimeConfig.minBalance) {
         notEnoughBalance = true;
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
         console.log(`account ${account} does not have enough funds (${web3.utils.fromWei(balance.toString())} EVE)`)
         await promisify(rl.question).bind(rl)('Get funds at https://gitter.im/evannetwork/faucet and then press a key.');
+        rl.close();
         const balance2 = parseInt(await web3.eth.getBalance(account), 10);
         if(balance2 < runtimeConfig.minBalance) {
           console.warn(`${account} still has insufficient funds.`)
@@ -104,10 +113,14 @@ module.exports = {
       return async () => {
         console.log(`checking profile for ${account}`);
         if (! await accountRuntime.profile.exists()) {
-        // if (true) {
           console.log(`creating profile for ${account}`);
           const keys = await accountRuntime.keyExchange.getDiffieHellmanKeys();
-          await accountRuntime.profile.createProfile(keys);
+          await Onboarding.createProfile(accountRuntime, {
+            accountDetails:{
+              profileType: 'user',
+              accountName: account,
+            }
+          });
           const alias = runtimeConfig.aliases[mnemonic] || runtimeConfig.aliases[account];
           if (alias) {
             console.log(`setting alias for ${account}`);
@@ -143,7 +156,6 @@ module.exports = {
               accountAndKey(split[0], runtimeConfig).accountId);
             console.log(`checking key exchange from ${accountId} with user ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
-            // if (false) {
               console.log(`key found from ${accountId} with user ${targetAccount}`);
             } else {
               console.log(`exchanging keys from ${accountId} with user ${targetAccount}`);
@@ -167,7 +179,6 @@ module.exports = {
             const targetAccount = split[split.length - 1];
             console.log(`checking key exchange from ${accountId} with account ${targetAccount}`);
             if (await runtime.profile.getContactKey(targetAccount, 'commKey')) {
-            // if (false) {
               console.log(`key found from ${accountId} with account ${targetAccount}`);
             } else {
               const agentProfile = new Profile({

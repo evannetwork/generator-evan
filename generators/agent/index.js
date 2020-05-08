@@ -139,8 +139,10 @@ module.exports = class extends Generator {
    */
   async writing() {
     const pkg = this.fs.readJSON('./package.json')
+
     if(!pkg.dependencies['@evan.network/edge-server-seed']) {
       pkg.dependencies['@evan.network/edge-server-seed'] = '^1.0.0'
+      pkg.scripts = pkg.scripts || {}
       pkg.scripts['start'] = "cd node_modules/@evan.network/edge-server-seed && npm start"
       pkg.scripts['debug'] = "cd node_modules/@evan.network/edge-server-seed && npm run debug"
       this.fs.writeJSON('./package.json', pkg, null, 2)
@@ -196,9 +198,6 @@ module.exports = class extends Generator {
     `);
   }
 
-  /**
-   * Copy files from a path under the templates directory into the specific dapp folder
-   */
   _copyTemplate(src, dst) {
     return this.fs.copyTpl(
       this.templatePath(src),

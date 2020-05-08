@@ -21,7 +21,7 @@ module.exports = class extends Generator {
    * Copy all files from the origin into the destination and replace the placeholders.
    */
   writing() {
-    this._copyTemplateIntoDApps();
+    this._copyTemplate();
 
     console.log(`
       Scripts for deploying a registrar for ENS addresses have been added to your project.
@@ -33,10 +33,7 @@ module.exports = class extends Generator {
       You can also add the "deploy-registrar" or any subtask tasks from "./gulp/deploy-registrar.js" to your gulp tasks.
     `);
   }
-  /**
-   * Copy files from a path under the templates directory into the specific dapp folder
-   */
-  _copyTemplateIntoDApps() {
+  _copyTemplate() {
     this.fs.copyTpl(
       this.templatePath('**/{.[^.],}*'),
       this.destinationPath(`${ this.destinationRoot() }/`),

@@ -11,11 +11,8 @@ Example:
         package.json: Development packages installed by npm
         .gitignore: files that should be ignored by git
         .npmrc: disabled package.lock.json
-        lerna.json: management for nested lerna projects (needed for smart-agents, dapps, ...)
-        config/deployment.js: DBCP deployment configuration, have a look into the readme.md file for more details
 
 Sub commands:
-    yo evan:dapps : Will create a new dapp within the dapps folder.
     yo evan:profiles : Will create config scripts where you can setup your accounts and their relationships.
     yo evan:contract : Will create a new contract sample within the contracts folder.
     yo evan:smart-agent : Will create a new smart-agent within the edge-server folder.

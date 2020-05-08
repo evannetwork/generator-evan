@@ -8,6 +8,18 @@
 ### Deprecations
 
 
+## Version 1.13.0
+### Features
+- add `useIdentity` support
+
+### Fixes
+- fix `npx link-agents`
+
+### Deprecations
+- remove `business center` generator and helper libraries
+- remove `dapp` generator
+
+
 ## Version 1.12.3
 ### Fixes
 - update gulp build scripts to be compatible with nodejs 12

@@ -2,7 +2,7 @@ const gulp = require('gulp')
 const path = require('path')
 const fs = require('fs')
 
-gulp.task('link-agents', () => {
+function linkAgents(cb) {
   const plugins = path.resolve(process.cwd(),'node_modules/@evan.network/edge-server-seed/config/plugins.js')
   const source_plugins = '../../../../scripts/config/plugins.js'
   try {
@@ -32,5 +32,11 @@ gulp.task('link-agents', () => {
           console.log("ERROR linking plugin: ", err )
         }
       })
-    })
-});
+    });
+    cb();
+}
+
+linkAgents.displayName = 'link-agents';
+
+exports.linkAgents = linkAgents;
+exports.default = linkAgents;
